@@ -1,0 +1,20 @@
+﻿<Application x:Class="Cliente.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:Cliente"
+             StartupUri="src/View/LoadV.xaml">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <!--<materialDesign:BundledTheme BaseTheme="Light" PrimaryColor="DeepPurple" SecondaryColor="Lime" />-->
+
+                <ResourceDictionary Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign2.Defaults.xaml" x:Name="asda"/>
+                <ResourceDictionary Source="pack://application:,,,/Utilidades;component/Styles/Style_TextBoxPlus.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Utilidades;component/Styles/Style_Button.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Utilidades;component/Styles/Style_PasswordBoxPlus.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Cliente;component/src/Styles/StylesMainView.xaml"/>
+                <ResourceDictionary Source="pack://application:,,,/Cliente;component/src/Resource/DataTemplate.xaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

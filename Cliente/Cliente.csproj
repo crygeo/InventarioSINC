@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net9.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<UseWPF>true</UseWPF>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.7.25103.5738" />
+		<PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\..\Utilidades\Utilidades.csproj" />
+	</ItemGroup>
+	<ItemGroup>
+		<Resource Include="src\Img\loading-process.png">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Resource>
+		<Resource Include="src\Img\prismatic-globe-database-xnom187ixkelq5gn.jpg">
+			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
+		</Resource>
+	</ItemGroup>
+</Project>

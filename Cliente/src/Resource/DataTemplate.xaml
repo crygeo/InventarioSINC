@@ -1,0 +1,16 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:vm="clr-namespace:InventarioSINCliente.src.ViewModel"
+                    xmlns:view="clr-namespace:InventarioSINCliente.src.View">
+    
+    
+    
+    <DataTemplate DataType="{x:Type vm:PageRolesVM}">
+        <view:PageRolesV/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PageUsuarioVM}">
+        <view:PageUsuariosV/>
+    </DataTemplate>
+
+</ResourceDictionary>
