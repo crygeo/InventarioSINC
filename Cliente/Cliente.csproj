@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<OutputType>WinExe</OutputType>
+		<OutputType>Exe</OutputType>
 		<TargetFramework>net9.0-windows</TargetFramework>
 		<Nullable>enable</Nullable>
 		<ImplicitUsings>enable</ImplicitUsings>
@@ -10,11 +10,13 @@
 
 	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-		<PackageReference Include="Extended.Wpf.Toolkit" Version="4.7.25103.5738" />
-		<PackageReference Include="MaterialDesignThemes" Version="5.2.1" />
+		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.2" />
+		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 	<ItemGroup>
+		<ProjectReference Include="..\..\MaterialDesignInXamlToolkit\src\MaterialDesignThemes.Wpf\MaterialDesignThemes.Wpf.csproj" />
 		<ProjectReference Include="..\..\Utilidades\Utilidades.csproj" />
+		<ProjectReference Include="..\Shared\Shared.csproj" />
 	</ItemGroup>
 	<ItemGroup>
 		<Resource Include="src\Img\loading-process.png">
@@ -23,5 +25,38 @@
 		<Resource Include="src\Img\prismatic-globe-database-xnom187ixkelq5gn.jpg">
 			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
 		</Resource>
+	</ItemGroup>
+	<ItemGroup>
+	  <Compile Update="src\View\Dialog\ChangePassDialog.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	  <Compile Update="src\View\Dialog\ConfirmDialog.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	  <Compile Update="src\View\Dialog\RolDialog.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	  <Compile Update="src\View\Dialog\AccountDialog.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	  <Compile Update="src\View\Items\RolList.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	  <Compile Update="src\View\Items\RoltemB.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	</ItemGroup>
+	<ItemGroup>
+	  <None Update="App.config">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </None>
+	</ItemGroup>
+	<ItemGroup>
+	  <Page Update="src\View\Dialog\AccountDialog.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
+	  <Page Update="src\View\Dialog\ChangePassDialog.xaml">
+	    <SubType>Designer</SubType>
+	  </Page>
 	</ItemGroup>
 </Project>

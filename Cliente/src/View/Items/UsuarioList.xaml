@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="Cliente.src.View.Items.UsuarioList"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Cliente.src.View.Items"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type=local:UsuarioList}">
+
+    <Grid>
+        <ListBox ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                 SelectedItem="{Binding Item, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                 SelectionMode="Extended"
+                 d:ItemsSource="{d:SampleData ItemCount=3}"
+                 HorizontalAlignment="Stretch"
+                 HorizontalContentAlignment="Stretch">
+
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <local:UsuarioItemB Usuario="{Binding}"
+                        EditarUsuarioCommand="{Binding EditarUsuarioCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        EliminarUsuarioCommand="{Binding EliminarUsuarioCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        CambiarPasswordCommand="{Binding CambiarPasswordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        AsignarRolCommand="{Binding AsignarRolCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                    <Setter Property="IsSelected" Value="{Binding IsSelect, Mode=TwoWay}" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+
+        </ListBox>
+    </Grid>
+</UserControl>

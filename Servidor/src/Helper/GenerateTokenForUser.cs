@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -9,7 +10,7 @@ using Servidor.src.Objs;
 namespace Servidor.src.Helper
 {
 
-    public static class JwtHelper
+    public static class GenerateTokenForUser
     {
         private static readonly string SecretKey = "ClaveSuperSeguraDesdeConfiguracion"; // Cárgala desde appsettings.json o variables de entorno
         private static readonly byte[] Key = Encoding.UTF8.GetBytes(SecretKey);
@@ -57,7 +58,7 @@ namespace Servidor.src.Helper
         {
             var claims = new List<Claim>
         {
-            new Claim(ClaimTypes.NameIdentifier, usuario.Id),
+            new Claim(ClaimTypes.NameIdentifier, usuario.Id.ToString()),
             new Claim(ClaimTypes.Name, usuario.User),
             new Claim(ClaimTypes.Dns, usuario.Cedula),
             new Claim(ClaimTypes.MobilePhone, usuario.Celular),
@@ -67,7 +68,7 @@ namespace Servidor.src.Helper
             // Agregar roles
             foreach (var rol in usuario.Roles)
             {
-                claims.Add(new Claim(ClaimTypes.Role, rol));
+                claims.Add(new Claim(ClaimTypes.Role, rol.ToString()));
             }
 
             return claims;

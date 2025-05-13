@@ -1,0 +1,23 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Shared.Interfaces.ModelsBase
+{
+    public interface IClasificacion: IIdentifiable
+    {
+        IRecepcionCarga RecepcionCarga { get; }
+        ICalidad Calidad { get; set; }
+        float PesoDesecho { get; set; }
+        float PesoNeto { get; set; }
+        float PesoBruto { get; }
+        float Rendimiento { get; }
+        IReadOnlyList<IEmpaqueUnidad> UnidadList { get; }
+
+        void AgregarProducto(IEmpaqueUnidad empaqueUnidad);
+        void QuitarProducto(IEmpaqueUnidad empaqueUnidad);
+
+    }
+}

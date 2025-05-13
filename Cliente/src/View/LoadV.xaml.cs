@@ -1,5 +1,5 @@
-﻿using InventarioSINCliente.src.Services;
-using InventarioSINCliente.src.ViewModel;
+﻿using Cliente.src.ViewModel;
+using Cliente.src.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
 using System.Windows.Threading;
 
-namespace InventarioSINCliente.src.View
+namespace Cliente.src.View
 {
     /// <summary>
     /// Lógica de interacción para LoadView.xaml

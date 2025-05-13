@@ -1,48 +1,135 @@
-﻿<Window
-        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+﻿<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:InventarioSINCliente.src.View"
-        xmlns:viewModel="clr-namespace:InventarioSINCliente.src.ViewModel"
-        xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:local="clr-namespace:Cliente.src.View"
+        xmlns:viewModel="clr-namespace:Cliente.src.ViewModel"
+        xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+        xmlns:rules="clr-namespace:Cliente.src.Rules"
         xmlns:utils="clr-namespace:Utilidades.Controls;assembly=Utilidades"
-        x:Class="InventarioSINCliente.src.View.LoginV"
+        xmlns:conver="clr-namespace:Utilidades.Converters;assembly=Utilidades"
+        x:Class="Cliente.src.View.LoginV"
         mc:Ignorable="d"
-        Title="Login" Height="450" Width="800" d:DataContext="{d:DesignInstance Type=viewModel:LoginVM}"
+        Title="Login" 
+        Height="450" 
+        Width="800" 
+        d:DataContext="{d:DesignInstance Type=viewModel:LoginVM}"
+        WindowStartupLocation="CenterScreen"
+        Style="{StaticResource MaterialDesignWindow}"
+        ResizeMode="NoResize"
         >
 
     <Window.DataContext>
         <viewModel:LoginVM/>
     </Window.DataContext>
-    <Grid>
+    <Window.Resources>
+        <conver:InputBoxConverter x:Key="InputBoxConverter"/>
+    </Window.Resources>
+    <md:DialogHost Identifier="RootDialog">
+        <Grid>
 
-        <Grid.Background>
-            <ImageBrush ImageSource="../Img/prismatic-globe-database-xnom187ixkelq5gn.jpg"/>
-        </Grid.Background>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="3*" />
-            <ColumnDefinition Width="4*" />
-        </Grid.ColumnDefinitions>
+            <Grid.Background>
+                <ImageBrush ImageSource="../Img/prismatic-globe-database-xnom187ixkelq5gn.jpg"/>
+            </Grid.Background>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*" />
+                <ColumnDefinition Width="4*" />
+            </Grid.ColumnDefinitions>
 
-        <!-- Logo Section -->
-        <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-            <TextBlock Text="• SINClient" FontSize="36" FontWeight="Bold" Foreground="#55DB83"
+            <!-- Logo Section -->
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <TextBlock Text="• SINClient" 
+                       FontSize="36" 
+                       FontWeight="Bold"
+                       Style="{StaticResource MaterialDesignBodyLargeTextBlock}"
                        VerticalAlignment="Center" />
-        </StackPanel>
+            </StackPanel>
 
-        <!-- Form Section -->
-        <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="30">
-            <utils:TextBoxPlus Text="{Binding Usuario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource TextBoxPlusStyle1}" Placeholder="User" />
-            <utils:PasswordBoxPlus Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Style="{StaticResource PasswordBoxPlusStyle1}" Placeholder="Password"/>
+            <!-- Form Section -->
+            <md:Card Grid.Column="1" Margin="30" UniformCornerRadius="30" Background="#99323232">
 
-            <CheckBox x:Name="CheckRemember" Content="Remember" IsChecked="{Binding RememberMe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Foreground="White" HorizontalAlignment="Center" 
-                      Margin="10" Background="#55DB83" 
-                      FocusVisualStyle="{StaticResource CustomFocusStyle}" Style="{StaticResource MaterialDesignFilterChipCheckBox}"/>
-            <Button Style="{DynamicResource ButtonStyle1}" Content="Iniciar sesion" Height="50"
-                    Background="#5555DB83" Foreground="White"
-                    BorderBrush="Transparent" FontWeight="Bold"
-                    Cursor="Hand" Command="{Binding LoginCommand}"/>
-        </StackPanel>
-    </Grid>
+                <Grid  VerticalAlignment="Center"
+                   HorizontalAlignment="Center"
+                   Margin="30">
+
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <StackPanel Grid.Row="0"
+                        Margin="0,10"
+                        Orientation="Horizontal">
+
+                        <md:PackIcon Kind="Account" 
+                             Width="25" 
+                             Height="25"
+                             VerticalAlignment="Center"/>
+
+                        <TextBox Text="{Binding Usuario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InputBoxConverter}, ConverterParameter='NickName'}"
+                             MinWidth="200"
+                             Margin="10,0,0,0"
+                             Grid.Row="0"
+                             Grid.Column="1"
+                             md:HintAssist.Hint="Account"
+                             Style="{StaticResource MaterialDesignOutlinedTextBox}">
+                        </TextBox>
+
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal"
+                        Margin="0,10"
+                        Grid.Row="1">
+
+                        <md:PackIcon Kind="Key" 
+                             Width="25" 
+                             Height="25"
+                             VerticalAlignment="Center"/>
+
+                        <PasswordBox x:Name="PasswordBox"
+                                 Margin="10,0,0,0"
+                                 MinWidth="200"
+                                 md:HintAssist.Hint="Password"
+                                 md:PasswordBoxAssist.Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                 md:PasswordBoxAssist.IsPasswordRevealed="False"
+                                 md:HintAssist.HintPaddingBrush="#323232"
+                                 Style="{StaticResource MaterialDesignOutlinedRevealPasswordBox}">
+
+                        </PasswordBox>
+                    </StackPanel>
+
+                    <CheckBox Grid.Row="2"
+                          Margin="0,30,0,30"
+                          x:Name="CheckRemember" 
+                          Content="Remember" 
+                          IsChecked="{Binding RememberMe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                          Foreground="White" 
+                          HorizontalAlignment="Center" 
+                          Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}"
+                          FocusVisualStyle="{StaticResource CustomFocusStyle}"/>
+
+                    <Button Grid.Row="3"
+                        Height="40"
+                        Width="150"
+                        Grid.ColumnSpan="2"
+                        Command="{Binding LoginCommand}"
+                        PreviewKeyDown="Button_PreviewKeyDown"
+                        md:ButtonAssist.CornerRadius="20"
+                        Style="{StaticResource MaterialDesignRaisedButton}"
+                        FocusVisualStyle="{StaticResource CustomFocusStyle}">
+
+                        <TextBlock Text="Iniciar sesion" />
+                    </Button>
+
+
+                </Grid>
+            </md:Card>
+        </Grid>
+    </md:DialogHost>
 </Window>

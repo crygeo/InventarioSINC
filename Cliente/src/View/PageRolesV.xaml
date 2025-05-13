@@ -1,14 +1,71 @@
-﻿<Page x:Class="InventarioSINCliente.src.View.PageRolesV"
+﻿<Page x:Class="Cliente.src.View.PageRolesV"
       xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
       xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
       xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" 
+      xmlns:vm="clr-namespace:Cliente.src.ViewModel" 
+      xmlns:Convert="clr-namespace:Utilidades.Converters;assembly=Utilidades" 
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:InventarioSINCliente.src.View"
+      xmlns:local="clr-namespace:Cliente.src.View"
+      xmlns:item="clr-namespace:Cliente.src.View.Items"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
-      Title="PageRolesV">
+      Title="PageRolesV" d:DataContext="{d:DesignInstance Type=vm:PageRolesVM}">
+    <Page.Resources>
+        <Convert:NodoHierarchyConverter x:Key="ArbolConvert"/>
+    </Page.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="4*"/>
+            <ColumnDefinition Width="7*"/>
+        </Grid.ColumnDefinitions>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-    <Grid Background="red">
-        
+            <item:RolList ItemsSource="{Binding DataContext.Entitys, RelativeSource={RelativeSource AncestorType=Page}}"
+                          Item="{Binding DataContext.EntiteSelect, RelativeSource={RelativeSource AncestorType=Page}, Mode=TwoWay}"
+                          EditarItemCommand="{Binding DataContext.EditarEntityCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                          EliminarItemCommand="{Binding DataContext.EliminarEntityCommand, RelativeSource={RelativeSource AncestorType=Page}}"/>
+            <StackPanel Grid.Row="1" Background="Transparent" Orientation="Horizontal" HorizontalAlignment="Right">
+
+                <Button Style="{StaticResource MaterialDesignFloatingActionDarkButton}"
+                        Margin="0,10,10,10"
+                        md:ButtonProgressAssist.IsIndicatorVisible="{Binding ProgressVisible}"
+                        md:ButtonProgressAssist.Value="{Binding ProgressValue}"
+                        VerticalAlignment="Center" 
+                        HorizontalAlignment="Right"
+                        Command="{Binding DataContext.CargarEntityCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                        ToolTip="MaterialDesignFloatingActionDarkButton">
+                        <md:PackIcon Width="24"
+                                     Height="24"
+                                     Kind="Reload"/>
+
+                </Button>
+                <Button Style="{StaticResource MaterialDesignFloatingActionDarkButton}"
+                    VerticalAlignment="Center"
+                    Margin="0,10,10,10"
+                    HorizontalAlignment="Right"
+                    Command="{Binding DataContext.CrearEntityCommand, RelativeSource={RelativeSource AncestorType=Page}}"
+                    ToolTip="MaterialDesignFloatingActionDarkButton"
+                    >
+                    <md:PackIcon Width="30"
+                                 Height="30"
+                                 Kind="AccountMultiplePlus"/>
+                </Button>
+            </StackPanel>
+
+        </Grid>
+        <StackPanel Grid.Column="1">
+            <TreeView ItemsSource="{Binding EntiteSelect.Permisos, Converter={StaticResource ArbolConvert}}">
+                <TreeView.ItemTemplate>
+                    <HierarchicalDataTemplate ItemsSource="{Binding Hijos}">
+                        <TextBlock Text="{Binding Nombre}" />
+                    </HierarchicalDataTemplate>
+                </TreeView.ItemTemplate>
+            </TreeView>
+        </StackPanel>
     </Grid>
 </Page>

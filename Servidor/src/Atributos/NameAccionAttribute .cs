@@ -1,4 +1,6 @@
-﻿namespace Servidor.src.Atributos
+﻿using System;
+
+namespace Servidor.src.Atributos
 {
 
     [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]

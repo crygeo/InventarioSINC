@@ -1,16 +1,18 @@
 ﻿using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Bson;
-using Servidor.src.Objs.Interfaces;
+using Shared.Interfaces.ModelsBase;
+using Shared.Interfaces;
+using System.Collections.Generic;
 
 namespace Servidor.src.Objs
 {
-    public class Rol : IIdentifiable
+    public class Rol : IRol
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; } // ID del usuario
-        public string Nombre { get; set; } // Ejemplo: "Administrador", "Editor", "Usuario"
-        public List<string> Permisos { get; set; } = new List<string>(); // Ejemplo: ["Usuarios.Crear", "Usuarios.Eliminar"]
-
+        public string Id { get; set; } = string.Empty; // ID del usuario
+        public string Nombre { get; set; } = ""; // Ejemplo: "Administrador", "Editor", "Usuario"
+        public List<string> Permisos { get; set; } = []; // Ejemplo: ["Usuarios.Crear", "Usuarios.Eliminar"]
+        public bool IsAdmin { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using InventarioSINCliente.src.Services;
+﻿using Cliente.src.Services;
 using System.IO.IsolatedStorage;
 using System.IO;
 using System.Text;
@@ -12,8 +12,9 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Utilidades.Controls;
+using Cliente.src.ViewModel;
 
-namespace InventarioSINCliente.src.View
+namespace Cliente.src.View
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml
@@ -28,31 +29,35 @@ namespace InventarioSINCliente.src.View
             InitializeComponent();
             // Registrar el evento PreviewKeyDown a nivel de ventana
             this.PreviewKeyDown += Window_PreviewKeyDown;
-            
+
         }
-        
+
         // Evento que captura las teclas presionadas en la ventana
         private void Window_PreviewKeyDown(object sender, KeyEventArgs e)
         {
             // Si se presiona la tecla Enter
             if (e.Key == Key.Enter)
             {
-                // Evitar que la tecla Enter realice su comportamiento predeterminado
-                e.Handled = true;
-
-                // Intentamos mover el foco al siguiente control en la secuencia de tabulación
-                var request = new TraversalRequest(FocusNavigationDirection.Next);
-
-                // Intentar mover el foco al siguiente control
-                UIElement focusedElement = Keyboard.FocusedElement as UIElement;
-                if (focusedElement != null)
+                if (Keyboard.FocusedElement == PasswordBox)
                 {
-                    focusedElement.MoveFocus(request);
+                    var dt = (LoginVM)this.DataContext;
+                    if (dt != null) dt.LoginCommand.Execute(null);
                 }
             }
         }
 
-
+        private void Button_PreviewKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key == Key.Enter)
+            {
+                if (sender is Button button)
+                {
+                    // Evitar que la tecla Enter realice su comportamiento predeterminado
+                    e.Handled = true;
+                    button.Command?.Execute(null);
+                }
+            }
+        }
     }
 
 }

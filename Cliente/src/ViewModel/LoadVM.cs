@@ -1,6 +1,6 @@
-﻿using InventarioSINCliente.src.Services;
-using InventarioSINCliente.src.View;
-using InventarioSINCliente.src.WindowStrategy;
+﻿using Cliente.src.Services;
+using Cliente.src.View;
+using Cliente.src.WindowStrategy;
 using System;
 using System.Threading.Tasks;
 using System.Windows;
@@ -12,11 +12,10 @@ using Utilidades.Mvvm;
 using Utilidades.Services;
 using Utilidades.WindowStrategies;
 
-namespace InventarioSINCliente.src.ViewModel
+namespace Cliente.src.ViewModel
 {
     public class LoadVM : ViewModelBase
     {
-        protected override ModelBase Model { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
         private readonly AuthService _authService;
         private string _logText = string.Empty;

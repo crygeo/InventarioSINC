@@ -1,12 +1,12 @@
 ﻿using MongoDB.Driver;
 using Servidor.src.Objs;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace Servidor.src.Repositorios
 {
     public class RepositorioUsuario : RepositorioBase<Usuario>
     {
-
-        public override string NameCollection { get; set; } = "Usuarios";
 
         public RepositorioUsuario() : base()
         {
@@ -20,5 +20,16 @@ namespace Servidor.src.Repositorios
         {
             return await Collection.Find(u => u.User == user).FirstOrDefaultAsync();
         }
+
+        public async Task<bool> ActualizarPassword(string idUser, string newPassword)
+        {
+            string hash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+
+            var filter = Builders<Usuario>.Filter.Eq(u => u.Id, idUser);
+            var update = Builders<Usuario>.Update.Set(u => u.Password, hash);
+            var result = await Collection.UpdateOneAsync(filter, update);
+            return result.ModifiedCount > 0;
+        }
+
     }
 }

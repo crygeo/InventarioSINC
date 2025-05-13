@@ -1,4 +1,4 @@
-﻿using InventarioSINCliente.src.ViewModel;
+﻿using Cliente.src.ViewModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 using Utilidades.Command;
 using Utilidades.Mvvm;
 
-namespace InventarioSINCliente.src.Command
+namespace Cliente.src.Command
 {
     public class ChangedPageC : CommandBase
     {

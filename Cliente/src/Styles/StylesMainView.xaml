@@ -8,6 +8,7 @@
     <Style x:Key="RadioButtonStyle1" TargetType="{x:Type RadioButton}">
         <Setter Property="Foreground" Value="{StaticResource MainView_Foreground_1}"/>
         <Setter Property="FontSize" Value="14"/>
+        <Setter Property="GroupName" Value="Pages"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type RadioButton}">
@@ -112,7 +113,7 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Control">
                     <Border Background="Transparent"
-                        BorderBrush="#DC7456"
+                        BorderBrush="{StaticResource MainView_Foreground_1}"
                         BorderThickness="2"
                         CornerRadius="15"
                         Opacity="0">

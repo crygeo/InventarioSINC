@@ -13,7 +13,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
-namespace InventarioSINCliente.src.View
+namespace Cliente.src.View
 {
     /// <summary>
     /// Lógica de interacción para PageRolesV.xaml

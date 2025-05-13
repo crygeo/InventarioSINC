@@ -1,7 +1,8 @@
-﻿using InventarioSINCliente.src.Model;
-using InventarioSINCliente.src.Services;
-using InventarioSINCliente.src.View;
-using InventarioSINCliente.src.WindowStrategy;
+﻿using Cliente.src.Services;
+using Cliente.src.View;
+using Cliente.src.View.Dialog;
+using Cliente.src.WindowStrategy;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,13 +14,11 @@ using Utilidades.Mvvm;
 using Utilidades.Services;
 using Utilidades.WindowStrategies;
 
-namespace InventarioSINCliente.src.ViewModel
+namespace Cliente.src.ViewModel
 {
     public class LoginVM : ViewModelBase
     {
-        protected override ModelBase Model { get; set; } = new LoginM();
-        private LoginM LoginM => (LoginM)Model;
-
+        private AuthService _authService;
         private string _usuario;
         private string _password;
         private bool _rememberMe;
@@ -45,6 +44,7 @@ namespace InventarioSINCliente.src.ViewModel
 
         public LoginVM()
         {
+            _authService = new AuthService();
             _password = string.Empty;
             _usuario = string.Empty;
             _rememberMe = false;
@@ -55,31 +55,65 @@ namespace InventarioSINCliente.src.ViewModel
 
         private async void Login(object obj)
         {
-            // Aqui va la logica de login
-            if (await LoginM.AuthService.LoginAsync(Usuario, Password))
+            ProgressDialog progressDialog = new();
+            MessageDialog successDialog = new()
             {
-                MessageBox.Show("¡Inicio de sesión exitoso!", "Éxito", MessageBoxButton.OK, MessageBoxImage.Information);
-                if (RememberMe == true)
-                    // Guardar el usuario y contraseña en el almacenamiento local
-                    await LoginM.AuthService.GuardarCredenciales(Usuario, Password, RememberMe);
+                Message = "¡Inicio de sesión exitoso!"
+            };
+
+
+            _ = DialogHost.Show(progressDialog, "RootDialog");
+
+            try
+            {
+                var result = await _authService.LoginAsync(Usuario, Password);
+                // Lógica de login
+                if (result.Item1)
+                {
+                    if (RememberMe)
+                        await AuthService.GuardarCredenciales(Usuario, Password, RememberMe);
+                    else
+                        await AuthService.BorrarCredenciales();
+
+                    // Cerrar ProgressDialog antes de mostrar el mensaje de éxito
+                    DialogHost.Close("RootDialog");
+
+                    // Mostrar mensaje de éxito
+                    await DialogHost.Show(successDialog, "RootDialog");
+
+                    // Abrir la ventana principal y cerrar la de login
+                    MainWindow.OpenWindow();
+                    NavigationService.CloseWindow<LoginV>();
+                }
                 else
-                    // Borrar las credenciales guardadas
-                    await LoginM.AuthService.BorrarCredenciales();
+                {
+                    // Cerrar ProgressDialog antes de mostrar el mensaje de error
+                    DialogHost.Close("RootDialog");
 
-                MainWindow.OpenWindow();
-                NavigationService.CloseWindow<LoginV>();
-
+                    var dialogError = new MessageDialog
+                    {
+                        Message = result.Item2
+                    };
+                    // Mostrar mensaje de error
+                    await DialogHost.Show(dialogError, "RootDialog");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                MessageBox.Show("Usuario o contraseña incorrectos.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-            }
+                DialogHost.Close("RootDialog");
 
+                MessageDialog exceptionDialog = new()
+                {
+                    Message = $"Error al iniciar sesión: {ex.Message}"
+                };
+                await DialogHost.Show(exceptionDialog, "RootDialog");
+            }
         }
+
 
         private async void CargarDatos()
         {
-            var dat = await LoginM.AuthService.CargarCredenciales();
+            var dat = await AuthService.CargarCredenciales();
             if (dat.Item3)
             {
                 Usuario = dat.Item1;
@@ -87,5 +121,7 @@ namespace InventarioSINCliente.src.ViewModel
                 RememberMe = dat.Item3;
             }
         }
+
+
     }
 }
