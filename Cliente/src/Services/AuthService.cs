@@ -27,7 +27,7 @@ namespace InventarioSINCliente.src.Services
 
             var jsonContent = new StringContent(JsonSerializer.Serialize(loginData), Encoding.UTF8, "application/json");
 
-            HttpResponseMessage response = await _httpClient.PostAsync($"{API_URL}/Login", jsonContent);
+            var client = GetClient();
 
             if (response.IsSuccessStatusCode)
             {
