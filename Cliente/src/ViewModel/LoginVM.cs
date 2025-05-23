@@ -122,6 +122,9 @@ namespace Cliente.src.ViewModel
             }
         }
 
-
+        protected override void UpdateChanged()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

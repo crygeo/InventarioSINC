@@ -22,7 +22,6 @@ namespace Cliente.src.ViewModel
         public ICommand AsignarRolCommand { get; }
 
         public override ServiceBase<Usuario> ServicioBase => UsuarioService.Instance;
-        public override ObservableCollection<Usuario> Entitys => ServicioBase.Collection;
 
 
         // Constructor, inicializa el servicio y carga los usuarios
@@ -35,7 +34,7 @@ namespace Cliente.src.ViewModel
 
         private async void CambiarPassword(object arg)
         {
-            if (EntiteSelect == null)
+            if (EntitySelect == null)
                 return; // No hay usuario seleccionado, salir del método
 
             var changedPassword = new ChangePassDialog
@@ -49,8 +48,8 @@ namespace Cliente.src.ViewModel
                         var progressDialog = new ProgressDialog();
                         await DialogHost.Show(progressDialog, "MainView", openedEventHandler: async (sender, args) =>
                         {
-                            var result = await UsuarioService.Instance.ChangePasswordAsync(EntiteSelect.Id, changePass.OldPassword, changePass.NewPassword);
-                            ValidarRespuesta(result);
+                            var result = await UsuarioService.Instance.ChangePasswordAsync(EntitySelect.Id, changePass.OldPassword, changePass.NewPassword);
+                            await DialogService.ValidarRespuesta(result);
                             DialogHost.Close("MainView"); // Cierra el diálogo de progreso
                         });
                     }
@@ -63,20 +62,20 @@ namespace Cliente.src.ViewModel
         }
         private async void AsignarRol(object arg)
         {
-            if (EntiteSelect == null)
+            if (EntitySelect == null)
                 return; // No hay usuario seleccionado, salir del método
 
-            if(arg is not Rol rol)
+            if (arg is not Rol rol)
                 return; // No hay rol seleccionado, salir del método
 
-            var result = await UsuarioService.Instance.AsignarRol(EntiteSelect.Id, rol.Id);
-            ValidarRespuesta(result);
-            if(result.Item1)
+            var result = await UsuarioService.Instance.AsignarRol(EntitySelect.Id, rol.Id);
+            await DialogService.ValidarRespuesta(result);
+            if (result.Entity)
                 rol.IsSelect = !rol.IsSelect; // Cambia el estado de selección del rol
 
         }
 
-        public async override void CrearEnttiy()
+        public async override Task CrearEntityAsync()
         {
             var usuarioDialog = new UsuarioDialog
             {
@@ -84,31 +83,23 @@ namespace Cliente.src.ViewModel
                 {
                     if (a is Usuario user)
                     {
-                        DialogHost.Close("MainView"); // Cierra el diálogo de creación después de confirmar
-                        //await Task.Delay(300);
-
-                        var progressDialog = new ProgressDialog();
-                        await DialogHost.Show(progressDialog, "MainView", openedEventHandler: async (sender, args) =>
+                        await DialogService.MostrarDialogoProgreso(async () =>
                         {
                             var result = await ServicioBase.CreateAsync(user);
-                            ValidarRespuesta(result);
-                            DialogHost.Close("MainView"); // Cierra el diálogo de progreso
+                            await DialogService.ValidarRespuesta(result); // Aquí sigue funcionando tu mensaje
+                            return result;
                         });
-
                     }
                 }),
                 Usuario = new Usuario() { FechaNacimiento = DateTime.Today },
                 TextHeader = "Nuevo Usuario"
             };
 
-            await DialogHost.Show(usuarioDialog, "MainView");
+            await DialogService.MostrarDialogo(usuarioDialog);
         }
-
-        public async override void EditarEntity()
+        public async override Task EditarEntityAsync()
         {
-            var usuarioSeleccionado = Entitys.FirstOrDefault(user => user.IsSelect);
-
-            if (usuarioSeleccionado == null)
+            if (EntitySelect == null)
                 return; // No hay usuario seleccionado, salir del método
 
             var usuarioDialog = new UsuarioDialog
@@ -117,31 +108,23 @@ namespace Cliente.src.ViewModel
                 {
                     if (a is Usuario user)
                     {
-                        DialogHost.Close("MainView"); // Cierra el diálogo de edición
-                        //await Task.Delay(300);
-
-                        var progressDialog = new ProgressDialog();
-                        await DialogHost.Show(progressDialog, "MainView", openedEventHandler: async (sender, args) =>
+                        await DialogService.MostrarDialogoProgreso(async () =>
                         {
                             var result = await ServicioBase.UpdateAsync(user.Id, user);
-                            ValidarRespuesta(result);
-                            DialogHost.Close("MainView"); // Cierra el diálogo progreso
+                            await DialogService.ValidarRespuesta(result); // Aquí sigue funcionando tu mensaje
+                            return result;
                         });
-
                     }
                 }),
-                Usuario = usuarioSeleccionado.Clone(),
+                Usuario = EntitySelect.Clone(),
                 TextHeader = "Editar Usuario"
             };
 
-            await DialogHost.Show(usuarioDialog, "MainView");
+            await DialogService.MostrarDialogo(usuarioDialog);
         }
-
-        public async override void DeleteEntity()
+        public async override Task DeleteEntityAsync()
         {
-            var usuariosSeleccionados = Entitys.Where(user => user.IsSelect).ToList();
-
-            if (usuariosSeleccionados.Count == 0)
+            if (EntitySelect == null)
                 return; // No hay usuarios seleccionados, salir del método
 
             var confirmDialog = new ConfirmDialog
@@ -150,27 +133,23 @@ namespace Cliente.src.ViewModel
                 Message = "¿Estás seguro de que quieres eliminar los usuarios seleccionados?",
                 AceptedCommand = new RelayCommand(async (_) =>
                 {
-                    DialogHost.Close("MainView"); // Cierra el diálogo de confirmación
-                    //await Task.Delay(300);
 
-                    var progressDialog = new ProgressDialog();
-
-                    await DialogHost.Show(progressDialog, "MainView", openedEventHandler: async (sender, args) =>
+                    await DialogService.MostrarDialogoProgreso(async () =>
                     {
-                        foreach (var usuario in usuariosSeleccionados)
-                        {
-                            var result = await ServicioBase.DeleteAsync(usuario.Id);
-                            DialogHost.Close("MainView"); // Cierra el diálogo progreso
-
-                            ValidarRespuesta(result);
-                            await Task.Delay(100);
-                        }
+                        var result = await ServicioBase.DeleteAsync(EntitySelect.Id);
+                        await DialogService.ValidarRespuesta(result);
+                        return result;
                     });
 
                 })
             };
 
-            await DialogHost.Show(confirmDialog, "MainView");
+            await DialogService.MostrarDialogo(confirmDialog);
+        }
+
+        protected override void UpdateChanged()
+        {
+            throw new NotImplementedException();
         }
     }
 }

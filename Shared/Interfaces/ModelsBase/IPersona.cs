@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface IPersona : IIdentifiable
+    public interface IPersona
     {
         string PrimerNombre { get; }
         string SegundoNombre { get; }

@@ -98,6 +98,7 @@
                                  md:HintAssist.Hint="Password"
                                  md:PasswordBoxAssist.Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
                                  md:PasswordBoxAssist.IsPasswordRevealed="False"
+                                 md:PasswordBoxAssist.IsRevealButtonTabStop="False"
                                  md:HintAssist.HintPaddingBrush="#323232"
                                  Style="{StaticResource MaterialDesignOutlinedRevealPasswordBox}">
 

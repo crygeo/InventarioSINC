@@ -13,8 +13,9 @@ namespace Shared.Interfaces.ModelsBase
         float PesoDesecho { get; set; }
         float PesoNeto { get; set; }
         float PesoBruto { get; }
+        float PesoBrutoProcesado { get; }
         float Rendimiento { get; }
-        IReadOnlyList<IEmpaqueUnidad> UnidadList { get; }
+        IReadOnlyList<ICoche> CochesList { get; }
 
         void AgregarProducto(IEmpaqueUnidad empaqueUnidad);
         void QuitarProducto(IEmpaqueUnidad empaqueUnidad);

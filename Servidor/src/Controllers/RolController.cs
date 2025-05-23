@@ -11,7 +11,7 @@ namespace Servidor.src.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RolesController(ServiceRol servicioRol) : BaseController<Rol>(servicioRol)
+    public class RolController(ServiceRol servicioRol) : BaseController<Rol>(servicioRol)
     {
         [HttpGet("Perms")]
         public async Task<ActionResult> GetPermss()

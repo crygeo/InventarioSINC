@@ -4,11 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Utilidades.Interfaces;
 using Utilidades.Mvvm;
 
 namespace Cliente.src.Model
 {
-    public class ItemNavigationM : ViewModelBase
+    public class ItemNavigationM : NotifyProperty, IItemNav
     {
         public required string Title { get; set; }
         public PackIconKind SelectedIcon { get; set; }
@@ -23,6 +24,16 @@ namespace Cliente.src.Model
         {
             get { return _notification; }
             set { SetProperty(ref _notification, value); }
+        }
+
+        public override string ToString()
+        {
+            return Title;
+        }
+
+        protected override void UpdateChanged()
+        {
+            throw new NotImplementedException();
         }
     }
 }

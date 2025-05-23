@@ -3,7 +3,6 @@ using MongoDB.Driver;
 using Servidor.src.Objs;
 using Servidor.src.Repositorios;
 using Shared.Interfaces;
-using Shared.Interfaces.Client;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

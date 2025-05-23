@@ -20,10 +20,6 @@ namespace Servidor.src.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
-    public class EmpresaController(ServiceEmpresa servicio) : BaseController<IEmpresa>(servicio) { }
-
-    [ApiController]
-    [Route("api/[controller]")]
     public class TallaController(ServiceTalla servicio) : BaseController<ITalla>(servicio) { }
 
     [ApiController]

@@ -2,7 +2,6 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Shared.Interfaces;
-using Shared.Interfaces.Client;
 using Shared.Interfaces.ModelsBase;
 using System;
 using System.Collections.Generic;
@@ -14,7 +13,7 @@ using Utilidades.Mvvm;
 
 namespace Cliente.src.Model
 {
-    public class Usuario : NotifyPropertyChanged, IUsuario, ISelectable, IUpdate
+    public class Usuario : ModelBase<IUsuario>, IUsuario
     {
         private string _primerNombre = "";
         public string PrimerNombre
@@ -86,7 +85,7 @@ namespace Cliente.src.Model
             set => SetProperty(ref _roles, value);
         }
         private string _id = string.Empty;
-        public string Id
+        public override string Id
         {
             get => _id;
             set => SetProperty(ref _id, value);
@@ -96,26 +95,25 @@ namespace Cliente.src.Model
         public string NombreAndApellido { get => $"{PrimerNombre} {PrimerApellido}"; set { } }
 
 
-        private bool _isSelectable = true;
-        public bool IsSelectable { get => _isSelectable; set => SetProperty(ref _isSelectable, value); }
-
-        public bool _isSelect = false;
-        public bool IsSelect { get => _isSelect; set => SetProperty(ref _isSelect, value); }
-
-        public void Update(IIdentifiable identity)
+        public override void Update(IIdentifiable identity)
         {
-            if (identity is IUsuario usuario)
-            {
-                PrimerNombre = usuario.PrimerNombre;
-                SegundoNombre = usuario.SegundoNombre;
-                PrimerApellido = usuario.PrimerApellido;
-                SegundoApellido = usuario.SegundoApellido;
-                Cedula = usuario.Cedula;
-                Celular = usuario.Celular;
-                FechaNacimiento = usuario.FechaNacimiento;
-                User = usuario.User;
-                Roles = usuario.Roles;
-            }
+            if (identity is not IUsuario user)
+                throw new ArgumentException("El objeto no es un usuario");
+
+            PrimerNombre = user.PrimerNombre;
+            SegundoNombre = user.SegundoNombre;
+            PrimerApellido = user.PrimerApellido;
+            SegundoApellido = user.SegundoApellido;
+            Cedula = user.Cedula;
+            Celular = user.Celular;
+            FechaNacimiento = user.FechaNacimiento;
+            User = user.User;
+            Roles = user.Roles;
+        }
+
+        protected override void UpdateChanged()
+        {
+            throw new NotImplementedException();
         }
     }
 }

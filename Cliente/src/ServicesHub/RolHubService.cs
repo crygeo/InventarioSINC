@@ -8,12 +8,7 @@ namespace Cliente.src.ServicesHub
 {
     public class RolHubService : HubServiceBase<Rol>
     {
-        public override ObservableCollection<Rol> Collection { get; }
-
-        public RolHubService(ObservableCollection<Rol> collection) : base()
-        {
-            Collection = collection;
-        }
+        public override ObservableCollection<Rol> Collection { get; } = new();
 
     }
 }

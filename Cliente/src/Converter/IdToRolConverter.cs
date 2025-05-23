@@ -1,6 +1,5 @@
 ﻿using Cliente.src.Model;
 using Cliente.src.Services;
-using Shared.Interfaces.Client;
 using System;
 using System.Collections.Generic;
 using System.Globalization;

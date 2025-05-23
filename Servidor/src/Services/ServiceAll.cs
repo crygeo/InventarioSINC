@@ -24,17 +24,7 @@ namespace Servidor.src.Services
             HubService = hubService;
         }
     }
-    public class ServiceEmpresa : ServiceBase<IEmpresa>
-    {
-        public override IRepository<IEmpresa> Repository { get; } = new RepositorioEmpresa();
-        public override IHubService<IEmpresa> HubService { get; }
-
-        public ServiceEmpresa(HubsServiceEmpresa hubService)
-        {
-            HubService = hubService;
-        }
-    }
-
+    
     public class ServiceTalla : ServiceBase<ITalla>
     {
         public override IRepository<ITalla> Repository { get; } = new RepositorioTalla();

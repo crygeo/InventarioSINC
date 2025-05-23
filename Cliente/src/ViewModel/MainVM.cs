@@ -13,12 +13,14 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Utilidades.Command;
+using Utilidades.Interfaces;
 using Utilidades.Mvvm;
 
 namespace Cliente.src.ViewModel
 {
-    public class MainVM : ViewModelBase
+    public class MainVM : ViewModelBase, IBarNavegacion
     {
+        private DialogService DialogService => DialogService.Instance;
         public UsuarioService ServicioUsuario => UsuarioService.Instance;
 
         private ViewModelBase _pageSelectViewModel = null!;
@@ -28,8 +30,8 @@ namespace Cliente.src.ViewModel
             set => SetProperty(ref _pageSelectViewModel, value);
         }
 
-        private ItemNavigationM _selectedItemNav = null!;
-        public ItemNavigationM SelectedItemNav
+        private IItemNav _selectedItemNav = null!;
+        public IItemNav SelectedItemNav
         {
             get => _selectedItemNav;
             set
@@ -43,23 +45,28 @@ namespace Cliente.src.ViewModel
 
         public ICommand AccountView { get; set; }
 
-        public List<ItemNavigationM> ListItemsNav { get; } = [
-            new()
-        {
-            Title = "Usuarios",
-            SelectedIcon = PackIconKind.AccountCog,
-            UnselectedIcon = PackIconKind.AccountCogOutline,
-            Notification = 1,
-            Page = new PageUsuarioVM()
-        },
-        new()
-        {
-            Title = "Roles",
-            SelectedIcon = PackIconKind.ShieldAccount,
-            UnselectedIcon = PackIconKind.ShieldAccountOutline,
-            Page = new PageRolesVM()
-        }
-        ];
+        public List<IItemNav> ListItemsNav { get; } = [
+            new ItemNavigationM() {
+                Title = "Usuarios",
+                SelectedIcon = PackIconKind.AccountCog,
+                UnselectedIcon = PackIconKind.AccountCogOutline,
+                Notification = 1,
+                Page = new PageUsuarioVM()
+            },
+            new ItemNavigationM() {
+                Title = "Roles",
+                SelectedIcon = PackIconKind.ShieldAccount,
+                UnselectedIcon = PackIconKind.ShieldAccountOutline,
+                Page = new PageRolesVM()
+            },
+            new ItemNavigationM() {
+                Title = "Propiedades",
+                SelectedIcon = PackIconKind.TablePlus,
+                UnselectedIcon = PackIconKind.TablePlus,
+                Page = new PageProcesosVM()
+            }
+            ];
+
 
         public MainVM()
         {
@@ -70,24 +77,21 @@ namespace Cliente.src.ViewModel
 
         private async void VerPerfilUsuario(object parm)
         {
-            var usuario = await ServicioUsuario.GetThisUser();
-            if (usuario.Item1 == null)
-            {
-                MessageDialog messageDialog = new()
-                {
-                    Message = usuario.Item2,
-                };
-                await DialogHost.Show(messageDialog, "MainView");
+            var result = await ServicioUsuario.GetThisUser();
+
+            await DialogService.ValidarRespuesta(result);
+
+            if (result.Entity == null)
                 return;
-            }
+
             var dialog = new AccountDialog()
             {
-                Usuario = usuario.Item1,
+                Usuario = result.Entity,
                 CloseSeccionCommand = new RelayCommand(ConfirmarCierreSeccion),
                 ChangedPasswordCommand = new RelayCommand(CambiarPassword),
             };
 
-            await DialogHost.Show(dialog, "MainView");
+            await DialogService.MostrarDialogo(dialog);
         }
 
         private async void ConfirmarCierreSeccion(object parm)
@@ -105,9 +109,7 @@ namespace Cliente.src.ViewModel
                 CancelCommand = new RelayCommand(VerPerfilUsuario)
             };
 
-            DialogHost.Close("MainView");
-            await Task.Delay(300);
-            await DialogHost.Show(confirmDialog, "MainView");
+            await DialogService.MostrarDialogo(confirmDialog);
         }
 
         private async void CambiarPassword(object param)
@@ -121,40 +123,26 @@ namespace Cliente.src.ViewModel
                     {
                         if (a is ChangePassDialog changePass)
                         {
-                            DialogHost.Close("MainView"); // Cierra el diálogo de cambio de contraseña
-                                                          //await Task.Delay(300);
-                            var progressDialog = new ProgressDialog();
-                            await DialogHost.Show(progressDialog, "MainView", openedEventHandler: async (sender, args) =>
+                            await DialogService.MostrarDialogoProgreso(async () =>
                             {
                                 var result = await UsuarioService.Instance.ChangePasswordAsync(user.Id, changePass.OldPassword, changePass.NewPassword);
-                                ValidarRespuesta(result);
-                                DialogHost.Close("MainView"); // Cierra el diálogo de progreso
+                                await DialogService.ValidarRespuesta(result);
+                                return result;
+
                             });
                         }
                     }),
                     OldPasswordRequired = Visibility.Visible,
                 };
 
-                DialogHost.Close("MainView");
-                await Task.Delay(300);
-                await DialogHost.Show(changedPassword, "MainView");
+                await DialogService.MostrarDialogo(changedPassword);
             }
 
         }
-        public async void ValidarRespuesta((bool, string) resp)
-        {
-            if (resp.Item1)
-                return;
-            else
-            {
-                var errorDialog = new MessageDialog
-                {
-                    Message = resp.Item2,
-                };
 
-                await Task.Delay(300);
-                await DialogHost.Show(errorDialog, "MainView");
-            }
+        protected override void UpdateChanged()
+        {
+            throw new NotImplementedException();
         }
     }
 

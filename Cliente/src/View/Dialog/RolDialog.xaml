@@ -17,49 +17,51 @@
         <conver:NodoHierarchyConverter x:Key="ArbolConvert"/>
 
     </UserControl.Resources>
-    <Grid Background="Transparent">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-        </Grid.ColumnDefinitions>
+    <md:DialogHost Identifier="DialogSecundario">
+        <Grid Background="Transparent">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+            </Grid.ColumnDefinitions>
 
-        <TextBlock Text="{Binding TextHeader, RelativeSource={RelativeSource AncestorType=UserControl}}" FontSize="16" FontWeight="Bold"
+            <TextBlock Text="{Binding TextHeader, RelativeSource={RelativeSource AncestorType=UserControl}}" FontSize="16" FontWeight="Bold"
                    Grid.Row="0" HorizontalAlignment="Center" Margin="10" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
 
-        <TextBox Text="{Binding Item.Nombre, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" MaxLength="20" 
+            <TextBox Text="{Binding Item.Nombre, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" MaxLength="20" 
                  md:HintAssist.Hint="Nombre de rol"
                  Grid.Row="1" MinWidth="150" Margin="10,10,10,20" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
 
-        <StackPanel Grid.Row="2" >
-            <TextBlock Text="Permisos: " Margin="10,0,0,10"/>
-            <TreeView  ItemsSource="{Binding ListPerms, RelativeSource={RelativeSource AncestorType=UserControl}}" MaxHeight="320" >
-                <TreeView.ItemTemplate>
-                    <HierarchicalDataTemplate  ItemsSource="{Binding Hijos}">
-                        <StackPanel Orientation="Horizontal">
-                            <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center">
+            <StackPanel Grid.Row="2" >
+                <TextBlock Text="Permisos: " Margin="10,0,0,10"/>
+                <TreeView  ItemsSource="{Binding ListPerms, RelativeSource={RelativeSource AncestorType=UserControl}}" MaxHeight="320" >
+                    <TreeView.ItemTemplate>
+                        <HierarchicalDataTemplate  ItemsSource="{Binding Hijos}">
+                            <StackPanel Orientation="Horizontal">
+                                <CheckBox IsChecked="{Binding IsChecked, Mode=TwoWay}" VerticalAlignment="Center">
 
-                                <TextBlock Text="{Binding Nombre}" Margin="5,0"/>
-                            </CheckBox>
-                        </StackPanel>
-                    </HierarchicalDataTemplate>
-                </TreeView.ItemTemplate>
-            </TreeView>
-        </StackPanel>
-        <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,15">
+                                    <TextBlock Text="{Binding Nombre}" Margin="5,0"/>
+                                </CheckBox>
+                            </StackPanel>
+                        </HierarchicalDataTemplate>
+                    </TreeView.ItemTemplate>
+                </TreeView>
+            </StackPanel>
+            <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center" Margin="0,15">
 
-            <Button Content="Cancelar" 
+                <Button Content="Cancelar" 
                     Command="{x:Static md:DialogHost.CloseDialogCommand}" 
                     Width="100"
                     Margin="10,0"/>
 
-            <Button Content="Guardar" 
+                <Button Content="Guardar" 
                     Click="Button_Click"
                     Margin="10,0"
                     Width="100" />
-        </StackPanel>
-    </Grid>
+            </StackPanel>
+        </Grid>
+    </md:DialogHost>
 </UserControl>

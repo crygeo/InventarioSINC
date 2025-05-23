@@ -7,6 +7,9 @@ using Cliente.src.Model;
 using Cliente.src.ServicesHub;
 using Microsoft.VisualBasic;
 using System.Collections.ObjectModel;
+using Shared.ObjectsResponse;
+using Utilidades.Interfaces;
+using Cliente.src.Extencions;
 
 namespace Cliente.src.Services
 {
@@ -15,35 +18,22 @@ namespace Cliente.src.Services
         private static readonly Lazy<RolService> _instance = new(() => new RolService());
         public static RolService Instance => _instance.Value;
 
-        public override HubServiceBase<Rol> HubService { get; }
-
-        public override string BaseUrl { get; } = $"{Config.FullUrl}/Roles";
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="collection">Instancia de una collecion para la sincronizacion de los datos.</param>
-        public RolService()
-        {
-            HubService = new RolHubService(Collection);
-        }
+        public RolService() : base(new RolHubService()) { }
 
         public Rol? ObtenerPorId(string idRol) => Collection.FirstOrDefault((r) => r.Id == idRol);
         public async Task InicializarAsync() => await InitAsync(); // ✅ Se ejecuta después de que `HubService` ya esté listo
 
-        public async Task<(List<string>, string)> GetAllPermisos()
+        public async Task<IResultResponse<List<string>>> GetAllPermisos()
         {
             var client = GetClient();
             var request = await GetRequest(HttpMethod.Get, $"{BaseUrl}/Perms");
             var response = await client.SendAsync(request);
 
-            var result = await ManejarErrores(response);
-            
-            if (result.Item1) return ([], result.Item2);
+            if (!response.IsSuccessStatusCode)
+                return await HandleError<List<string>>(response);
 
-            var json = await response.Content.ReadAsStringAsync();
-            var datos = JsonConvert.DeserializeObject<List<string>>(json);
-            return (datos ?? [], " ");
+            return await JsonHelper.TryDeserializeAsync<List<string>>(response, "Permisos cargados correctamente");
         }
+
     }
 }

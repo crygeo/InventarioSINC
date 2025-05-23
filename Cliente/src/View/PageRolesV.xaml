@@ -26,7 +26,7 @@
             </Grid.RowDefinitions>
 
             <item:RolList ItemsSource="{Binding DataContext.Entitys, RelativeSource={RelativeSource AncestorType=Page}}"
-                          Item="{Binding DataContext.EntiteSelect, RelativeSource={RelativeSource AncestorType=Page}, Mode=TwoWay}"
+                          Item="{Binding DataContext.EntitySelect, RelativeSource={RelativeSource AncestorType=Page}, Mode=TwoWay}"
                           EditarItemCommand="{Binding DataContext.EditarEntityCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                           EliminarItemCommand="{Binding DataContext.EliminarEntityCommand, RelativeSource={RelativeSource AncestorType=Page}}"/>
             <StackPanel Grid.Row="1" Background="Transparent" Orientation="Horizontal" HorizontalAlignment="Right">
@@ -59,7 +59,7 @@
 
         </Grid>
         <StackPanel Grid.Column="1">
-            <TreeView ItemsSource="{Binding EntiteSelect.Permisos, Converter={StaticResource ArbolConvert}}">
+            <TreeView ItemsSource="{Binding EntitySelect.Permisos, Converter={StaticResource ArbolConvert}}">
                 <TreeView.ItemTemplate>
                     <HierarchicalDataTemplate ItemsSource="{Binding Hijos}">
                         <TextBlock Text="{Binding Nombre}" />

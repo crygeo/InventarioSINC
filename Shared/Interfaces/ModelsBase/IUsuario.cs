@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface IUsuario : IPersona
+    public interface IUsuario : IPersona, IIdentifiable
     {
         string User { get; set; }
         string Password { get; set; }

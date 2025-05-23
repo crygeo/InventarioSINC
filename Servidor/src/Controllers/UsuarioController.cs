@@ -10,27 +10,31 @@ using System.Linq;
 using Servidor.src.Atributos;
 using Servidor.src.Helper;
 using System;
+using Shared.Response;
+using Shared.ObjectsResponse;
 
 namespace Servidor.src.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsuariosController(ServiceUsuario servicioUsuario) : BaseController<Usuario>(servicioUsuario)
+    public class UsuarioController(ServiceUsuario servicioUsuario) : BaseController<Usuario>(servicioUsuario)
     {
         [HttpGet("this")]
         public async Task<IActionResult> GetThisUser()
         {
             string userId = User.Claims.FirstOrDefault()?.Value ?? "";
 
-            if (userId == null)
+            if (string.IsNullOrWhiteSpace(userId))
             {
-                return Unauthorized();
+                return Unauthorized(new ErrorResponse("No se pudo identificar al usuario actual."));
             }
+
             var usuario = await servicioUsuario.GetByIdAsync(userId);
             if (usuario == null)
             {
-                return NotFound();
+                return NotFound(new ErrorResponse("Usuario no encontrado."));
             }
+
             return Ok(usuario);
         }
 
@@ -43,38 +47,36 @@ namespace Servidor.src.Controllers
                 string solicitanteId = User.Claims.FirstOrDefault()?.Value ?? "";
 
                 if (!IdValidator.IsValidObjectId(solicitanteId) || !IdValidator.IsValidObjectId(request.UserId))
-                    return BadRequest("ID(s) no válidos.");
+                    return BadRequest(new ErrorResponse("ID(s) no válidos."));
 
                 bool esMismoUsuario = solicitanteId == request.UserId;
 
-                // Si el usuario NO se está cambiando su propia contraseña, validar permisos
                 if (!esMismoUsuario)
                 {
                     var validacion = await ValidarUsuarioAsync();
                     if (validacion != null) return validacion;
                 }
 
-                // Si es su propia cuenta, verifica que haya enviado la contraseña actual y que sea válida
                 if (esMismoUsuario)
                 {
                     if (string.IsNullOrWhiteSpace(request.OldPassword))
-                        return BadRequest("Debe ingresar su contraseña actual.");
+                        return BadRequest(new ErrorResponse("Debe ingresar su contraseña actual."));
 
                     var usuario = await _service.GetByIdAsync(solicitanteId);
                     if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.OldPassword, usuario.Password))
-                        return Unauthorized("La contraseña actual es incorrecta.");
+                        return Unauthorized(new ErrorResponse("La contraseña actual es incorrecta."));
                 }
 
                 var actualizado = await servicioUsuario.ActualizarPasswordAsync(request.UserId, request.NewPassword);
                 if (!actualizado)
-                    return NotFound("No se encontró el usuario o falló la actualización.");
+                    return NotFound(new ErrorResponse("No se encontró el usuario o falló la actualización."));
 
                 return Ok(true);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex + "\n" + request.ToString());
-                return StatusCode(500, $"Error al cambiar la contraseña. {ex.Message}");
+                return StatusCode(500, new ErrorResponse("Error al cambiar la contraseña.", ex.Message));
             }
         }
 
@@ -86,8 +88,12 @@ namespace Servidor.src.Controllers
             {
                 string solicitanteId = User.Claims.FirstOrDefault()?.Value ?? "";
 
-                if (!IdValidator.IsValidObjectId(solicitanteId) || !IdValidator.IsValidObjectId(request.UserId) || !IdValidator.IsValidObjectId(request.RolId))
-                    return BadRequest("ID(s) no válidos.");
+                if (!IdValidator.IsValidObjectId(solicitanteId) ||
+                    !IdValidator.IsValidObjectId(request.UserId) ||
+                    !IdValidator.IsValidObjectId(request.RolId))
+                {
+                    return BadRequest(new ErrorResponse("ID(s) no válidos."));
+                }
 
                 var validacion = await ValidarUsuarioAsync();
                 if (validacion != null) return validacion;
@@ -99,7 +105,7 @@ namespace Servidor.src.Controllers
             catch (Exception ex)
             {
                 Console.WriteLine(ex + "\n" + request.ToString());
-                return StatusCode(500, $"Error al cambiar la contraseña. {ex.Message}");
+                return StatusCode(500, new ErrorResponse("Error al asignar el rol.", ex.Message));
             }
         }
     }

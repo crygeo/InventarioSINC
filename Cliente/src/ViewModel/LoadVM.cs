@@ -75,5 +75,9 @@ namespace Cliente.src.ViewModel
             NavigationService.CloseWindow<LoadV>();
         }
 
+        protected override void UpdateChanged()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

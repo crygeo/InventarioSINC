@@ -20,5 +20,7 @@ namespace Servidor.src.Hubs
         {
             await Clients.All.SendAsync($"Delete{typeof(T).Name}", obj);
         }
+
+        
     }
 }

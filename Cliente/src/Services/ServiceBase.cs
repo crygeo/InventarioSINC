@@ -1,8 +1,10 @@
-﻿using Cliente.src.ServicesHub;
+﻿using Cliente.src.Extencions;
+using Cliente.src.Model;
+using Cliente.src.ServicesHub;
 using MongoDB.Bson;
 using Newtonsoft.Json;
 using Shared.Interfaces;
-using Shared.Interfaces.Client;
+using Shared.ObjectsResponse;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,108 +14,126 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using Utilidades.Interfaces;
-using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace Cliente.src.Services
 {
-    public abstract class ServiceBase<TItem> : HttpClientBase, IServiceClient<TItem> where TItem : IIdentifiable, ISelectable, IUpdate
+    public abstract class ServiceBase<TEntity> : HttpClientBase, IServiceClient<TEntity>
+    where TEntity : IIdentifiable, IUpdate
     {
-        public abstract HubServiceBase<TItem> HubService { get; }
+        public readonly Utilidades.Interfaces.IHubService<TEntity> HubService;
 
-        public ObservableCollection<TItem> Collection { get; } = [];
+        public ObservableCollection<TEntity> Collection => HubService.Collection;
 
+        public override string BaseUrl { get; } = $"{Config.FullUrl}/{typeof(TEntity).Name}";
 
-        public virtual async Task<(bool, string)> InitAsync()
+        protected ServiceBase(Utilidades.Interfaces.IHubService<TEntity> hubService)
         {
-            await HubService.StartConnectionAsync(); // 🛑 Ahora solo se ejecuta cuando esté listo
-            Collection.Clear();
-            var collect = await GetAllAsync();
-            foreach (var item in collect.Item1)
-                Collection.Add(item);
-
-            return (string.IsNullOrEmpty(collect.Item2), collect.Item2);
+            HubService = hubService;
         }
-        public virtual async Task StopASunc()
+
+        public virtual async Task<IResultResponse<bool>> InitAsync()
+        {
+            await HubService.StartConnectionAsync();
+            Collection.Clear();
+
+            var result = await GetAllAsync();
+            if (!result.Success || result.Entity == null)
+                return ResultError<bool>(result.Message, result.Error);
+
+            Collection.ReplaceWith(result.Entity);
+
+            return ResultSuccess(true, "Colección inicializada");
+        }
+
+        public virtual async Task<IResultResponse<bool>> StopAsync()
         {
             Collection.Clear();
             await HubService.StopConnectionAsync();
+            return ResultSuccess(true, "Conexión detenida");
         }
 
-
-        public async Task<(IEnumerable<TItem>, string)> GetAllAsync()
+        public virtual async Task<IResultResponse<bool>> UpdateCollection()
         {
-            var client = GetClient();
+            var result = await GetAllAsync();
+            if (!result.Success || result.Entity == null)
+                return ResultError<bool>(result.Message, result.Error);
+
+            Collection.ReplaceWith(result.Entity);
+
+            return ResultSuccess(true, "Colección actualizada");
+        }
+
+        public async Task<IResultResponse<IEnumerable<TEntity>>> GetAllAsync()
+        {
             var request = await GetRequest(HttpMethod.Get, BaseUrl);
-            var response = await client.SendAsync(request);
-
-            var result = await ManejarErrores(response);
-            if (result.Item1) return ([], result.Item2);
-
-            var json = await response.Content.ReadAsStringAsync();
-            var datos = JsonConvert.DeserializeObject<IEnumerable<TItem>>(json);
-            return (datos ?? [], "");
+            return await HandleResponseAsync<IEnumerable<TEntity>>(request, "Consulta exitosa");
         }
 
-
-        public async Task<(TItem?, string)> GetByIdAsync(string id)
+        public async Task<IResultResponse<TEntity>> GetByIdAsync(string id)
         {
-            var client = GetClient();
             var request = await GetRequest(HttpMethod.Get, $"{BaseUrl}/{id}");
-            var response = await client.SendAsync(request);
-
-            var result = await ManejarErrores(response);
-            if (result.Item1) return (default, result.Item2);
-
-            response.EnsureSuccessStatusCode();
-            var json = await response.Content.ReadAsStringAsync();
-            return (JsonConvert.DeserializeObject<TItem>(json), "");
+            return await HandleResponseAsync<TEntity>(request, "Consulta exitosa");
         }
-        public async Task<(bool, string)> CreateAsync(TItem entity)
+
+        public async Task<IResultResponse<bool>> CreateAsync(TEntity entity)
         {
-            var client = GetClient();
             var request = await GetRequest(HttpMethod.Post, BaseUrl, entity);
-            var response = await client.SendAsync(request);
-
-            var result = await ManejarErrores(response);
-            return result.Item1 ? (false, result.Item2) : (true, "");
+            return await HandleResponseAsync<bool>(request, "Creado exitosamente", true);
         }
-        public async Task<(bool, string)> DeleteAsync(string id)
+
+        public async Task<IResultResponse<bool>> DeleteAsync(string id)
         {
-            var client = GetClient();
             var request = await GetRequest(HttpMethod.Delete, $"{BaseUrl}/{id}");
-            var response = await client.SendAsync(request);
-
-            var result = await ManejarErrores(response);
-            return result.Item1 ? (false, result.Item2) : (true, "");
-
+            return await HandleResponseAsync<bool>(request, "Eliminado exitosamente", true);
         }
-        public async Task<(bool, string)> UpdateAsync(string id, TItem entity)
+
+        public async Task<IResultResponse<bool>> UpdateAsync(string id, TEntity entity)
+        {
+            var request = await GetRequest(HttpMethod.Put, $"{BaseUrl}/{id}", entity);
+            return await HandleResponseAsync<bool>(request, "Actualizado correctamente", true);
+        }
+
+        protected async Task<IResultResponse<T>> HandleResponseAsync<T>(HttpRequestMessage request, string successMessage, bool isVoid = false)
         {
             var client = GetClient();
-            var request = await GetRequest(HttpMethod.Put, $"{BaseUrl}/{id}", entity);
-            var response = await client.SendAsync(request);
+            var response = await client.SendAsync(request /*.ConfigureAwait(false) */);
 
-            var result = await ManejarErrores(response);
-            return result.Item1? (false, result.Item2): (true, "") ;
+            if (!response.IsSuccessStatusCode)
+                return await HandleError<T>(response);
+
+            if (isVoid)
+                return ResultSuccess<T>(default!, successMessage);
+
+            return await JsonHelper.TryDeserializeAsync<T>(response, successMessage);
         }
 
-        public async Task<(bool, string)> ManejarErrores(HttpResponseMessage response)
+        private ResultResponse<T> ResultSuccess<T>(T entity, string message) =>
+            new() { Success = true, Entity = entity, Message = message };
+
+        private ResultResponse<T> ResultError<T>(string message, string error = "") =>
+            new() { Success = false, Entity = default!, Message = message, Error = error };
+
+        public async Task<ResultResponse<T>> HandleError<T>(HttpResponseMessage response)
         {
-            if (response.IsSuccessStatusCode)
-                return (false, "");
-
-            string message = await response.Content.ReadAsStringAsync();
-           
-            return (true,message);
+            string content = await response.Content.ReadAsStringAsync();
+            try
+            {
+                var error = JsonConvert.DeserializeObject<ErrorResponse>(content);
+                return ResultError<T>(error?.Message ?? "Error inesperado", error?.Error ?? "");
+            }
+            catch (Exception ex)
+            {
+                return ResultError<T>($"Error desconocido. \n {ex.Message}", content);
+            }
         }
-
-
-
     }
 
-    public class ErrorResponse
+
+    public class ResultResponse<TObj> : IResultResponse<TObj>
     {
-        public string Error { get; set; }
-        public string Message { get; set; }
+        public TObj Entity { get; init; } = default!;
+        public bool Success { get; set; }
+        public string Message { get; set; } = string.Empty;
+        public string Error { get; set; } = string.Empty;
     }
 }

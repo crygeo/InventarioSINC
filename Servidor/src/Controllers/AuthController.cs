@@ -5,6 +5,7 @@ using Servidor.src.Helper;
 using Servidor.src.Objs;
 using Servidor.src.Repositorios;
 using Servidor.src.Services;
+using Shared.ObjectsResponse;
 using Shared.Response;
 using System;
 using System.IdentityModel.Tokens.Jwt;
@@ -30,45 +31,55 @@ namespace Servidor.src.Controllers
         [HttpGet("validate-token")]
         public async Task<IActionResult> ValidateToken()
         {
-            var token = Request.Headers["Authorization"].ToString();
-
-            if (string.IsNullOrEmpty(token) || !token.StartsWith("Bearer "))
+            try
             {
-                return Unauthorized("Token no proporcionado o inválido");
+                var token = Request.Headers["Authorization"].ToString();
+
+                if (string.IsNullOrEmpty(token) || !token.StartsWith("Bearer "))
+                {
+                    return Unauthorized(new ErrorResponse(401, "Token no proporcionado o inválido"));
+                }
+
+                token = token.Substring("Bearer ".Length).Trim();
+
+                var principal = GenerateTokenForUser.ValidateToken(token);
+
+                if (principal?.Identity == null)
+                {
+                    return Unauthorized(new ErrorResponse(401, "Token inválido o expirado"));
+                }
+
+                string id = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
+                if (!string.IsNullOrEmpty(id))
+                {
+                    var user = await _service.GetByIdAsync(id);
+                    if (user == null)
+                        return Unauthorized(new ErrorResponse(401, "Usuario no encontrado"));
+
+                    if (!await _service.VerificarPermiso(user, NamePermiso))
+                        return Unauthorized(new ErrorResponse(401, "Usuario no permitido para iniciar sesión"));
+                }
+
+                var expClaim = principal.Claims.FirstOrDefault(c => c.Type == "exp")?.Value;
+                if (!long.TryParse(expClaim, out long expTime))
+                {
+                    return Unauthorized(new ErrorResponse(401, "Error al obtener la expiración del token"));
+                }
+
+                var expirationTime = DateTimeOffset.FromUnixTimeSeconds(expTime).UtcDateTime;
+                var timeRemaining = (expirationTime - DateTime.UtcNow).TotalSeconds;
+
+                return Ok(new TokenValidationResponse
+                {
+                    Message = "Sesión válida",
+                    User = principal.Identity.Name ?? "",
+                    TimeRemaining = timeRemaining
+                });
             }
-
-            token = token.Substring("Bearer ".Length).Trim(); // Eliminar el prefijo "Bearer " para obtener solo el token
-
-            var principal = GenerateTokenForUser.ValidateToken(token); // Método para verificar y obtener el principal (usuario) del token
-
-            if (principal == null || principal.Identity == null)
+            catch (Exception ex)
             {
-                return Unauthorized("Token inválido o expirado");
+                return StatusCode(500, new ErrorResponse(500, "Ocurrió un error al validar el token", ex.Message));
             }
-
-            string id = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
-            if (!string.IsNullOrEmpty(id))
-            {
-                var User = await _service.GetByIdAsync(id);
-                if (User == null)
-                    return Unauthorized("Usuario no encontrado");
-
-                if (!await _service.VerificarPermiso(User, NamePermiso))
-                    return Unauthorized("Usuario no permitido para iniciar seccion.");
-            }
-            // Obtener la fecha de expiración del token
-
-            var expClaim = principal.Claims.FirstOrDefault(c => c.Type == "exp")?.Value;
-            if (!long.TryParse(expClaim, out long expTime))
-            {
-                return Unauthorized("Error al obtener la expiración del token");
-            }
-
-            var expirationTime = DateTimeOffset.FromUnixTimeSeconds(expTime).UtcDateTime;
-            var timeRemaining = (expirationTime - DateTime.UtcNow).TotalSeconds;
-
-            // Si el token es válido, puedes devolver la información del usuario o un nuevo token
-            return Ok(new TokenValidationResponse { Message = "Sesión válida", User = principal.Identity.Name ?? "", TimeRemaining = timeRemaining });
         }
 
         [HttpGet("check")]
@@ -81,28 +92,33 @@ namespace Servidor.src.Controllers
         [ActionName("Login")]
         public async Task<IActionResult> Login([FromBody] LoginRequest login)
         {
-            if (string.IsNullOrWhiteSpace(login.User) || string.IsNullOrWhiteSpace(login.Password))
+            try
             {
-                return BadRequest("Usuario y contraseña son requeridos");
+                if (string.IsNullOrWhiteSpace(login.User) || string.IsNullOrWhiteSpace(login.Password))
+                {
+                    return BadRequest(new ErrorResponse(400, "Usuario y contraseña son requeridos"));
+                }
+
+                var usuario = await _service.GetByUser(login.User);
+
+                if (usuario == null || string.IsNullOrWhiteSpace(usuario.Password) || !BCrypt.Net.BCrypt.Verify(login.Password, usuario.Password))
+                {
+                    return Unauthorized(new ErrorResponse(401, "Credenciales inválidas"));
+                }
+
+                if (!await _service.VerificarPermiso(usuario, NamePermiso))
+                {
+                    return Unauthorized(new ErrorResponse(401, "Usuario no permitido para iniciar sesión"));
+                }
+
+                var token = GenerateTokenForUser.GenerateToken(usuario);
+
+                return Ok(new { token });
             }
-
-            var usuario = await _service.GetByUser(login.User);
-
-
-            if (usuario == null || string.IsNullOrWhiteSpace(usuario.Password) || !BCrypt.Net.BCrypt.Verify(login.Password, usuario.Password))
+            catch (Exception ex)
             {
-                return Unauthorized("Credenciales inválidas");
+                return StatusCode(500, new ErrorResponse(500, "Ocurrió un error durante el inicio de sesión", ex.Message));
             }
-
-
-            if (!await _service.VerificarPermiso(usuario, NamePermiso))
-                return Unauthorized($"Usuario no permitido para iniciar seccion.");
-
-            var token = GenerateTokenForUser.GenerateToken(usuario);
-
-            return Ok(new { token });
         }
-
     }
-
 }

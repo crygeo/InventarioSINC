@@ -39,7 +39,7 @@
 
             <Item:UsuarioList ItemsSource="{Binding DataContext.Entitys, RelativeSource={RelativeSource AncestorType=Page}}"
                               Grid.Row="0"
-                              Item="{Binding DataContext.EntiteSelect, RelativeSource={RelativeSource AncestorType=Page}, Mode=TwoWay}"
+                              Item="{Binding DataContext.EntitySelect, RelativeSource={RelativeSource AncestorType=Page}, Mode=TwoWay}"
                               EditarUsuarioCommand="{Binding DataContext.EditarEntityCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                               EliminarUsuarioCommand="{Binding DataContext.EliminarEntityCommand, RelativeSource={RelativeSource AncestorType=Page}}"
                               CambiarPasswordCommand="{Binding DataContext.CambiarPasswordCommand, RelativeSource={RelativeSource AncestorType=Page}}"
@@ -91,15 +91,15 @@
                 </Style>
             </StackPanel.Resources>
             <Label Content="Nombre: "/>
-            <TextBlock Text="{Binding DataContext.EntiteSelect.NombreCompleto, RelativeSource={RelativeSource AncestorType=Page}}" Style="{StaticResource TextStyle}"/>
+            <TextBlock Text="{Binding DataContext.EntitySelect.NombreCompleto, RelativeSource={RelativeSource AncestorType=Page}}" Style="{StaticResource TextStyle}"/>
             <Label Content="Cedula: "/>
-            <TextBlock Text="{Binding DataContext.EntiteSelect.Cedula, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource textFormat}, ConverterParameter='Dni'}" Style="{StaticResource TextStyle}"/>
+            <TextBlock Text="{Binding DataContext.EntitySelect.Cedula, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource textFormat}, ConverterParameter='Dni'}" Style="{StaticResource TextStyle}"/>
             <Label Content="Telefono: "/>
-            <TextBlock Text="{Binding DataContext.EntiteSelect.Celular, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource textFormat}, ConverterParameter='Phone'}" Style="{StaticResource TextStyle}"/>
+            <TextBlock Text="{Binding DataContext.EntitySelect.Celular, RelativeSource={RelativeSource AncestorType=Page}, Converter={StaticResource textFormat}, ConverterParameter='Phone'}" Style="{StaticResource TextStyle}"/>
             <Label Content="Fecha Nacimiento: "/>
-            <TextBlock Text="{Binding DataContext.EntiteSelect.FechaNacimiento, RelativeSource={RelativeSource AncestorType=Page}, StringFormat='dd MMM yyyy'}" Style="{StaticResource TextStyle}"/>
+            <TextBlock Text="{Binding DataContext.EntitySelect.FechaNacimiento, RelativeSource={RelativeSource AncestorType=Page}, StringFormat='dd MMM yyyy'}" Style="{StaticResource TextStyle}"/>
             <Label Content="Roles: "/>
-            <ItemsControl ItemsSource="{Binding DataContext.EntiteSelect.Roles, RelativeSource={RelativeSource AncestorType=Page}}" >
+            <ItemsControl ItemsSource="{Binding DataContext.EntitySelect.Roles, RelativeSource={RelativeSource AncestorType=Page}}" >
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel DataContext="{Binding Converter={StaticResource IdToRolConvert}}" Orientation="Horizontal">

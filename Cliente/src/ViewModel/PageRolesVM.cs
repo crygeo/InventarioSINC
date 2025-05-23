@@ -21,82 +21,58 @@ namespace Cliente.src.ViewModel
     {
         public override ServiceBase<Rol> ServicioBase => RolService.Instance;
         public RolService ServiceRol => (RolService)ServicioBase;
-        public override ObservableCollection<Rol> Entitys => ServicioBase.Collection;
 
-        public PageRolesVM()
+        public async override Task CrearEntityAsync()
         {
-        }
-
-
-        public async override void CrearEnttiy()
-        {
-            var usuarioDialog = new RolDialog
+            var dialog = new RolDialog
             {
                 AceptedCommand = new RelayCommand(async (a) =>
                 {
                     if (a is Rol user)
                     {
-                        DialogHost.Close("MainView"); // Cierra el diálogo de creación después de confirmar
-                        //await Task.Delay(300);
 
-                        var progressDialog = new ProgressDialog();
-                        await DialogHost.Show(progressDialog, "MainView", openedEventHandler: async (sender, args) =>
+                        await DialogService.MostrarDialogoProgreso(async () =>
                         {
                             var result = await ServicioBase.CreateAsync(user);
-                            ValidarRespuesta(result);
-                            DialogHost.Close("MainView"); // Cierra el diálogo de progreso
+                            await DialogService.ValidarRespuesta(result);
+                            return result;
                         });
 
                     }
                 }),
                 Item = new Rol() { },
-                ListPerms = (await ServiceRol.GetAllPermisos()).Item1.ConstruirArbol(),
+                ListPerms = (await ServiceRol.GetAllPermisos()).Entity.ConstruirArbol(),
                 TextHeader = "Nuevo Rol"
             };
 
-            await DialogHost.Show(usuarioDialog, "MainView");
+            await DialogService.MostrarDialogo(dialog);
         }
-
-        public async override void DeleteEntity()
+        public async override Task DeleteEntityAsync()
         {
-            var usuariosSeleccionados = Entitys.Where(user => user.IsSelect).ToList();
-
-            if (usuariosSeleccionados.Count == 0)
+            if (EntitySelect == null)
                 return; // No hay usuarios seleccionados, salir del método
 
             var confirmDialog = new ConfirmDialog
             {
                 TextHeader = "Eliminar Rol",
-                Message = "¿Estás seguro de que quieres eliminar los roles seleccionados?",
+                Message = "¿Estás seguro de que quieres eliminar el rol seleccionado?",
                 AceptedCommand = new RelayCommand(async (_) =>
                 {
-                    DialogHost.Close("MainView"); // Cierra el diálogo de confirmación
-                    //await Task.Delay(300);
-
-                    var progressDialog = new ProgressDialog();
-
-                    await DialogHost.Show(progressDialog, "MainView", openedEventHandler: async (sender, args) =>
+                    await DialogService.MostrarDialogoProgreso(async () =>
                     {
-                        foreach (var usuario in usuariosSeleccionados)
-                        {
-                            var result = await ServicioBase.DeleteAsync(usuario.Id);
-                            ValidarRespuesta(result);
-                            await Task.Delay(100);
-                        }
-                        DialogHost.Close("MainView"); // Cierra el diálogo progreso
+                        var result = await ServicioBase.DeleteAsync(EntitySelect.Id);
+                        await DialogService.ValidarRespuesta(result);
+                        return result;
                     });
 
                 })
             };
 
-            await DialogHost.Show(confirmDialog, "MainView");
+            await DialogService.MostrarDialogo(confirmDialog);
         }
-
-        public async override void EditarEntity()
+        public async override Task EditarEntityAsync()
         {
-            var entitySeleccionado = Entitys.FirstOrDefault(user => user.IsSelect);
-
-            if (entitySeleccionado == null)
+            if (EntitySelect == null)
                 return; // No hay usuario seleccionado, salir del método
 
             var entityDialog = new RolDialog
@@ -105,28 +81,26 @@ namespace Cliente.src.ViewModel
                 {
                     if (a is Rol entity)
                     {
-                        DialogHost.Close("MainView"); // Cierra el diálogo de edición
-                                                      //await Task.Delay(300);
-
-                        var progressDialog = new ProgressDialog();
-                        await DialogHost.Show(progressDialog, "MainView", openedEventHandler: async (sender, args) =>
+                        await DialogService.MostrarDialogoProgreso(async () =>
                         {
                             var result = await ServicioBase.UpdateAsync(entity.Id, entity);
-                            ValidarRespuesta(result);
-                            DialogHost.Close("MainView"); // Cierra el diálogo progreso
+                                await DialogService.ValidarRespuesta(result);
+                            return result;
                         });
 
                     }
                 }),
-                Item = entitySeleccionado.Clone(),
-                ListPerms = (await ServiceRol.GetAllPermisos()).Item1.ConstruirArbol().SeleccionarNodos(entitySeleccionado.Permisos),
+                Item = EntitySelect.Clone(),
+                ListPerms = (await ServiceRol.GetAllPermisos()).Entity.ConstruirArbol().SeleccionarNodos(EntitySelect.Permisos),
                 TextHeader = "Editar Rol"
             };
 
-            await DialogHost.Show(entityDialog, "MainView");
+            await DialogService.MostrarDialogo(entityDialog);
         }
-
-        
+        protected override void UpdateChanged()
+        {
+            throw new NotImplementedException();
+        }
     }
 }
 

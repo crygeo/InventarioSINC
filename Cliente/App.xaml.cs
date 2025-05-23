@@ -13,13 +13,13 @@ namespace Cliente
     {
         public App()
         {
-            //init();
+            init();
         }
 
         private async void init()
         {
-            await AuthService.BorrarCredenciales();
-            AuthService.DeleteToken();
+            ////await AuthService.BorrarCredenciales();
+            //AuthService.DeleteToken();
 
         }
 

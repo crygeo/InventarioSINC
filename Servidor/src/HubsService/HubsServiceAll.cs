@@ -10,11 +10,6 @@ namespace Servidor.src.HubsService
         public HubsServiceProveedor(IHubContext<HubProveedor> hubContext) : base(hubContext) { }
     }
 
-    public class HubsServiceEmpresa : HubServiceBase<IEmpresa>
-    {
-        public HubsServiceEmpresa(IHubContext<HubEmpresa> hubContext) : base(hubContext) { }
-    }
-
     public class HubsServiceTalla : HubServiceBase<ITalla>
     {
         public HubsServiceTalla(IHubContext<HubTalla> hubContext) : base(hubContext) { }

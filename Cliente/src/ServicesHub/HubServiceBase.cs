@@ -14,7 +14,7 @@ using Utilidades.Interfaces;
 namespace Cliente.src.ServicesHub
 {
 
-    public abstract class HubServiceBase<TEntity> where TEntity : IIdentifiable, ISelectable, IUpdate
+    public abstract class HubServiceBase<TEntity> : Utilidades.Interfaces.IHubService<TEntity> where TEntity : IIdentifiable, IUpdate
     {
         protected readonly HubConnection _hubConnection;
         private readonly string _hubUrl;

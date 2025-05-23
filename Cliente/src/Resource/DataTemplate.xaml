@@ -13,7 +13,35 @@
     <DataTemplate DataType="{x:Type vm:PageUsuarioVM}">
         <view:PageUsuariosV/>
     </DataTemplate>
-
     
+    <DataTemplate DataType="{x:Type vm:PageProcesosVM}">
+        <view:PageProcesosV/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PageCalidad}">
+        <view:PageGeneralView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PageClase}">
+        <view:PageGeneralView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PageClasificacion}">
+        <view:PageGeneralView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PageTalla}">
+        <view:PageGeneralView/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PageRecepcionCarga}">
+        <view:PageGeneralView/>
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type vm:PageProveedor}">
+        <view:PageGeneralView/>
+    </DataTemplate>
+
+
 
 </ResourceDictionary>

@@ -10,11 +10,13 @@
 
 	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="MaterialDesignColors" Version="5.2.2-ci991" />
+		<PackageReference Include="MaterialDesignThemes" Version="5.2.2-ci991" />
 		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.2" />
 		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
 	</ItemGroup>
 	<ItemGroup>
-		<ProjectReference Include="..\..\MaterialDesignInXamlToolkit\src\MaterialDesignThemes.Wpf\MaterialDesignThemes.Wpf.csproj" />
 		<ProjectReference Include="..\..\Utilidades\Utilidades.csproj" />
 		<ProjectReference Include="..\Shared\Shared.csproj" />
 	</ItemGroup>
@@ -39,7 +41,13 @@
 	  <Compile Update="src\View\Dialog\AccountDialog.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>
+	  <Compile Update="src\View\Items\ObjectIList.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
 	  <Compile Update="src\View\Items\RolList.xaml.cs">
+	    <SubType>Code</SubType>
+	  </Compile>
+	  <Compile Update="src\View\Items\ObjectItem.xaml.cs">
 	    <SubType>Code</SubType>
 	  </Compile>
 	  <Compile Update="src\View\Items\RoltemB.xaml.cs">
