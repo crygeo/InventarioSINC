@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface IRecepcionCarga: IIdentifiable
+    public interface IRecepcionCarga: IIdentifiable, IDeleteable
     {
         string MacroLote { get; set; } // en IRecepcionCarga
         string Lote { get; set; }

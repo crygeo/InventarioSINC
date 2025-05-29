@@ -91,6 +91,13 @@ namespace Cliente.src.Model
             set => SetProperty(ref _id, value);
         }
 
+        private bool _deleteable = false;
+        public bool Deleteable
+        {
+            get => _deleteable;
+            set => SetProperty(ref _deleteable, value);
+        }
+
         public string NombreCompleto { get => $"{PrimerNombre} {SegundoNombre} {PrimerApellido} {SegundoApellido}"; set { } }
         public string NombreAndApellido { get => $"{PrimerNombre} {PrimerApellido}"; set { } }
 

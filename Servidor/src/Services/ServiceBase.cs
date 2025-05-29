@@ -11,6 +11,10 @@ public abstract class ServiceBase<TObj> : IService<TObj> where TObj : IIdentifia
     public abstract IRepository<TObj> Repository { get; }
     public abstract IHubService<TObj> HubService { get; }
 
+    public virtual Task InitServiceAsync()
+    {
+        return Task.CompletedTask;
+    }
 
     public async Task<bool> CreateAsync(TObj entity)
     {

@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace Servidor.src.Controllers
 {
     [ApiController]
-    public abstract class BaseController<TObj> : ControllerBase where TObj : IIdentifiable
+    public abstract class BaseController<TObj> : ControllerBase where TObj : IIdentifiable, IDeleteable
     {
         public readonly ServiceBase<TObj> _service;
 
@@ -74,6 +74,7 @@ namespace Servidor.src.Controllers
                 if (objeto == null)
                     return BadRequest(new ErrorResponse(400, "El objeto no puede ser nulo."));
 
+                objeto.Deleteable = true;
                 if (await _service.CreateAsync(objeto))
                     return Ok();
                 else

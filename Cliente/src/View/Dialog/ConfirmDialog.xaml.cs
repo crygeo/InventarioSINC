@@ -1,4 +1,6 @@
 ﻿using Cliente.src.View.Items;
+using CommunityToolkit.Mvvm.Input;
+using MaterialDesignThemes.Wpf;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -21,21 +23,21 @@ namespace Cliente.src.View.Dialog
     /// </summary>
     public partial class ConfirmDialog : UserControl
     {
-        public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptedCommand), typeof(ICommand), typeof(ConfirmDialog));
-        public static readonly DependencyProperty CancelCommandProperty = DependencyProperty.Register(nameof(CancelCommand), typeof(ICommand), typeof(ConfirmDialog));
+        public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptedCommand), typeof(IAsyncRelayCommand), typeof(ConfirmDialog));
+        public static readonly DependencyProperty CancelCommandProperty = DependencyProperty.Register(nameof(CancelCommand), typeof(IAsyncRelayCommand), typeof(ConfirmDialog));
         public static readonly DependencyProperty TextHeaderProperty = DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(ConfirmDialog));
         public static readonly DependencyProperty MessageProperty = DependencyProperty.Register(nameof(Message), typeof(string), typeof(ConfirmDialog));
 
 
-        public ICommand CancelCommand
+        public IAsyncRelayCommand CancelCommand
         {
-            get => (ICommand)GetValue(CancelCommandProperty);
+            get => (IAsyncRelayCommand)GetValue(CancelCommandProperty);
             set => SetValue(CancelCommandProperty, value);
         }
 
-        public ICommand AceptedCommand
+        public IAsyncRelayCommand AceptedCommand
         {
-            get => (ICommand)GetValue(AceptedCommandProperty);
+            get => (IAsyncRelayCommand)GetValue(AceptedCommandProperty);
             set => SetValue(AceptedCommandProperty, value);
         }
 
@@ -54,9 +56,15 @@ namespace Cliente.src.View.Dialog
             InitializeComponent();
         }
 
-        private void OnCancel(object sender, RoutedEventArgs e)
+        private async void OnCancel(object sender, RoutedEventArgs e)
         {
-            CancelCommand?.Execute(null); // Ejecuta la acción que te pasaron
+            await CancelCommand.ExecuteAsync(null); // Ejecuta la acción que te pasaron
+        }
+
+        private async void OnAcepted(object sender, RoutedEventArgs e)
+        {
+            await AceptedCommand.ExecuteAsync(null);
+            DialogHost.Close(DialogService.DialogIdentifierMain);
         }
     }
 }

@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using Shared.Interfaces.ModelsBase;
 using Shared.Interfaces;
 using System.Collections.Generic;
+using Microsoft.AspNetCore.DataProtection.Repositories;
 
 namespace Servidor.src.Objs
 {
@@ -14,5 +15,6 @@ namespace Servidor.src.Objs
         public string Nombre { get; set; } = ""; // Ejemplo: "Administrador", "Editor", "Usuario"
         public List<string> Permisos { get; set; } = []; // Ejemplo: ["Usuarios.Crear", "Usuarios.Eliminar"]
         public bool IsAdmin { get; set; }
+        public bool Deleteable { get; set; }
     }
 }

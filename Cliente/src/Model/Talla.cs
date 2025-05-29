@@ -9,6 +9,11 @@ using Utilidades.Interfaces;
 
 namespace Cliente.src.Model
 {
+<<<<<<< HEAD
+=======
+
+    [Obsolete("Esta clase está deshabilitada. No debe usarse.", true)]
+>>>>>>> 29/05/2025
     public class Talla : ModelBase<ITalla>, ITalla
     {
 
@@ -16,6 +21,16 @@ namespace Cliente.src.Model
         private string _name = string.Empty;
         private string _description = string.Empty;
         private List<IClase> _clasesPermitidas = new List<IClase>();
+<<<<<<< HEAD
+=======
+        private bool _deleteable = false;
+
+        public bool Deleteable
+        {
+            get => _deleteable;
+            set => SetProperty(ref _deleteable, value);
+        }
+>>>>>>> 29/05/2025
 
         public override string Id
         {

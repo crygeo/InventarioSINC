@@ -17,6 +17,10 @@ using System.Windows.Shapes;
 using Utilidades.Factory;
 using Utilidades.Extencions;
 using MaterialDesignThemes.Wpf;
+<<<<<<< HEAD
+=======
+using CommunityToolkit.Mvvm.Input;
+>>>>>>> 29/05/2025
 
 namespace Cliente.src.View.Items
 {
@@ -27,7 +31,7 @@ namespace Cliente.src.View.Items
     {
         public static readonly DependencyProperty ItemProperty = DependencyProperty.Register(nameof(Item), typeof(Rol), typeof(RolDialog));
         public static readonly DependencyProperty ListPermsProperty = DependencyProperty.Register(nameof(ListPerms), typeof(List<Nodos>), typeof(RolDialog));
-        public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptedCommand), typeof(ICommand), typeof(RolDialog));
+        public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptedCommand), typeof(IAsyncRelayCommand), typeof(RolDialog));
         public static readonly DependencyProperty TextHeaderProperty = DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(RolDialog));
 
         public Rol Item
@@ -42,9 +46,9 @@ namespace Cliente.src.View.Items
             set => SetValue(ListPermsProperty, value);
         }
 
-        public ICommand AceptedCommand
+        public IAsyncRelayCommand AceptedCommand
         {
-            get => (ICommand)GetValue(AceptedCommandProperty);
+            get => (IAsyncRelayCommand)GetValue(AceptedCommandProperty);
             set => SetValue(AceptedCommandProperty, value);
         }
 
@@ -59,12 +63,14 @@ namespace Cliente.src.View.Items
             InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             var list = ListPerms.ObtenerSeleccionados().DescostruirArbol();
             Item.Permisos = list;
 
-            AceptedCommand.Execute(Item);
+            await AceptedCommand.ExecuteAsync(Item);
+
+            DialogHost.Close(DialogService.DialogIdentifierMain);
             
         }
     }

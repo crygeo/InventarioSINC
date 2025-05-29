@@ -16,6 +16,9 @@ namespace Servidor.src.Services
     public class ServiceUsuario : ServiceBase<Usuario>
     {
 
+        public static readonly string ADMIN_ID = "6650c6a2b5cf184a0a8a0f3a";
+
+
         public override IRepository<Usuario> Repository { get; } = new RepositorioUsuario();
         public override IHubService<Usuario> HubService { get; }
 
@@ -25,7 +28,7 @@ namespace Servidor.src.Services
             HubService = hubService;
         }
         public Task<Usuario> GetByUser(string user) => ((RepositorioUsuario)Repository).GetByUser(user);
-        
+
         public async Task<bool> ActualizarPasswordAsync(string userId, string newPassword)
         {
             RepositorioUsuario repUser = (RepositorioUsuario)Repository;
@@ -39,13 +42,42 @@ namespace Servidor.src.Services
         {
             var usuario = await Repository.GetByIdAsync(userId);
             if (usuario == null) return false;
-            
+
             usuario.Roles.AddOrRemove(rolId);
             await Repository.UpdateAsync(userId, usuario);
             await HubService.UpdateItem(usuario);
             return true;
         }
 
+        private async Task CrearUsuarioAdmin()
+        {
+            var usuarios = await Repository.GetByIdAsync(ADMIN_ID);
+
+            if (usuarios != null) return; // Si ya existe el usuario admin, no hacemos nada
+            // Crear un usuario admin por defecto si no existe
+            var usuarioAdmin = new Usuario
+            {
+                PrimerNombre = "",
+                SegundoNombre = "",
+                PrimerApellido = "",
+                SegundoApellido = "",
+                Cedula = "",
+                Celular = "",
+                FechaNacimiento = DateTime.Now,
+                Id = ADMIN_ID,
+                Password = BCrypt.Net.BCrypt.HashPassword("admin"),
+                Roles = new List<string> {ServiceRol.GENERAL_ROLE_ID},
+                User = "admin",
+                Deleteable = false
+            };
+
+            await Repository.CreateAsync(usuarioAdmin);
+        }
+
+        override public async Task InitServiceAsync()
+        {
+            await CrearUsuarioAdmin();
+        }
 
 
     }

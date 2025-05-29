@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface ITalla : IIdentifiable
+    public interface ITalla : IIdentifiable, IDeleteable
     {
         string Name { get; }
         string Description { get; }

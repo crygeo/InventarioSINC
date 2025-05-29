@@ -25,12 +25,12 @@ namespace Servidor.src.HubsService
         public HubsServiceClasificacion(IHubContext<HubClasificacion> hubContext) : base(hubContext) { }
     }
 
-    public class HubsServiceClase : HubServiceBase<IClase>
+    public class HubsServiceClase : HubServiceBase<Clase>
     {
         public HubsServiceClase(IHubContext<HubClase> hubContext) : base(hubContext) { }
     }
 
-    public class HubsServiceCalidad : HubServiceBase<ICalidad>
+    public class HubsServiceCalidad : HubServiceBase<Calidad>
     {
         public HubsServiceCalidad(IHubContext<HubCalidad> hubContext) : base(hubContext) { }
     }

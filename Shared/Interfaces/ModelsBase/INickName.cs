@@ -6,10 +6,13 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    [Obsolete("Esta clase está deshabilitada. No debe usarse.", true)]
-    public interface IClase : IIdentifiable, IDeleteable
+    public interface INickName
     {
         string Name { get; set; }
-        string Description { get; set; }
+        string NickName { get; set; }
+        string DisplayName
+        {
+            get => string.IsNullOrEmpty(NickName) ? Name : NickName;
+        }
     }
 }

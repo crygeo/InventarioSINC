@@ -5,31 +5,33 @@ namespace Servidor.src.Objs
 {
     public class ProveedorEmpresa : IProveedor, IEmpresa
     {
-        public string RUC { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public string Direccion { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public string Id { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public string RazonSocial { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
-        public string RepresentanteLegal { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+        public string RUC { get; set; }
+        public string Direccion { get; set; }
+        public string Id { get; set; }
+        public string RazonSocial { get; set; }
+        public string RepresentanteLegal { get; set; }
+        public bool Deleteable { get; set; }
     }
 
     public class ProveedorPersona : IProveedor, IPersona
     {
-        public string RUC { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public string Direccion { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
-        public string Id { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+        public string RUC { get; set; }
+        public string Direccion { get; set; }
+        public string Id { get; set; }
 
-        public string PrimerNombre => throw new NotImplementedException();
+        public string PrimerNombre { get;}
 
-        public string SegundoNombre => throw new NotImplementedException();
+        public string SegundoNombre { get; }
 
-        public string PrimerApellido => throw new NotImplementedException();
+        public string PrimerApellido { get; }
 
-        public string SegundoApellido => throw new NotImplementedException();
+        public string SegundoApellido { get; }
 
-        public string Cedula => throw new NotImplementedException();
+        public string Cedula { get; }
+        public string Celular { get; }
 
-        public string Celular => throw new NotImplementedException();
+        public DateTime FechaNacimiento { get; }
 
-        public DateTime FechaNacimiento => throw new NotImplementedException();
+        public bool Deleteable { get; set; }
     }
 }

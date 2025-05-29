@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface IClasificacion: IIdentifiable
+    public interface IClasificacion: IIdentifiable, IDeleteable
     {
         IRecepcionCarga RecepcionCarga { get; }
         ICalidad Calidad { get; set; }

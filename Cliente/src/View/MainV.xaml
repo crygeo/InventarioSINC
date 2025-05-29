@@ -14,56 +14,58 @@
     <Window.Resources>
         <viewModel:MainVM x:Key="viewModel"/>
     </Window.Resources>
-    <md:DialogHost Identifier="MainView">
+    <md:DialogHost Identifier="DialogProgrees">
+        <md:DialogHost Identifier="DialogMain">
 
-        <Grid DataContext="{Binding Source={StaticResource viewModel}}">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="80"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-            </Grid.RowDefinitions>
-            <Grid Grid.Column="0" >
+            <Grid DataContext="{Binding Source={StaticResource viewModel}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="80"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*"/>
-                    <RowDefinition Height="70"/>
                 </Grid.RowDefinitions>
-                <Viewbox VerticalAlignment="Top"
+                <Grid Grid.Column="0" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="70"/>
+                    </Grid.RowDefinitions>
+                    <Viewbox VerticalAlignment="Top"
                          Margin="0,20"
                          Stretch="Uniform">
-                    <ListBox VerticalAlignment="Top"
+                        <ListBox VerticalAlignment="Top"
                          ItemsSource="{Binding ListItemsNav}"
                          SelectedItem="{Binding SelectedItemNav, Mode=TwoWay}"
                          SelectedIndex="0">
-                        <ListBox.ItemContainerStyle>
-                            <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesign3.NavigationRailListBoxItem}">
-                                <Setter Property="md:BadgedAssist.Badge" Value="{Binding Notification}" />
-                                <Setter Property="md:NavigationRailAssist.IsTextVisible" Value="True" />
-                                <Setter Property="md:NavigationRailAssist.SelectedIcon" Value="{Binding SelectedIcon}" />
-                                <Setter Property="md:NavigationRailAssist.UnselectedIcon" Value="{Binding UnselectedIcon}" />
-                            </Style>
-                        </ListBox.ItemContainerStyle>
-                        <ListBox.Resources>
-                            <DataTemplate DataType="{x:Type m:ItemNavigationM}">
-                                <TextBlock Text="{Binding Title}"/>
-                            </DataTemplate>
-                        </ListBox.Resources>
-                    </ListBox>
+                            <ListBox.ItemContainerStyle>
+                                <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesign3.NavigationRailListBoxItem}">
+                                    <Setter Property="md:BadgedAssist.Badge" Value="{Binding Notification}" />
+                                    <Setter Property="md:NavigationRailAssist.IsTextVisible" Value="True" />
+                                    <Setter Property="md:NavigationRailAssist.SelectedIcon" Value="{Binding SelectedIcon}" />
+                                    <Setter Property="md:NavigationRailAssist.UnselectedIcon" Value="{Binding UnselectedIcon}" />
+                                </Style>
+                            </ListBox.ItemContainerStyle>
+                            <ListBox.Resources>
+                                <DataTemplate DataType="{x:Type m:ItemNavigationM}">
+                                    <TextBlock Text="{Binding Title}"/>
+                                </DataTemplate>
+                            </ListBox.Resources>
+                        </ListBox>
 
-                </Viewbox>
-                <Button Grid.Row="1" Style="{StaticResource MaterialDesignIconButton}" Background="#404242" Command="{Binding AccountView}">
-                    <md:PackIcon Kind="AccountCircle" Width="30" Height="30"/>
-                </Button>
-            </Grid>
+                    </Viewbox>
+                    <Button Grid.Row="1" Style="{StaticResource MaterialDesignIconButton}" Background="#404242" Command="{Binding AccountView}">
+                        <md:PackIcon Kind="AccountCircle" Width="30" Height="30"/>
+                    </Button>
+                </Grid>
 
-            <!--<StackPanel Background="{StaticResource MainView_Background_1}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Orientation="Horizontal">
+                <!--<StackPanel Background="{StaticResource MainView_Background_1}" VerticalAlignment="Stretch" HorizontalAlignment="Stretch" Orientation="Horizontal">
                 <RadioButton Style="{DynamicResource RadioButtonStyle1}" Command="{Binding ChangePageCommand}" CommandParameter="Usuarios" IsChecked="True" Content="Usuarios" />
                 <RadioButton Style="{DynamicResource RadioButtonStyle1}" Command="{Binding ChangePageCommand}" CommandParameter="Roles" Content="Roles"/>
             </StackPanel>-->
-            <Grid Grid.Column="1">
-                <Frame Content="{Binding PageSelectViewModel}" d:Content="{d:DesignInstance Type=viewModel:PageUsuarioVM}" NavigationUIVisibility="Hidden"/>
+                <Grid Grid.Column="1">
+                    <Frame Content="{Binding PageSelectViewModel}" d:Content="{d:DesignInstance Type=viewModel:PageUsuarioVM}" NavigationUIVisibility="Hidden"/>
+                </Grid>
             </Grid>
-        </Grid>
+        </md:DialogHost>
     </md:DialogHost>
 </Window>

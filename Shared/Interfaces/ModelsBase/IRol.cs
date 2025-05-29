@@ -8,7 +8,7 @@ using Shared.Interfaces;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface IRol : IIdentifiable
+    public interface IRol : IIdentifiable, IDeleteable
     {
         string Nombre { get; set; } // Ejemplo: "Administrador", "Editor", "Usuario"
         List<string> Permisos { get; set; } // Ejemplo: ["Usuarios.Crear", "Usuarios.Eliminar"]

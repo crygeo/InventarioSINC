@@ -20,7 +20,17 @@ namespace Cliente.src.Model
         private string _macroLote = string.Empty;
         private string _lote = string.Empty;
         private bool _entregaCerrada = false;
+<<<<<<< HEAD
 
+=======
+        private bool _deleteable = false;
+
+        public bool Deleteable
+        {
+            get => _deleteable;
+            set => SetProperty(ref _deleteable, value);
+        }
+>>>>>>> 29/05/2025
 
         public IProveedor Proveedor
         {
@@ -74,6 +84,10 @@ namespace Cliente.src.Model
             get => _entregaCerrada;
             set => SetProperty(ref _entregaCerrada, value);
         }
+<<<<<<< HEAD
+=======
+        
+>>>>>>> 29/05/2025
 
         public void CerrarEntrega()
         {

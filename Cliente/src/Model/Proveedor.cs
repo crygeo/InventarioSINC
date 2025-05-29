@@ -14,10 +14,18 @@ namespace Cliente.src.Model
         private string _id = string.Empty;
         private string _ruc = string.Empty;
         private string _direccion = string.Empty;
+<<<<<<< HEAD
+=======
+        private bool _deleteable = false;
+>>>>>>> 29/05/2025
 
         public override string Id { get => _id; set => SetProperty(ref _id, value); }
         public string RUC { get => _ruc; set => SetProperty(ref _ruc, value); }
         public string Direccion { get => _direccion; set => SetProperty(ref _direccion, value); }
+<<<<<<< HEAD
+=======
+        public bool Deleteable { get => _deleteable; set => SetProperty(ref _deleteable, value); }
+>>>>>>> 29/05/2025
 
         public override void Update(IIdentifiable identity)
         {

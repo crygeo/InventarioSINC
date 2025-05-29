@@ -11,6 +11,7 @@ namespace Cliente.src.ViewModel
 {
     public class PageRecepcionCarga : ViewModelServiceBase<RecepcionCarga>
     {
+<<<<<<< HEAD
         public override ServiceBase<RecepcionCarga> ServicioBase => new RecepcionCargaService();
 
         public override Task CrearEntityAsync()
@@ -27,6 +28,9 @@ namespace Cliente.src.ViewModel
         {
             throw new NotImplementedException();
         }
+=======
+        public override ServiceBase<RecepcionCarga> ServicioBase => RecepcionCargaService.Instance;
+>>>>>>> 29/05/2025
 
         protected override void UpdateChanged()
         {

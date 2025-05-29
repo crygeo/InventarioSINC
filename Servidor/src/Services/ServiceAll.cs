@@ -58,10 +58,10 @@ namespace Servidor.src.Services
         }
     }
 
-    public class ServiceClase : ServiceBase<IClase>
+    public class ServiceClase : ServiceBase<Clase>
     {
-        public override IRepository<IClase> Repository { get; } = new RepositorioClase();
-        public override IHubService<IClase> HubService { get; }
+        public override IRepository<Clase> Repository { get; } = new RepositorioClase();
+        public override IHubService<Clase> HubService { get; }
 
         public ServiceClase(HubsServiceClase hubService)
         {
@@ -69,10 +69,10 @@ namespace Servidor.src.Services
         }
     }
 
-    public class ServiceCalidad : ServiceBase<ICalidad>
+    public class ServiceCalidad : ServiceBase<Calidad>
     {
-        public override IRepository<ICalidad> Repository { get; } = new RepositorioCalidad();
-        public override IHubService<ICalidad> HubService { get; }
+        public override IRepository<Calidad> Repository { get; } = new RepositorioCalidad();
+        public override IHubService<Calidad> HubService { get; }
 
         public ServiceCalidad(HubsServiceCalidad hubService)
         {

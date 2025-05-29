@@ -4,6 +4,10 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
+<<<<<<< HEAD
+=======
+using Servidor;
+>>>>>>> 29/05/2025
 using Servidor.src.Extensiones;
 using Servidor.src.Helper;
 using Servidor.src.Hubs;
@@ -81,10 +85,16 @@ builder.Services.AddAuthentication("Bearer")
     });
 
 
+builder.Services.AddScoped<AppInitializer>();
 
 
 var app = builder.Build();
 
+using (var scope = app.Services.CreateScope())
+{
+    var initializer = scope.ServiceProvider.GetRequiredService<AppInitializer>();
+    await initializer.InitAsync();
+}
 
 app.UseHttpsRedirection();
 app.UseRouting();

@@ -13,6 +13,7 @@ namespace Cliente.src.ViewModel
 {
     public class PageProveedor : ViewModelServiceBase<Proveedor>
     {
+<<<<<<< HEAD
         public override ServiceBase<Proveedor> ServicioBase => new ProveedorService();
 
         public override Task CrearEntityAsync()
@@ -29,6 +30,9 @@ namespace Cliente.src.ViewModel
         {
             throw new NotImplementedException();
         }
+=======
+        public override ServiceBase<Proveedor> ServicioBase => ProveedorService.Instance;
+>>>>>>> 29/05/2025
 
         protected override void UpdateChanged()
         {

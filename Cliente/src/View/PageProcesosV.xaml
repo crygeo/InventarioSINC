@@ -10,7 +10,11 @@
       xmlns:item="clr-namespace:Cliente.src.View.Items"
       mc:Ignorable="d" 
       d:DesignHeight="450" d:DesignWidth="800"
+<<<<<<< HEAD
       Title="PageRolesV" d:DataContext="{d:DesignInstance Type=vm:PageRolesVM}">
+=======
+      Title="PageRolesV" d:DataContext="{d:DesignInstance Type=vm:PageProcesosVM}">
+>>>>>>> 29/05/2025
     <Page.Resources>
         <!--<Convert:NodoHierarchyConverter x:Key="ArbolConvert"/>-->
     </Page.Resources>
@@ -25,7 +29,11 @@
             <ListBox
                 Height="80"
                 ItemsSource="{Binding ListItemsNav}"
+<<<<<<< HEAD
                 SelectedIndex="0"
+=======
+                SelectedItem="{Binding SelectedItemNav}"
+>>>>>>> 29/05/2025
                 Style="{StaticResource MaterialDesign3.NavigationBarListBox}">
                 <ListBox.ItemContainerStyle>
                     <Style
@@ -43,12 +51,22 @@
                     </Style>
                 </ListBox.ItemContainerStyle>
                 <ListBox.Resources>
+<<<<<<< HEAD
                    
+=======
+
+>>>>>>> 29/05/2025
                 </ListBox.Resources>
             </ListBox>
         </Grid>
         <Border Grid.Row="1" Margin="10" CornerRadius="10">
+<<<<<<< HEAD
             <Frame Content="{Binding PageSelectViewModel}" d:Content="{d:DesignInstance Type=viewModel:PageUsuarioVM}" NavigationUIVisibility="Hidden"/>
+=======
+            <Grid>
+                <Frame Content="{Binding PageSelectViewModel}" d:Content="{d:DesignInstance Type=vm:PageProcesosVM}" NavigationUIVisibility="Hidden"/>
+            </Grid>
+>>>>>>> 29/05/2025
         </Border>
     </Grid>
 </Page>

@@ -19,6 +19,7 @@
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type vm:PageCalidad}">
+<<<<<<< HEAD
         <view:PageGeneralView/>
     </DataTemplate>
 
@@ -40,6 +41,29 @@
     
     <DataTemplate DataType="{x:Type vm:PageProveedor}">
         <view:PageGeneralView/>
+=======
+        <view:PageGeneralV/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PageClase}">
+        <view:PageGeneralV/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PageClasificacion}">
+        <view:PageGeneralV/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PageTalla}">
+        <view:PageGeneralV/>
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PageRecepcionCarga}">
+        <view:PageGeneralV/>
+    </DataTemplate>
+    
+    <DataTemplate DataType="{x:Type vm:PageProveedor}">
+        <view:PageGeneralV/>
+>>>>>>> 29/05/2025
     </DataTemplate>
 
 

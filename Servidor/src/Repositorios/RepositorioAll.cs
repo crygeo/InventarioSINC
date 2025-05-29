@@ -1,4 +1,5 @@
-﻿using Shared.Interfaces;
+﻿using Servidor.src.Objs;
+using Shared.Interfaces;
 using Shared.Interfaces.ModelsBase;
 
 namespace Servidor.src.Repositorios
@@ -7,7 +8,7 @@ namespace Servidor.src.Repositorios
     public class RepositorioRecepcionCarga : RepositorioBase<IRecepcionCarga> { }
     public class RepositorioProveedor : RepositorioBase<IProveedor> { }
     public class RepositorioClasificacion : RepositorioBase<IClasificacion> { }
-    public class RepositorioClase : RepositorioBase<IClase> { }
-    public class RepositorioCalidad : RepositorioBase<ICalidad> { }
+    public class RepositorioClase : RepositorioBase<Clase> { }
+    public class RepositorioCalidad : RepositorioBase<Calidad> { }
 
 }

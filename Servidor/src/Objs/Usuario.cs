@@ -23,8 +23,7 @@ namespace Servidor.src.Objs
 
         [BsonRepresentation(BsonType.ObjectId)]
         public List<string> Roles { get;  set; } = [];
-
-
+        public bool Deleteable { get; set; }
     }
 
 }

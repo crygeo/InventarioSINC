@@ -24,11 +24,11 @@ namespace Servidor.src.Controllers
 
     [ApiController]
     [Route("api/[controller]")]
-    public class CalidadController(ServiceCalidad servicio) : BaseController<ICalidad>(servicio) { }
+    public class CalidadController(ServiceCalidad servicio) : BaseController<Calidad>(servicio) { }
 
     [ApiController]
     [Route("api/[controller]")]
-    public class ClaseController(ServiceClase servicio) : BaseController<IClase>(servicio) { }
+    public class ClaseController(ServiceClase servicio) : BaseController<Clase>(servicio) { }
 
     [ApiController]
     [Route("api/[controller]")]

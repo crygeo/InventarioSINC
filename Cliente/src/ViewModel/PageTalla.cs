@@ -11,6 +11,7 @@ namespace Cliente.src.ViewModel
 {
     public class PageTalla : ViewModelServiceBase<Talla>
     {
+<<<<<<< HEAD
         public override ServiceBase<Talla> ServicioBase => new TallaService();
 
         public override Task CrearEntityAsync()
@@ -27,6 +28,9 @@ namespace Cliente.src.ViewModel
         {
             throw new NotImplementedException();
         }
+=======
+        public override ServiceBase<Talla> ServicioBase => TallaService.Instance;
+>>>>>>> 29/05/2025
 
         protected override void UpdateChanged()
         {

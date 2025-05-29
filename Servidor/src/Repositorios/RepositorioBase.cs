@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Servidor.src.Repositorios
 {
-    public abstract class RepositorioBase<TObj> : IRepository<TObj> where TObj : IIdentifiable
+    public abstract class RepositorioBase<TObj> : IRepository<TObj> where TObj : IIdentifiable, IDeleteable
     {
         public IMongoCollection<TObj> Collection { get; }
 
@@ -108,6 +108,9 @@ namespace Servidor.src.Repositorios
         {
             try
             {
+                var obj = await GetByIdAsync(id);
+                if (obj == null || !obj.Deleteable) return false; // Si el objeto no existe, no se puede eliminar
+
                 var result = await Collection.DeleteOneAsync(x => x.Id == id);
                 return result.DeletedCount > 0;
             }
