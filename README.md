@@ -67,6 +67,111 @@ Servicio centralizado para abrir diálogos y subdiálogos con soporte para:
 - **Cliente**: provee una UI robusta y flexible con WPF
 
 ---
+# 🧩 Arquitectura del Proyecto: Separación Cliente/Servidor basada en Interfaces Compartidas
+
+Este proyecto adopta una arquitectura **cliente/servidor desacoplada** que utiliza **interfaces compartidas** para garantizar la mantenibilidad, escalabilidad y reutilización del código. Se basa en una **estructura modular** que separa claramente las responsabilidades de cada capa.
+
+---
+
+## 📁 Estructura del Proyecto
+
+| Capa     | Propósito                                    | Detalles técnicos |
+|----------|----------------------------------------------|-------------------|
+| **Cliente** | Interfaz de usuario (WPF + MVVM)              | Modelos enriquecidos con `ModelBase<T>`, soporte a `INotifyPropertyChanged`, validación con `INotifyDataErrorInfo` y `SetProperty` para bindings. |
+| **Servidor** | API REST (ASP.NET Core + MongoDB)             | Clases simples (POCOs) con `[BsonId]`, sin lógica de UI, optimizadas para serialización JSON y persistencia MongoDB. |
+| **Shared** | Contratos comunes reutilizables                 | Interfaces como `IModelObj`, `IProducto`, `IAtributosEntity`, etc., compartidas entre cliente y servidor. |
+
+---
+
+## 🎯 Objetivo de la Separación
+
+La separación por capas permite:
+
+- ✅ Evitar la duplicación de código.
+- ✅ Respetar el principio de responsabilidad única (SRP).
+- ✅ Reutilizar contratos compartidos sin acoplar las implementaciones.
+- ✅ Simplificar validaciones, bindings y serialización/deserialización según el entorno.
+
+---
+
+## 🧠 Cliente (WPF)
+
+Los modelos del cliente extienden `ModelBase<T>` y se benefician de:
+
+- 🎯 **Cambio de estado reactivo**: `INotifyPropertyChanged`.
+- 🛡️ **Validación dinámica**: `INotifyDataErrorInfo`.
+- 🔄 **Soporte total a formularios**: Bindings de WPF y método `SetProperty`.
+
+Esto permite una UI rica y validaciones contextuales directamente en el cliente.
+
+---
+
+## 🛠️ Servidor (ASP.NET Core)
+
+Los modelos del servidor son simples objetos CLR (`POCOs`) diseñados para:
+
+- 📦 **Serialización eficiente** con `System.Text.Json`.
+- 🧱 **Persistencia directa** en MongoDB usando `IMongoCollection<T>`.
+- 🧼 **Operaciones CRUD limpias** sin acoplar lógica de presentación.
+
+---
+
+## 🔄 Ventaja del Uso de Interfaces
+
+El uso de interfaces como `IEnumerable<IAtributosEntity>` permite:
+
+- 🔁 Intercambio flexible de modelos entre capas.
+- 🧩 Implementaciones separadas con contratos comunes.
+- 🧽 Limpieza de dependencias UI en el servidor.
+- 🔐 Tipado fuerte sin sacrificar flexibilidad.
+
+---
+
+## ✅ Beneficios Generales
+
+- ♻️ **Reutilización** de código y contratos.
+- 🔌 **Desacoplamiento** entre cliente y servidor.
+- 📐 **Escalabilidad** para nuevos módulos o cambios de tecnología.
+- 📦 **Mantenibilidad** a largo plazo del proyecto.
+
+---
+
+## 📚 Ejemplo de Contrato Compartido
+
+```csharp
+public interface IProducto : IModelObj {
+    string Nombre { get; set; }
+    decimal Precio { get; set; }
+    IEnumerable<IAtributosEntity> Atributos { get; set; }
+}
+```
+## 🧪 Ejemplo Cliente (WPF)
+
+```csharp
+public class ProductoViewModel : ModelBase<ProductoViewModel>, IProducto {
+    private string _nombre;
+    public string Nombre {
+        get => _nombre;
+        set => SetProperty(ref _nombre, value);
+    }
+
+    // Otros miembros...
+}
+```
+
+## 🗄️ Ejemplo Servidor (ASP.NET Core)
+```csharp
+public class ProductoEntity : IProducto {
+    [BsonId]
+    public Guid Id { get; set; }
+    public string Nombre { get; set; }
+    public decimal Precio { get; set; }
+    public List<AtributoEntity> Atributos { get; set; }
+}
+```
+
+📌 Esta arquitectura sigue los principios de Clean Architecture, promoviendo separación de responsabilidades y contratos independientes reutilizables entre frontend y backend.
+---
 ## 🔐 Autenticación y autorización
 
 Este proyecto implementa autenticación basada en **JWT (JSON Web Tokens)**. Todas las rutas protegidas requieren que el usuario esté autenticado y tenga los permisos adecuados.
