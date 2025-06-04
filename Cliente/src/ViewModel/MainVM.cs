@@ -1,6 +1,7 @@
 ﻿using Cliente.src.Command;
 using Cliente.src.Model;
 using Cliente.src.Services;
+using Cliente.src.Services.Model;
 using Cliente.src.View.Dialog;
 using Cliente.src.View.Items;
 using Cliente.src.ViewModel;
@@ -22,7 +23,7 @@ namespace Cliente.src.ViewModel
     public class MainVM : ViewModelBase, IBarNavegacion
     {
         private DialogService DialogService => DialogService.Instance;
-        public UsuarioService ServicioUsuario => UsuarioService.Instance;
+        public UsuarioService ServicioUsuario => (UsuarioService)ServiceFactory.GetService<Usuario>();
 
         private ViewModelBase _pageSelectViewModel = null!;
         public ViewModelBase PageSelectViewModel
@@ -47,29 +48,6 @@ namespace Cliente.src.ViewModel
         public IAsyncRelayCommand AccountView { get; }
 
         public List<IItemNav> ListItemsNav { get; } = [
-<<<<<<< HEAD
-            new ItemNavigationM() {
-                Title = "Usuarios",
-                SelectedIcon = PackIconKind.AccountCog,
-                UnselectedIcon = PackIconKind.AccountCogOutline,
-                Notification = 1,
-                Page = new PageUsuarioVM()
-            },
-            new ItemNavigationM() {
-                Title = "Roles",
-                SelectedIcon = PackIconKind.ShieldAccount,
-                UnselectedIcon = PackIconKind.ShieldAccountOutline,
-                Page = new PageRolesVM()
-            },
-            new ItemNavigationM() {
-                Title = "Propiedades",
-                SelectedIcon = PackIconKind.TablePlus,
-                UnselectedIcon = PackIconKind.TablePlus,
-                Page = new PageProcesosVM()
-            }
-            ];
-
-=======
             new ItemNavigationM {
             Title = "Usuarios",
             SelectedIcon = PackIconKind.AccountCog,
@@ -90,7 +68,6 @@ namespace Cliente.src.ViewModel
             Page = new PageProcesosVM()
         }
         ];
->>>>>>> 29/05/2025
 
         public MainVM()
         {
@@ -101,28 +78,18 @@ namespace Cliente.src.ViewModel
         private async Task VerPerfilUsuarioAsync()
         {
             var result = await ServicioUsuario.GetThisUser();
-<<<<<<< HEAD
-
-=======
->>>>>>> 29/05/2025
             await DialogService.ValidarRespuesta(result);
 
-            if (result.Entity == null)
+            if (result.EntityGet == null)
                 return;
 
-<<<<<<< HEAD
-            var dialog = new AccountDialog()
-            {
-                Usuario = result.Entity,
-                CloseSeccionCommand = new RelayCommand(ConfirmarCierreSeccion),
-                ChangedPasswordCommand = new RelayCommand(CambiarPassword),
-=======
             var dialog = new AccountDialog
             {
-                Usuario = result.Entity,
+                Usuario = result.EntityGet,
                 CloseSeccionCommand = new AsyncRelayCommand(CerrarSesionAsync),
-                ChangedPasswordCommand = new AsyncRelayCommand(param => CambiarPasswordAsync(param))
->>>>>>> 29/05/2025
+                ChangedPasswordCommand = new AsyncRelayCommand<Usuario>(CambiarPasswordAsync),
+                DialogOpenIdentifier = DialogService.DialogIdentifierMain,
+                DialogNameIdentifier = DialogService.DialogSub01,
             };
 
             await DialogService.MostrarDialogo(dialog);
@@ -134,8 +101,9 @@ namespace Cliente.src.ViewModel
             {
                 TextHeader = "Cerrar Sesión",
                 Message = "¿Estás seguro de que quieres cerrar sesión?",
-                AceptedCommand = new AsyncRelayCommand(EjecutarCierreSesionAsync),
-                CancelCommand = new AsyncRelayCommand(VerPerfilUsuarioAsync)
+                AceptarCommand = new AsyncRelayCommand(EjecutarCierreSesionAsync),
+                DialogOpenIdentifier = DialogService.DialogSub01,
+                DialogNameIdentifier = DialogService.DialogSub02,
             };
 
             await DialogService.MostrarDialogo(confirmDialog);
@@ -148,58 +116,34 @@ namespace Cliente.src.ViewModel
             App.ReiniciarAplicacion();
         }
 
-<<<<<<< HEAD
-                var changedPassword = new ChangePassDialog
-                {
-                    AceptedCommand = new RelayCommand(async (a) =>
-                    {
-                        if (a is ChangePassDialog changePass)
-                        {
-                            await DialogService.MostrarDialogoProgreso(async () =>
-                            {
-                                var result = await UsuarioService.Instance.ChangePasswordAsync(user.Id, changePass.OldPassword, changePass.NewPassword);
-                                await DialogService.ValidarRespuesta(result);
-                                return result;
-
-                            });
-                        }
-                    }),
-                    OldPasswordRequired = Visibility.Visible,
-                };
-
-                await DialogService.MostrarDialogo(changedPassword);
-            }
-=======
-        private async Task CambiarPasswordAsync(object? param)
+        private async Task CambiarPasswordAsync(Usuario? usuario)
         {
-            if (param is not Usuario user)
+            if (usuario == null)
                 return;
->>>>>>> 29/05/2025
 
             var dialog = new ChangePassDialog
             {
-                AceptedCommand = new AsyncRelayCommand(arg => EjecutarCambioPasswordAsync(arg, user)),
-                OldPasswordRequired = Visibility.Visible
+                AceptedCommand = new AsyncRelayCommand<ChangePassDialog>((changePass) => EjecutarCambioPasswordAsync(changePass, usuario)),
+                OldPasswordRequired = Visibility.Visible,
+                DialogOpenIdentifier = DialogService.DialogSub01,
+                DialogNameIdentifier = DialogService.DialogSub02,
             };
 
             await DialogService.MostrarDialogo(dialog);
         }
-<<<<<<< HEAD
-=======
 
-        private async Task EjecutarCambioPasswordAsync(object? arg, Usuario user)
+        private async Task EjecutarCambioPasswordAsync(ChangePassDialog? changePass, Usuario? usuario)
         {
-            if (arg is not ChangePassDialog changePass)
+            if (changePass == null || usuario == null)
                 return;
 
             await DialogService.MostrarDialogoProgreso(async () =>
             {
-                var result = await UsuarioService.Instance.ChangePasswordAsync(user.Id, changePass.OldPassword, changePass.NewPassword);
+                var result = await ServicioUsuario.ChangePasswordAsync(usuario.Id, changePass.OldPassword, changePass.NewPassword);
                 await DialogService.ValidarRespuesta(result);
                 return result;
-            });
+            }, DialogService.DialogSub02);
         }
->>>>>>> 29/05/2025
 
         protected override void UpdateChanged()
         {

@@ -14,21 +14,22 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Cliente.src.Extencions;
+using Cliente.src.View.Dialog;
 using Utilidades.Factory;
 using Utilidades.Extencions;
 using MaterialDesignThemes.Wpf;
-<<<<<<< HEAD
-=======
 using CommunityToolkit.Mvvm.Input;
->>>>>>> 29/05/2025
+using Utilidades.Interfaces;
 
 namespace Cliente.src.View.Items
 {
     /// <summary>
     /// Lógica de interacción para UsuarioItemDetall.xaml
     /// </summary>
-    public partial class RolDialog : UserControl
+    public partial class RolDialog : UserControl, IDialog
     {
+        private IDialog _dialogImplementation;
         public static readonly DependencyProperty ItemProperty = DependencyProperty.Register(nameof(Item), typeof(Rol), typeof(RolDialog));
         public static readonly DependencyProperty ListPermsProperty = DependencyProperty.Register(nameof(ListPerms), typeof(List<Nodos>), typeof(RolDialog));
         public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptedCommand), typeof(IAsyncRelayCommand), typeof(RolDialog));
@@ -63,15 +64,21 @@ namespace Cliente.src.View.Items
             InitializeComponent();
         }
 
-        private async void Button_Click(object sender, RoutedEventArgs e)
+        private async void ButtonGuardar(object sender, RoutedEventArgs e)
         {
             var list = ListPerms.ObtenerSeleccionados().DescostruirArbol();
             Item.Permisos = list;
 
-            await AceptedCommand.ExecuteAsync(Item);
-
-            DialogHost.Close(DialogService.DialogIdentifierMain);
-            
+            await AceptedCommand.TryEjecutarYCerrarDialogoAsync(this, Item);
         }
+
+        private async void ButtonCancelar(object sender, RoutedEventArgs e)
+        {
+            await AceptedCommand.TryEjecutarYCerrarDialogoAsync(this);
+        }
+
+
+        public string DialogNameIdentifier { get; set; } = $"Dialog_{Guid.NewGuid():N}";
+        public required string DialogOpenIdentifier { get; set; }
     }
 }

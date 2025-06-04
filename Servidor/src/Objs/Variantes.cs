@@ -6,16 +6,15 @@ namespace Servidor.src.Objs
 {
     public class Variantes : IVariantes
     {
+        private string _value { get; set; }
         public string Name { get; set; }
         public string NickName { get; set; }
         public string Descripcion { get; set; }
 
-        public IEnumerable<Atributo> Atributos { get; set; } = [];
-
-        IEnumerable<IAtributo> IAtributosEntity.Atributos
+        public string Value
         {
-            get => Atributos;
-            set => Atributos = value.Cast<Atributo>();
+            get => _value;
+            set => _value = value;
         }
     }
 }

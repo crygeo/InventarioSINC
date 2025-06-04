@@ -13,9 +13,6 @@ namespace Cliente.src.Model
 {
     public class Rol : ModelBase<IRol>, IRol, IClassified
     {
-        private string _id = string.Empty;
-        public override string Id { get => _id; set => SetProperty(ref _id, value); }
-
         private string _nombre = "";
         public string Nombre { get => _nombre; set => SetProperty(ref _nombre, value); }
 
@@ -33,7 +30,8 @@ namespace Cliente.src.Model
         private string _message = string.Empty;
         public string Message { get => _message; set => SetProperty(ref _message, value); }
 
-        public override void Update(IIdentifiable identity)
+
+        public override void Update(IModelObj identity)
         {
             if(identity is not IRol rol)
                 throw new ArgumentException("El objeto no es un rol válido.");

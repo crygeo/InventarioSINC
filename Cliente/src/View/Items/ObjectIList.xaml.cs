@@ -1,13 +1,12 @@
-<<<<<<< HEAD
-﻿ using Cliente.src.Model;
-=======
 ﻿using Cliente.src.Attributes;
+using Cliente.src.Extencions;
 using Cliente.src.Model;
->>>>>>> 29/05/2025
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
@@ -30,25 +29,21 @@ namespace Cliente.src.View.Items
     {
         public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(ObjectIList));
         public static readonly DependencyProperty ItemProperty = DependencyProperty.Register(nameof(Item), typeof(object), typeof(ObjectIList));
-<<<<<<< HEAD
-=======
         public static readonly DependencyProperty TypeItemProperty = DependencyProperty.Register(nameof(TypeItem), typeof(Type), typeof(ObjectIList));
->>>>>>> 29/05/2025
 
-        public static readonly DependencyProperty EditarItemCommandProperty = DependencyProperty.Register(nameof(EditarItemCommand), typeof(ICommand), typeof(ObjectIList));
-        public static readonly DependencyProperty EliminarItemCommandProperty =DependencyProperty.Register(nameof(EliminarItemCommand), typeof(ICommand), typeof(ObjectIList));
-
+        public static readonly DependencyProperty EditarItemCommandProperty = DependencyProperty.Register(nameof(EditarItemCommand), typeof(IAsyncRelayCommand), typeof(ObjectIList));
+        public static readonly DependencyProperty EliminarItemCommandProperty =DependencyProperty.Register(nameof(EliminarItemCommand), typeof(IAsyncRelayCommand), typeof(ObjectIList));
 
 
-        public ICommand EditarItemCommand
+
+        public IAsyncRelayCommand EditarItemCommand
         {
-            get => (ICommand)GetValue(EditarItemCommandProperty);
+            get => (IAsyncRelayCommand)GetValue(EditarItemCommandProperty);
             set => SetValue(EditarItemCommandProperty, value);
         }
-
-        public ICommand EliminarItemCommand
+        public IAsyncRelayCommand EliminarItemCommand
         {
-            get => (ICommand)GetValue(EliminarItemCommandProperty);
+            get => (IAsyncRelayCommand)GetValue(EliminarItemCommandProperty);
             set => SetValue(EliminarItemCommandProperty, value);
         }
         public IEnumerable ItemsSource
@@ -56,12 +51,6 @@ namespace Cliente.src.View.Items
             get => (IEnumerable)GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
         }
-<<<<<<< HEAD
-        public object Item
-        {
-            get => (object)GetValue(ItemsSourceProperty);
-            set => SetValue(ItemsSourceProperty, value);
-=======
 
         public object Item
         {
@@ -72,32 +61,17 @@ namespace Cliente.src.View.Items
         {
             get => (Type)GetValue(TypeItemProperty);
             set => SetValue(TypeItemProperty, value);
->>>>>>> 29/05/2025
         }
 
         public ObjectIList()
         {
             InitializeComponent();
             //DataContext = this;
-<<<<<<< HEAD
-=======
 
             this.Loaded += ObjectIList_Loaded;
 
->>>>>>> 29/05/2025
         }
 
-        private void ListBoxItem_PreviewMouseDown(object sender, MouseButtonEventArgs e)
-        {
-            if (sender is ListBoxItem item && Keyboard.IsKeyDown(Key.LeftShift))
-            {
-                item.IsSelected = !item.IsSelected;
-                e.Handled = true; // Evita que WPF cambie la selección predeterminada
-            }
-        }
-
-<<<<<<< HEAD
-=======
         private void ObjectIList_Loaded(object sender, RoutedEventArgs e)
         {
             GenerateColumns();
@@ -108,7 +82,7 @@ namespace Cliente.src.View.Items
             TrySetItemType();
 
             if (TypeItem == null)
-                return;
+                throw new Exception($"TypeItem is null");
 
             var properties = TypeItem.GetProperties()
                 .Where(p => Attribute.IsDefined(p, typeof(SolicitarAttribute)));
@@ -117,13 +91,30 @@ namespace Cliente.src.View.Items
 
             foreach (var prop in properties)
             {
+                var attr = prop.GetCustomAttribute<SolicitarAttribute>();
+                var displayName = attr?.Nombre ?? prop.Name;
+
+                var isEnumerable = typeof(System.Collections.IEnumerable).IsAssignableFrom(prop.PropertyType)
+                                   && prop.PropertyType != typeof(string);
+
+                Binding binding;
+                if (isEnumerable)
+                {
+                    binding = new Binding($"{prop.Name}.Count");
+                }
+                else
+                {
+                    binding = new Binding(prop.Name);
+                }
+
                 DataGridSolicitados.Columns.Add(new DataGridTextColumn
                 {
-                    Header = prop.Name,
-                    Binding = new Binding(prop.Name)
+                    Header = displayName,
+                    Binding = binding
                 });
             }
         }
+
 
         private void TrySetItemType()
         {
@@ -135,6 +126,5 @@ namespace Cliente.src.View.Items
                 TypeItem = item.GetType();
         }
 
->>>>>>> 29/05/2025
     }
 }

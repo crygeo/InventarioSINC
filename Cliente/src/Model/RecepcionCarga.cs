@@ -10,27 +10,25 @@ namespace Cliente.src.Model
 {
     public class RecepcionCarga : ModelBase<IRecepcionCarga>, IRecepcionCarga
     {
-        private IProveedor _proveedor;
+        private IEnumerable<IIdentificador> _identificadores = [];
+        private IProveedor _proveedor = new ProveedorPersona();
         private DateTime _fechaIngreso = DateTime.Now;
         private List<ICarga> _camiones = [];
         private float _pesoTotal;
         private byte[]? _guiaGlobal;
         private string _nota = string.Empty;
-        private string _id = string.Empty;
-        private string _macroLote = string.Empty;
-        private string _lote = string.Empty;
-        private bool _entregaCerrada = false;
-<<<<<<< HEAD
 
-=======
-        private bool _deleteable = false;
-
-        public bool Deleteable
+        public override void Update(IModelObj identity)
         {
-            get => _deleteable;
-            set => SetProperty(ref _deleteable, value);
+            throw new NotImplementedException();
         }
->>>>>>> 29/05/2025
+
+        protected override void UpdateChanged()
+        {
+            throw new NotImplementedException();
+        }
+
+        public IEnumerable<IIdentificador> Identificadores => _identificadores;
 
         public IProveedor Proveedor
         {
@@ -41,64 +39,34 @@ namespace Cliente.src.Model
         public DateTime FechaIngreso
         {
             get => _fechaIngreso;
+            set => SetProperty(ref _fechaIngreso, value);
         }
+
         public List<ICarga> Camiones
         {
             get => _camiones;
             set => SetProperty(ref _camiones, value);
         }
+
         public float PesoTotal
         {
             get => _pesoTotal;
             set => SetProperty(ref _pesoTotal, value);
         }
+
         public byte[]? GuiaGlobal
         {
             get => _guiaGlobal;
             set => SetProperty(ref _guiaGlobal, value);
         }
+
         public string Nota
         {
             get => _nota;
             set => SetProperty(ref _nota, value);
         }
 
-        public override string Id
-        {
-            get => _id;
-            set => SetProperty(ref _id, value);
-        }
-        public string MacroLote
-        {
-            get => _macroLote;
-            set => SetProperty(ref _macroLote, value);
-        }
-
-        public string Lote
-        {
-            get => _lote;
-            set => SetProperty(ref _lote, value);
-        }
-        public bool EntregaCerrada
-        {
-            get => _entregaCerrada;
-            set => SetProperty(ref _entregaCerrada, value);
-        }
-<<<<<<< HEAD
-=======
-        
->>>>>>> 29/05/2025
-
         public void CerrarEntrega()
-        {
-            EntregaCerrada = true;
-        }
-        public override void Update(IIdentifiable identity)
-        {
-            throw new NotImplementedException();
-        }
-
-        protected override void UpdateChanged()
         {
             throw new NotImplementedException();
         }

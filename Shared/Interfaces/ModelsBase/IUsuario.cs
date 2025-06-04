@@ -9,11 +9,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-<<<<<<< HEAD
-    public interface IUsuario : IPersona, IIdentifiable
-=======
     public interface IUsuario : IPersona, IIdentifiable, IDeleteable
->>>>>>> 29/05/2025
     {
         string User { get; set; }
         string Password { get; set; }

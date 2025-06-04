@@ -1,16 +1,9 @@
-<<<<<<< HEAD
-﻿using Cliente.src.Extencions;
-using Cliente.src.Model;
-using Cliente.src.Services;
-using Cliente.src.View.Dialog;
-=======
 ﻿using Cliente.src.Attributes;
 using Cliente.src.Extencions;
 using Cliente.src.Model;
-using Cliente.src.Services;
+using Cliente.src.Services.Model;
 using Cliente.src.View.Dialog;
 using Cliente.src.View.Items;
->>>>>>> 29/05/2025
 using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
 using Shared.Extensions;
@@ -24,20 +17,18 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Cliente.src.Services;
+using Shared.Interfaces.ModelsBase;
 using Utilidades.Interfaces;
 using Utilidades.Mvvm;
 
 namespace Cliente.src.ViewModel
 {
-<<<<<<< HEAD
-    public abstract class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : IIdentifiable, IUpdate, ISelectable
-=======
-    public abstract class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : IIdentifiable, IUpdate, ISelectable, new()
->>>>>>> 29/05/2025
+    public abstract class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : class, IModelObj, ISelectable, new()
     {
-        protected DialogService DialogService { get; set; } = DialogService.Instance;
+        protected DialogService DialogServiceI { get; set; } = DialogService.Instance;
 
-        public abstract ServiceBase<TEntity> ServicioBase { get; }
+        public ServiceBase<TEntity> ServicioBase { get; } = ServiceFactory.GetService<TEntity>();
         public ObservableCollection<TEntity> Entitys { get => ServicioBase.Collection; }
 
         private TEntity? _entitySelect;
@@ -96,26 +87,17 @@ namespace Cliente.src.ViewModel
         public virtual async void InitAsync()
         {
             var result = await ServicioBase.InitAsync();
-            await DialogService.ValidarRespuesta(result);
+            await DialogServiceI.ValidarRespuesta(result);
         }
 
-<<<<<<< HEAD
-
-        public virtual async void StopAsync() => await ServicioBase.StopAsync();
-=======
->>>>>>> 29/05/2025
 
         public virtual async void StopAsync() => await ServicioBase.StopAsync();
 
-<<<<<<< HEAD
-=======
 
->>>>>>> 29/05/2025
         public virtual async Task CargarEntitysAsync()
         {
             if (_isLoading)
                 return;
-<<<<<<< HEAD
 
             _isLoading = true;
             ProgressVisible = true;
@@ -134,38 +116,7 @@ namespace Cliente.src.ViewModel
             });
 
             var result = await ServicioBase.UpdateCollection();
-            await DialogService.ValidarRespuesta(result);
-            if (result.Success)
-                Entitys.FirstOrDefault()?.Select();
-
-            await progressTask;
-
-        }
-
-        public abstract Task CrearEntityAsync();
-        public abstract Task EditarEntityAsync();
-        public abstract Task DeleteEntityAsync();
-
-=======
-
-            _isLoading = true;
-            ProgressVisible = true;
-            ProgressValue = 0;
-
-            var progressTask = Task.Run(async () =>
-            {
-                for (int i = 0; i <= 100; i++)
-                {
-                    ProgressValue = i;
-                    await Task.Delay(_tiempoEsperaS * 10);
-                }
-
-                ProgressVisible = false;
-                _isLoading = false;
-            });
-
-            var result = await ServicioBase.UpdateCollection();
-            await DialogService.ValidarRespuesta(result);
+            await DialogServiceI.ValidarRespuesta(result);
             if (result.Success)
                 Entitys.FirstOrDefault()?.Select();
 
@@ -176,26 +127,25 @@ namespace Cliente.src.ViewModel
 
         public async virtual Task CrearEntityAsync()
         {
-            var Dialog = new FormularioDinamico(new TEntity())
-            {
-                AceptarCommand = new AsyncRelayCommand<TEntity>(AgregarUsuario),
-                TextHeader = $"Crear {GetNombreEntidad(Pluralidad.Singular)}"
-            };
 
-            await DialogService.MostrarDialogo(Dialog);
+            await DialogService.MostrarFormularioDinamicoAsyncMain(
+                new TEntity(),
+                $"Crear {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
+                ConfirmarCrearEntityAsync
+            );
         }
         public async virtual Task EditarEntityAsync()
         {
             if (EntitySelect == null)
                 return;
 
-            var Dialog = new FormularioDinamico(EntitySelect.Clone())
-            {
-                AceptarCommand = new AsyncRelayCommand<TEntity?>(ConfirmarEditarEntityAsync),
-                TextHeader = $"Editar {GetNombreEntidad(Pluralidad.Singular)}"
-            };
 
-            await DialogService.MostrarDialogo(Dialog);
+            await DialogService.MostrarFormularioDinamicoAsyncMain(
+                EntitySelect.Clone(),
+                $"Editar {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
+                ConfirmarEditarEntityAsync
+            );
+
         }
         public async virtual Task DeleteEntityAsync()
         {
@@ -204,35 +154,39 @@ namespace Cliente.src.ViewModel
 
             var confirmDialog = new ConfirmDialog
             {
-                TextHeader = $"Eliminar {GetNombreEntidad(Pluralidad.Singular)}",
-                Message = $"¿Estás seguro de que quieres eliminar el {GetNombreEntidad(Pluralidad.Singular)} seleccionado?",
-                AceptedCommand = new AsyncRelayCommand(ConfirmarEliminarEntityAsync)
+                TextHeader = $"Eliminar {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
+                Message = $"¿Estás seguro de que quieres eliminar el {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)} seleccionado?",
+                AceptarCommand = new AsyncRelayCommand(ConfirmarEliminarEntityAsync),
+                DialogNameIdentifier = DialogService.DialogSub01,
+                DialogOpenIdentifier = DialogService.DialogIdentifierMain
             };
 
-            await DialogService.MostrarDialogo(confirmDialog);
+            await DialogServiceI.MostrarDialogo(confirmDialog);
         }
 
 
-        private async Task AgregarUsuario(TEntity? entity)
+        private async Task ConfirmarCrearEntityAsync(TEntity? entity)
         {
             if (entity == null)
                 return;
 
-            await DialogService.MostrarDialogoProgreso(async () =>
+            await DialogServiceI.MostrarDialogoProgreso(async () =>
             {
                 var result = await ServicioBase.CreateAsync(entity);
-                await DialogService.ValidarRespuesta(result);
+                result.ObjInteration = typeof(TEntity);
+                await DialogServiceI.ValidarRespuesta(result);
                 return result;
             });
         }
         private async Task ConfirmarEditarEntityAsync(TEntity? entity)
         {
-            if (entity == null) return;
+            if (EntitySelect == null) return;
 
-            await DialogService.MostrarDialogoProgreso(async () =>
+            await DialogServiceI.MostrarDialogoProgreso(async () =>
             {
                 var result = await ServicioBase.UpdateAsync(entity.Id, entity);
-                await DialogService.ValidarRespuesta(result);
+                result.ObjInteration = typeof(TEntity);
+                await DialogServiceI.ValidarRespuesta(result);
                 return result;
             });
         }
@@ -241,39 +195,17 @@ namespace Cliente.src.ViewModel
 
             if (EntitySelect == null) return;
 
-            await DialogService.MostrarDialogoProgreso(async () =>
+            await DialogServiceI.MostrarDialogoProgreso(async () =>
             {
                 var result = await ServicioBase.DeleteAsync(EntitySelect.Id);
-                await DialogService.ValidarRespuesta(result);
+                result.ObjInteration = typeof(TEntity);
+                await DialogServiceI.ValidarRespuesta(result);
                 return result;
             });
         }
 
-        private string GetNombreEntidad(Pluralidad pluralidad)
-        {
-            string nombreEntidad = "";
+        
 
-            var atributo = typeof(TEntity).GetCustomAttribute<NombreEntidadAttribute>();
-
-            switch (pluralidad)
-            {
-                case Pluralidad.Plural:
-                    nombreEntidad = atributo?.Plural ?? $"{typeof(TEntity).Name.ToLower()}s";
-                    break;
-                case Pluralidad.Singular:
-                    nombreEntidad = atributo?.Singular ?? typeof(TEntity).Name.ToLower();
-                    break;
-
-            }
-
-            return nombreEntidad;
-        }
-
-        private enum Pluralidad
-        {
-            Singular,
-            Plural
-        }
->>>>>>> 29/05/2025
     }
+    
 }

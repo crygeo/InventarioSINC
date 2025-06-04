@@ -18,52 +18,28 @@
         <view:PageProcesosV/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:PageCalidad}">
-<<<<<<< HEAD
-        <view:PageGeneralView/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type vm:PageClase}">
-        <view:PageGeneralView/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type vm:PageClasificacion}">
-        <view:PageGeneralView/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type vm:PageTalla}">
-        <view:PageGeneralView/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type vm:PageRecepcionCarga}">
-        <view:PageGeneralView/>
-    </DataTemplate>
-    
-    <DataTemplate DataType="{x:Type vm:PageProveedor}">
-        <view:PageGeneralView/>
-=======
+    <DataTemplate DataType="{x:Type vm:PageProductoVM}">
         <view:PageGeneralV/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:PageClase}">
+    <DataTemplate DataType="{x:Type vm:PageIdentificadorVM}">
         <view:PageGeneralV/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:PageClasificacion}">
-        <view:PageGeneralV/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type vm:PageTalla}">
+    <DataTemplate DataType="{x:Type vm:PageClasificacionVM}">
         <view:PageGeneralV/>
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type vm:PageRecepcionCarga}">
         <view:PageGeneralV/>
     </DataTemplate>
-    
-    <DataTemplate DataType="{x:Type vm:PageProveedor}">
+
+    <DataTemplate DataType="{x:Type vm:PageProveedorEmpresa}">
         <view:PageGeneralV/>
->>>>>>> 29/05/2025
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PageProveedorPersona}">
+        <view:PageGeneralV/>
     </DataTemplate>
 
 

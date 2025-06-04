@@ -1,5 +1,5 @@
 ﻿using Cliente.src.Model;
-using Cliente.src.Services;
+using Cliente.src.Services.Model;
 using Shared.Interfaces;
 using Shared.Interfaces.ModelsBase;
 using System;
@@ -8,32 +8,20 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cliente.src.Services;
 
 namespace Cliente.src.ViewModel
 {
-    public class PageProveedor : ViewModelServiceBase<Proveedor>
+    public class PageProveedorEmpresa : ViewModelServiceBase<ProveedorEmpresa>
     {
-<<<<<<< HEAD
-        public override ServiceBase<Proveedor> ServicioBase => new ProveedorService();
-
-        public override Task CrearEntityAsync()
+        protected override void UpdateChanged()
         {
             throw new NotImplementedException();
         }
+    }
 
-        public override Task DeleteEntityAsync()
-        {
-            throw new NotImplementedException();
-        }
-
-        public override Task EditarEntityAsync()
-        {
-            throw new NotImplementedException();
-        }
-=======
-        public override ServiceBase<Proveedor> ServicioBase => ProveedorService.Instance;
->>>>>>> 29/05/2025
-
+    public class PageProveedorPersona : ViewModelServiceBase<ProveedorPersona>
+    {
         protected override void UpdateChanged()
         {
             throw new NotImplementedException();

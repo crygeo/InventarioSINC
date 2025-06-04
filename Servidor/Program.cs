@@ -4,10 +4,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-<<<<<<< HEAD
-=======
-using Servidor;
->>>>>>> 29/05/2025
 using Servidor.src.Extensiones;
 using Servidor.src.Helper;
 using Servidor.src.Hubs;
@@ -18,6 +14,7 @@ using Servidor.src.Services;
 using System;
 using System.Linq;
 using System.Text;
+using Servidor;
 
 var builder = WebApplication.CreateBuilder(args);
 //var secretKey = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key not found"));

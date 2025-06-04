@@ -9,6 +9,11 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="src\Img\loading-process.png" />
+	  <None Remove="src\Img\prismatic-globe-database-xnom187ixkelq5gn.jpg" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
 		<PackageReference Include="MaterialDesignColors" Version="5.2.2-ci991" />
@@ -22,56 +27,16 @@
 		<ProjectReference Include="..\Shared\Shared.csproj" />
 	</ItemGroup>
 	<ItemGroup>
-		<Resource Include="src\Img\loading-process.png">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Resource>
-		<Resource Include="src\Img\prismatic-globe-database-xnom187ixkelq5gn.jpg">
-			<CopyToOutputDirectory>Always</CopyToOutputDirectory>
-		</Resource>
-	</ItemGroup>
-	<ItemGroup>
-	  <Compile Update="src\View\Dialog\ChangePassDialog.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="src\View\Dialog\ConfirmDialog.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="src\View\Dialog\MessageDialogError.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="src\View\Dialog\RolDialog.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="src\View\Dialog\AccountDialog.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="src\View\Items\VariantesAdd.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="src\View\Items\ObjectIList.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="src\View\Items\RolList.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="src\View\Items\ObjectItem.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
-	  <Compile Update="src\View\Items\RoltemB.xaml.cs">
-	    <SubType>Code</SubType>
-	  </Compile>
+	  <Resource Include="src\Img\loading-process.png">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Resource>
+	  <Resource Include="src\Img\prismatic-globe-database-xnom187ixkelq5gn.jpg">
+	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+	  </Resource>
 	</ItemGroup>
 	<ItemGroup>
 	  <None Update="App.config">
 	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
 	  </None>
-	</ItemGroup>
-	<ItemGroup>
-	  <Page Update="src\View\Dialog\AccountDialog.xaml">
-	    <SubType>Designer</SubType>
-	  </Page>
-	  <Page Update="src\View\Dialog\ChangePassDialog.xaml">
-	    <SubType>Designer</SubType>
-	  </Page>
 	</ItemGroup>
 </Project>

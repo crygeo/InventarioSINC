@@ -1,12 +1,8 @@
 ﻿using Cliente.src.View.Dialog;
+using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
-<<<<<<< HEAD
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
-using System.Threading.Tasks;
+using Shared.Interfaces.ModelsBase;
+using System.Net.Http;
 using Utilidades.Interfaces;
 
 namespace Cliente.src.Services
@@ -16,173 +12,201 @@ namespace Cliente.src.Services
         private static readonly Lazy<DialogService> _instance = new(() => new DialogService());
         public static DialogService Instance => _instance.Value;
 
-        private bool _dialogoAbierto = false;
+        public static string DialogIdentifierMain { get; } = $"Dialog_ViewMain";
+        public static string DialogIdentifierProgress { get; } = $"Dialog_ViewProgress";
+        public static string DialogSub01 { get; } = $"Dialog_Sub01";
+        public static string DialogSub02 { get; } = $"Dialog_Sub02";
 
-        public static string DialogIdentifier => "MainView";
+        public SnackbarMessageQueue MensajeQueue { get; } = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
 
-        private DialogService()
+
+        // Múltiples banderas por identificador
+        private readonly Dictionary<string, bool> _dialogosAbiertos = new();
+
+        private DialogService() { }
+        public async Task MostrarDialogoError<T>(IResultResponse<T> content, string dial = "")
         {
-        }
+            string diID = "";
+            if (string.IsNullOrEmpty(dial))
+                diID = DialogIdentifierMain;
+            else
+                diID = dial;
 
-        public async Task MostrarDialogo(object content)
-        {
-            if (_dialogoAbierto || DialogHost.IsDialogOpen(DialogIdentifier))
-                return;
-
-            _dialogoAbierto = true;
-            try
+            MessageDialogError dialog = new MessageDialogError
             {
-                await DialogHost.Show(content, DialogIdentifier);
-            }
-            finally
-            {
-                _dialogoAbierto = false;
-            }
-        }
-
-        public async Task MostrarDialogo(string content)
-        {
-            MessageDialog dialog = new MessageDialog { Message = content };
+                DialogOpenIdentifier = diID,
+                ErrorResponse = content
+            };
             await MostrarDialogo(dialog);
         }
-
-        public async Task MostrarDialogoProgreso<T>(Func<Task<IResultResponse<T>>> accion, string? nameIdentifier = null)
+        public async Task MostrarDialogo(string content, string dial = "")
         {
-            var dialogId = nameIdentifier ?? DialogIdentifier;
+            string diID = "";
+            if (string.IsNullOrEmpty(dial))
+                diID = DialogIdentifierMain;
+            else
+                diID = dial;
 
-            if (_dialogoAbierto || DialogHost.IsDialogOpen(dialogId))
+            MessageDialog dialog = new MessageDialog { Message = content, DialogOpenIdentifier = diID };
+            await MostrarDialogo(dialog);
+        }
+        public async Task MostrarDialogo(IDialog dialogTo)
+        {
+            if (await CerrarSiEstaAbiertoYEsperar(dialogTo.DialogOpenIdentifier))
             {
-                DialogHost.Close(dialogId);
-                _dialogoAbierto = false;
-
-                await Task.Delay(100); // Prevent loop risk
-                await MostrarDialogoProgreso(accion, nameIdentifier);
+                await MostrarDialogo(dialogTo);
                 return;
             }
 
-            _dialogoAbierto = true;
             try
             {
-                var progressDialog = new ProgressDialog();
-
-                await DialogHost.Show(progressDialog, dialogId, openedEventHandler: async (sender, args) =>
-                {
-                    var result = await accion();
-                    DialogHost.Close(dialogId);
-                });
+                await DialogHost.Show(dialogTo, dialogTo.DialogOpenIdentifier);
+                EstablecerEstado(dialogTo.DialogOpenIdentifier, true);
+            }
+            catch (Exception ex)
+            {
+                EstablecerEstado(dialogTo.DialogOpenIdentifier, false);
+                MensajeQueue.Enqueue($"Error al mostrar el diálogo: {ex.Message}");
             }
             finally
             {
-                _dialogoAbierto = false;
+                EstablecerEstado(dialogTo.DialogOpenIdentifier, false);
+            }
+        }
+        public async Task<IResultResponse<T>> MostrarDialogoProgreso<T>(Func<Task<IResultResponse<T>>> accion, string? nameIdentifier = null)
+
+        {
+            var dialogId = nameIdentifier ?? DialogIdentifierProgress;
+            IResultResponse<T>? resultado = null;
+
+            if (await CerrarSiEstaAbiertoYEsperar(dialogId))
+            {
+                return await MostrarDialogoProgreso(accion, nameIdentifier); // retry limpio
+            }
+
+            EstablecerEstado(dialogId, true);
+            try
+            {
+                var progressDialog = new ProgressDialog()
+                {
+                    DialogOpenIdentifier = nameIdentifier ?? DialogIdentifierProgress,
+                };
+
+                await DialogHost.Show(progressDialog, progressDialog.DialogOpenIdentifier,
+                    openedEventHandler: new DialogOpenedEventHandler(async (sender, args) =>
+                    {
+                        resultado = await accion();
+                        await CerrarSiEstaAbiertoYEsperar(progressDialog);
+                    })
+                );
+
+
+                // Espera a que DialogHost.Show cierre
+                while (resultado == null)
+                {
+                    await Task.Delay(50); // evita spinlock
+                }
+
+                return resultado;
+            }
+            finally
+            {
+                EstablecerEstado(dialogId, false);
             }
         }
 
 
-
-
-
-        public async Task ValidarRespuesta<T>(IResultResponse<T> resp)
+        public static async Task<T?> MostrarFormularioDinamicoAsyncMain<T>(T instancia, string header, Func<T, Task> aceptar)
+            where T : class
         {
-            if (resp.Success)
-                return;
-            else
-                await MostrarDialogo(resp.Message);
+            await MostrarFormularioDinamicoAsync(instancia, header, new AsyncRelayCommand<T>(aceptar),
+                DialogIdentifierMain, DialogSub01);
+
+            return instancia;
         }
-    }
-=======
-using Utilidades.Interfaces;
-
-public class DialogService : IDialogService
-{
-    private static readonly Lazy<DialogService> _instance = new(() => new DialogService());
-    public static DialogService Instance => _instance.Value;
-
-    public static string DialogIdentifierMain => "DialogMain";
-    public static string DialogIdentifierProgress => "DialogProgrees";
-
-    // Múltiples banderas por identificador
-    private readonly Dictionary<string, bool> _dialogosAbiertos = new();
-
-    private DialogService() { }
-
-    public async Task MostrarDialogo(string content)
-    {
-        MessageDialog dialog = new MessageDialog { Message = content };
-        await MostrarDialogo(dialog);
-    }
-
-    private bool EstaAbierto(string dialogId) =>
-        _dialogosAbiertos.TryGetValue(dialogId, out var abierto) && abierto;
-
-    private void EstablecerEstado(string dialogId, bool abierto) =>
-        _dialogosAbiertos[dialogId] = abierto;
-
-    public async Task<bool> CerrarSiEstaAbiertoYEsperar(string dialogId)
-    {
-        if (EstaAbierto(dialogId) || DialogHost.IsDialogOpen(dialogId))
+        public static async Task<T?> MostrarFormularioDinamicoAsyncSubDialog01<T>(T instancia, string header, Func<T, Task> aceptar)
+            where T : class
         {
-            DialogHost.Close(dialogId);
-            EstablecerEstado(dialogId, false);
+            await MostrarFormularioDinamicoAsync(instancia, header, new AsyncRelayCommand<T>(aceptar),
+                DialogSub01, DialogSub02);
 
-            await Task.Delay(100); // Previene loops u errores de render
-            return true;
+            return instancia;
         }
-
-        return false;
-    }
-
-    public async Task MostrarDialogo(object content, string? nameIdentifier = null)
-    {
-        var dialogId = nameIdentifier ?? DialogIdentifierMain;
-
-        if (await CerrarSiEstaAbiertoYEsperar(dialogId))
+        public static async Task<T?> MostrarFormularioDinamicoAsync<T>(T instancia, string header, IAsyncRelayCommand<T> aceptarCommand, string openId, string nameId)
+            where T : class
         {
-            await MostrarDialogo(content, nameIdentifier);
-            return;
-        }
-
-        EstablecerEstado(dialogId, true);
-        try
-        {
-            await DialogHost.Show(content, dialogId);
-        }
-        finally
-        {
-            EstablecerEstado(dialogId, false);
-        }
-    }
-
-    public async Task MostrarDialogoProgreso<T>(Func<Task<IResultResponse<T>>> accion, string? nameIdentifier = null)
-    {
-        var dialogId = nameIdentifier ?? DialogIdentifierProgress;
-
-        if (await CerrarSiEstaAbiertoYEsperar(dialogId))
-        {
-            await MostrarDialogoProgreso(accion, nameIdentifier);
-            return;
-        }
-
-        EstablecerEstado(dialogId, true);
-        try
-        {
-            var progressDialog = new ProgressDialog();
-
-            await DialogHost.Show(progressDialog, dialogId, openedEventHandler: async (sender, args) =>
+            var form = new FormularioDinamico(instancia)
             {
-                var result = await accion();
-                DialogHost.Close(dialogId);
-            });
-        }
-        finally
-        {
-            EstablecerEstado(dialogId, false);
-        }
-    }
+                TextHeader = header,
+                AceptarCommand = aceptarCommand,
+                DialogOpenIdentifier = openId,
+                DialogNameIdentifier = nameId
+            };
 
-    public async Task ValidarRespuesta<T>(IResultResponse<T> resp)
-    {
-        if (!resp.Success)
-            await MostrarDialogo(resp.Message);
+            await Instance.MostrarDialogo(form);
+            return instancia;
+        }
+
+
+
+        public async Task<bool> CerrarSiEstaAbiertoYEsperar(IDialog dialogId)
+        {
+            return await CerrarSiEstaAbiertoYEsperar(dialogId.DialogOpenIdentifier);
+        }
+        public async Task<bool> CerrarSiEstaAbiertoYEsperar(string dialogId)
+        {
+            if (EstaAbierto(dialogId) || DialogHost.IsDialogOpen(dialogId))
+            {
+                DialogHost.Close(dialogId);
+                EstablecerEstado(dialogId, false);
+
+                await Task.Delay(100); // Previene loops u errores de render
+                return true;
+            }
+
+            return false;
+        }
+
+
+
+        private bool EstaAbierto(string dialogId) => _dialogosAbiertos.TryGetValue(dialogId, out var abierto) && abierto;
+        private void EstablecerEstado(string dialogId, bool abierto) =>
+            _dialogosAbiertos[dialogId] = abierto;
+
+
+        public async Task ValidarRespuesta<T>(IResultResponse<T> resp, string dialog = "")
+        {
+            if (!resp.Success)
+            {
+                await MostrarDialogoError(resp);
+                return;
+            }
+
+            // Ignorar GET o si no hay tipo involucrado
+            if (resp.Method == HttpMethod.Get || resp.ObjInteration is null)
+                return;
+
+            // Solo para tipos que implementen IModelObj
+            if (!typeof(IModelObj).IsAssignableFrom(resp.ObjInteration))
+                return;
+
+            // Obtener el nombre de la entidad
+            string nombreEntidad = resp.ObjInteration.Name;
+
+            // Crear el mensaje en base al método
+            string mensaje;
+
+            if (resp.Method == HttpMethod.Post)
+                mensaje = $"El {nombreEntidad} fue creado correctamente.";
+            else if (resp.Method == HttpMethod.Put)
+                mensaje = $"El {nombreEntidad} fue actualizado correctamente.";
+            else if (resp.Method == HttpMethod.Delete)
+                mensaje = $"El {nombreEntidad} fue eliminado correctamente.";
+            else
+                mensaje = "Operación exitosa.";
+
+            MensajeQueue.Enqueue(mensaje);
+        }
+
     }
->>>>>>> 29/05/2025
 }
