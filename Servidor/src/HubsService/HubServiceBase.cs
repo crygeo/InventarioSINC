@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Servidor.src.Hubs;
 using Shared.Interfaces;
+using Shared.Interfaces.ModelsBase;
 using System.Threading.Tasks;
 
 namespace Servidor.src.HubsService
 {
-    public abstract class HubServiceBase<T> : IHubService<T> where T : IIdentifiable
+    public abstract class HubServiceBase<T> : IHubService<T> where T : IModelObj
     {
         public IHubContext<Hub> HubContext { get; }
         public HubServiceBase(IHubContext<Hub> hubContext)

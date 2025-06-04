@@ -11,6 +11,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Cliente.src.Services;
 
 namespace Cliente.src.View
 {
@@ -22,6 +23,7 @@ namespace Cliente.src.View
         public MainV()
         {
             InitializeComponent();
+            SnackbarThree.MessageQueue = DialogService.Instance.MensajeQueue;
         }
     }
 }

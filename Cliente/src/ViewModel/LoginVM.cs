@@ -1,6 +1,7 @@
 ﻿using Cliente.src.Services;
 using Cliente.src.View;
 using Cliente.src.View.Dialog;
+using Cliente.src.View.Items;
 using Cliente.src.WindowStrategy;
 using MaterialDesignThemes.Wpf;
 using System;
@@ -10,9 +11,11 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
+using Utilidades.Interfaces;
 using Utilidades.Mvvm;
 using Utilidades.Services;
 using Utilidades.WindowStrategies;
+using static Cliente.src.Services.AuthService;
 
 namespace Cliente.src.ViewModel
 {
@@ -55,61 +58,38 @@ namespace Cliente.src.ViewModel
 
         private async void Login(object obj)
         {
-            ProgressDialog progressDialog = new();
-            MessageDialog successDialog = new()
-            {
-                Message = "¡Inicio de sesión exitoso!"
-            };
-
-
-            _ = DialogHost.Show(progressDialog, "RootDialog");
-
-            try
+            IResultResponse<TokenResponse> res = await DialogService.Instance.MostrarDialogoProgreso(async () =>
             {
                 var result = await _authService.LoginAsync(Usuario, Password);
-                // Lógica de login
-                if (result.Item1)
-                {
-                    if (RememberMe)
-                        await AuthService.GuardarCredenciales(Usuario, Password, RememberMe);
-                    else
-                        await AuthService.BorrarCredenciales();
+                await DialogService.Instance.ValidarRespuesta(result, "RootDialog");
+                return result;
+            }, "RootDialog");
 
-                    // Cerrar ProgressDialog antes de mostrar el mensaje de éxito
-                    DialogHost.Close("RootDialog");
-
-                    // Mostrar mensaje de éxito
-                    await DialogHost.Show(successDialog, "RootDialog");
-
-                    // Abrir la ventana principal y cerrar la de login
-                    MainWindow.OpenWindow();
-                    NavigationService.CloseWindow<LoginV>();
-                }
-                else
-                {
-                    // Cerrar ProgressDialog antes de mostrar el mensaje de error
-                    DialogHost.Close("RootDialog");
-
-                    var dialogError = new MessageDialog
-                    {
-                        Message = result.Item2
-                    };
-                    // Mostrar mensaje de error
-                    await DialogHost.Show(dialogError, "RootDialog");
-                }
-            }
-            catch (Exception ex)
+            if (res.Success)
             {
-                DialogHost.Close("RootDialog");
-
-                MessageDialog exceptionDialog = new()
-                {
-                    Message = $"Error al iniciar sesión: {ex.Message}"
-                };
-                await DialogHost.Show(exceptionDialog, "RootDialog");
+                if (RememberMe)
+                    await AuthService.GuardarCredenciales(Usuario, Password, RememberMe);
+                else
+                    await AuthService.BorrarCredenciales();
+                await MostDialog(res.Message);
             }
         }
 
+
+        private async Task MostDialog(string msg)
+        {
+            MessageDialog successDialog = new()
+            {
+                Message = $"!{msg}¡",
+                DialogNameIdentifier = $"Dialog_{Guid.NewGuid():N}",
+                DialogOpenIdentifier = "RootDialog"
+            };
+
+            await DialogService.Instance.MostrarDialogo(successDialog);
+
+            MainWindow.OpenWindow();
+            NavigationService.CloseWindow<LoginV>();
+        }
 
         private async void CargarDatos()
         {

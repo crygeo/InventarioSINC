@@ -5,10 +5,11 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Shared.Interfaces.ModelsBase;
 
 namespace Servidor.src.Repositorios
 {
-    public abstract class RepositorioBase<TObj> : IRepository<TObj> where TObj : IIdentifiable, IDeleteable
+    public abstract class RepositorioBase<TObj> : IRepository<TObj> where TObj : IModelObj
     {
         public IMongoCollection<TObj> Collection { get; }
 

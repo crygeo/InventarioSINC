@@ -1,10 +1,11 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Shared.Interfaces;
+using Shared.Interfaces.ModelsBase;
 using System.Threading.Tasks;
 
 namespace Servidor.src.Hubs
 {
-    public class HubBase<T> : Hub, IHubNotification<T> where T : IIdentifiable
+    public class HubBase<T> : Hub, IHubNotification<T> where T : IModelObj
     {
         public virtual async Task NewItem(T obj)
         {

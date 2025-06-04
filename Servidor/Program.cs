@@ -42,22 +42,22 @@ builder.Services.AddSignalR();
 
 builder.Services.AddScoped<HubsServiceUsuario>();
 builder.Services.AddScoped<HubsServiceRol>();
-builder.Services.AddScoped<HubsServiceProveedor>();
-builder.Services.AddScoped<HubsServiceTalla>();
-builder.Services.AddScoped<HubsServiceRecepcionCarga>();
+builder.Services.AddScoped<HubsServiceProveedorEmpresa>();
+builder.Services.AddScoped<HubsServiceProveedorPersona>();
 builder.Services.AddScoped<HubsServiceClasificacion>();
-builder.Services.AddScoped<HubsServiceClase>();
-builder.Services.AddScoped<HubsServiceCalidad>();
+builder.Services.AddScoped<HubsServiceProducto>();
+builder.Services.AddScoped<HubsServiceRecepcionCarga>();
+builder.Services.AddScoped<HubsServiceIdentificador>();
 
 // Configurar la inyección de dependencias para MongoDB y tus repositorios
 builder.Services.AddScoped<ServiceUsuario>();
 builder.Services.AddScoped<ServiceRol>();
-builder.Services.AddScoped<ServiceProveedor>();
-builder.Services.AddScoped<ServiceTalla>();
-builder.Services.AddScoped<ServiceRecepcionCarga>();
+builder.Services.AddScoped<ServiceProveedorEmpresa>();
+builder.Services.AddScoped<ServiceProveedorPersona>();
 builder.Services.AddScoped<ServiceClasificacion>();
-builder.Services.AddScoped<ServiceClase>();
-builder.Services.AddScoped<ServiceCalidad>();
+builder.Services.AddScoped<ServiceProducto>();
+builder.Services.AddScoped<ServiceRecepcionCarga>();
+builder.Services.AddScoped<ServiceIdentificador>();
 
 builder.Services.AddCors(options =>
 {
@@ -122,12 +122,12 @@ app.Use(async (context, next) =>
 app.MapControllers();
 app.MapHubByConvention<HubUsuario>();
 app.MapHubByConvention<HubRol>();
-app.MapHubByConvention<HubProveedor>();
-app.MapHubByConvention<HubTalla>();
-app.MapHubByConvention<HubRecepcionCarga>();
+app.MapHubByConvention<HubProveedorEmpresa>();
+app.MapHubByConvention<HubProveedorPersona>();
 app.MapHubByConvention<HubClasificacion>();
-app.MapHubByConvention<HubClase>();
-app.MapHubByConvention<HubCalidad>();
+app.MapHubByConvention<HubRecepcionCarga>();
+app.MapHubByConvention<HubIdentificador>();
+app.MapHubByConvention<HubProducto>();
 
 app.Run();
 

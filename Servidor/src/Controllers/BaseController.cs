@@ -7,11 +7,12 @@ using Shared.ObjectsResponse;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
+using Shared.Interfaces.ModelsBase;
 
 namespace Servidor.src.Controllers
 {
     [ApiController]
-    public abstract class BaseController<TObj> : ControllerBase where TObj : IIdentifiable, IDeleteable
+    public abstract class BaseController<TObj> : ControllerBase where TObj : IModelObj
     {
         public readonly ServiceBase<TObj> _service;
 

@@ -47,7 +47,6 @@
                     Content="Cancelar"
                     Height="30"
                     MinWidth="80"
-                    Command="{x:Static md:DialogHost.CloseDialogCommand}"
                     Click="OnCancel"/>
             <Button Grid.Column="1"
                     Margin="0,10,0,20"

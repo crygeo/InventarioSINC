@@ -14,32 +14,33 @@ using System.Threading.Tasks;
 
 namespace Servidor.src.Services
 {
-    public class ServiceProveedor : ServiceBase<IProveedor>
+    public class ServiceProveedorEmpresa : ServiceBase<ProveedorEmpresa>
     {
-        public override IRepository<IProveedor> Repository { get; } = new RepositorioProveedor();
-        public override IHubService<IProveedor> HubService { get; }
+        public override IRepository<ProveedorEmpresa> Repository { get; } = new RepositorioProveedorEmpresa();
+        public override IHubService<ProveedorEmpresa> HubService { get; }
 
-        public ServiceProveedor(HubsServiceProveedor hubService)
+        public ServiceProveedorEmpresa(HubsServiceProveedorEmpresa hubService)
+        {
+            HubService = hubService;
+        }
+    }
+
+    public class ServiceProveedorPersona : ServiceBase<ProveedorPersona>
+    {
+        public override IRepository<ProveedorPersona> Repository { get; } = new RepositorioProveedorPersona();
+        public override IHubService<ProveedorPersona> HubService { get; }
+
+        public ServiceProveedorPersona(HubsServiceProveedorPersona hubService)
         {
             HubService = hubService;
         }
     }
     
-    public class ServiceTalla : ServiceBase<ITalla>
-    {
-        public override IRepository<ITalla> Repository { get; } = new RepositorioTalla();
-        public override IHubService<ITalla> HubService { get; }
 
-        public ServiceTalla(HubsServiceTalla hubService)
-        {
-            HubService = hubService;
-        }
-    }
-
-    public class ServiceRecepcionCarga : ServiceBase<IRecepcionCarga>
+    public class ServiceRecepcionCarga : ServiceBase<RecepcionCarga>
     {
-        public override IRepository<IRecepcionCarga> Repository { get; } = new RepositorioRecepcionCarga();
-        public override IHubService<IRecepcionCarga> HubService { get; }
+        public override IRepository<RecepcionCarga> Repository { get; } = new RepositorioRecepcionCarga();
+        public override IHubService<RecepcionCarga> HubService { get; }
 
         public ServiceRecepcionCarga(HubsServiceRecepcionCarga hubService)
         {
@@ -47,10 +48,10 @@ namespace Servidor.src.Services
         }
     }
 
-    public class ServiceClasificacion : ServiceBase<IClasificacion>
+    public class ServiceClasificacion : ServiceBase<Clasificacion>
     {
-        public override IRepository<IClasificacion> Repository { get; } = new RepositorioClasificacion();
-        public override IHubService<IClasificacion> HubService { get; }
+        public override IRepository<Clasificacion> Repository { get; } = new RepositorioClasificacion();
+        public override IHubService<Clasificacion> HubService { get; }
 
         public ServiceClasificacion(HubsServiceClasificacion hubService)
         {
@@ -58,26 +59,28 @@ namespace Servidor.src.Services
         }
     }
 
-    public class ServiceClase : ServiceBase<Clase>
+    public class ServiceIdentificador : ServiceBase<Identificador>
     {
-        public override IRepository<Clase> Repository { get; } = new RepositorioClase();
-        public override IHubService<Clase> HubService { get; }
+        public override IRepository<Identificador> Repository { get; } = new RepositorioIdentificador();
+        public override IHubService<Identificador> HubService { get; }
 
-        public ServiceClase(HubsServiceClase hubService)
+        public ServiceIdentificador(HubsServiceIdentificador hubService)
         {
             HubService = hubService;
         }
     }
 
-    public class ServiceCalidad : ServiceBase<Calidad>
+    public class ServiceProducto : ServiceBase<Producto>
     {
-        public override IRepository<Calidad> Repository { get; } = new RepositorioCalidad();
-        public override IHubService<Calidad> HubService { get; }
+        public override IRepository<Producto> Repository { get; } = new RepositorioProducto();
+        public override IHubService<Producto> HubService { get; }
 
-        public ServiceCalidad(HubsServiceCalidad hubService)
+        public ServiceProducto(HubsServiceProducto hubService)
         {
             HubService = hubService;
         }
     }
+
+
 
 }

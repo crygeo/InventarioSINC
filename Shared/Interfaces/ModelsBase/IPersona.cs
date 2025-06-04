@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface IPersona
+    public interface IPersona : IModelObj
     {
-        string PrimerNombre { get; }
-        string SegundoNombre { get; }
-        string PrimerApellido { get; }
-        string SegundoApellido { get; }
-        string Cedula { get; }
-        string Celular { get; }
-        DateTime FechaNacimiento { get; }
+        string PrimerNombre { get; set; }
+        string SegundoNombre { get; set; }
+        string PrimerApellido { get; set; }
+        string SegundoApellido { get; set; }
+        string Cedula { get; set; }
+        string Celular { get; set; }
+        DateTime FechaNacimiento { get; set; }
     }
 }

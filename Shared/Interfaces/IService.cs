@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.SignalR;
+using Shared.Interfaces.ModelsBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces
 {
-    public interface IService<TObj> : ICrud<TObj> where TObj : IIdentifiable
+    public interface IService<TObj> : ICrud<TObj> where TObj : IModelObj
     {
         IRepository<TObj> Repository { get; }
         IHubService<TObj> HubService { get; }

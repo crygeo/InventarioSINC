@@ -1,4 +1,5 @@
 ﻿using MongoDB.Bson;
+using Shared.Interfaces.ModelsBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces
 {
-    public interface ICrud<TEntity> where TEntity : IIdentifiable
+    public interface ICrud<TEntity> where TEntity : IModelObj
     {
         Task<IEnumerable<TEntity>> GetAllAsync();
         Task<TEntity?> GetByIdAsync(string id);

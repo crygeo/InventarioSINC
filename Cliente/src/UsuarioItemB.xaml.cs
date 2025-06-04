@@ -1,6 +1,6 @@
 ﻿using Cliente.src.Extencions;
 using Cliente.src.Model;
-using Cliente.src.Services;
+using Cliente.src.Services.Model;
 using Shared.Extensions;
 using System;
 using System.Collections.Generic;
@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Cliente.src.Services;
 
 namespace Cliente.src.View.Items
 {
@@ -87,7 +88,7 @@ namespace Cliente.src.View.Items
         {
             InitializeComponent();
 
-            ListRoles = RolService.Instance.Collection.Clone();
+            ListRoles = ServiceFactory.GetService<Rol>().Collection.Clone(); // Clona la colección de roles desde el servicio
             //DataContext = this; // 🔥 Establece el DataContext en la misma instancia del control
 
         }

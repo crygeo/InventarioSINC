@@ -1,0 +1,53 @@
+﻿<UserControl x:Class="Cliente.src.View.Dialog.MessageDialogError"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:Cliente.src.View.Dialog"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             mc:Ignorable="d" 
+             d:DesignHeight="150" d:DesignWidth="400"
+             MaxWidth="400"
+             Width="Auto"
+             MinHeight="150">
+
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Mensaje principal -->
+        <TextBlock Text="{Binding ErrorResponse.Message, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                   Margin="10"
+                   FontSize="16"
+                   FontWeight="Bold"
+                   TextWrapping="Wrap"
+                   Foreground="White"/>
+
+        <!-- Expander para detalles -->
+        <Expander Header="Mostrar más" Grid.Row="1" Margin="10,5,10,0">
+            <StackPanel Margin="10,5,0,5">
+                <TextBlock Text="Objeto relacionado:" FontWeight="Bold" Foreground="White"/>
+                <TextBlock Text="{Binding ErrorResponse.ObjInteration.Name, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                           Foreground="White" Margin="5,0,0,5"/>
+
+                <TextBlock Text="Detalles del error:" FontWeight="Bold" Foreground="White"/>
+                <TextBlock Text="{Binding ErrorResponse.Error, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+                           TextWrapping="Wrap"
+                           Foreground="White" 
+                           Margin="5,0,0,5"/>
+            </StackPanel>
+        </Expander>
+
+        <!-- Botón cerrar -->
+        <Button Grid.Row="2"
+                Content="OK"
+                Margin="0,10,0,0"
+                Width="100"
+                Height="30"
+                HorizontalAlignment="Center"
+                Command="{x:Static md:DialogHost.CloseDialogCommand}"/>
+    </Grid>
+</UserControl>

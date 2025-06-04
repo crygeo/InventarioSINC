@@ -1,4 +1,5 @@
 ﻿using Cliente.src.Model;
+using CommunityToolkit.Mvvm.Input;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -14,26 +15,35 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Cliente.src.Extencions;
+using Utilidades.Interfaces;
 
 namespace Cliente.src.View.Items
 {
     /// <summary>
     /// Lógica de interacción para UsuarioItemDetall.xaml
     /// </summary>
-    public partial class UsuarioDialog : UserControl
+    public partial class UsuarioDialog : UserControl, IDialog
     {
         public static readonly DependencyProperty UsuarioProperty = DependencyProperty.Register(nameof(Usuario), typeof(Usuario), typeof(UsuarioDialog));
-        public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptedCommand), typeof(ICommand), typeof(UsuarioDialog));
+        public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptedCommand), typeof(IAsyncRelayCommand), typeof(UsuarioDialog));
         public static readonly DependencyProperty TextHeaderProperty = DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(UsuarioDialog));
+        public static readonly DependencyProperty CancelarCommandProperty = DependencyProperty.Register(nameof(CancelarCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog), new PropertyMetadata(null));
+        private string _dialogIdentifier;
 
+        public IAsyncRelayCommand CancelarCommand
+        {
+            get => (IAsyncRelayCommand)GetValue(CancelarCommandProperty);
+            set => SetValue(CancelarCommandProperty, value);
+        }
         public Usuario Usuario
         {
             get => (Usuario)GetValue(UsuarioProperty);
             set => SetValue(UsuarioProperty, value);
         }
-        public ICommand AceptedCommand
+        public IAsyncRelayCommand AceptedCommand
         {
-            get => (ICommand)GetValue(AceptedCommandProperty);
+            get => (IAsyncRelayCommand)GetValue(AceptedCommandProperty);
             set => SetValue(AceptedCommandProperty, value);
         }
 
@@ -47,5 +57,18 @@ namespace Cliente.src.View.Items
         {
             InitializeComponent();
         }
+
+        private async void ButtonCancelar(object sender, RoutedEventArgs e)
+        {
+            await CancelarCommand.TryEjecutarYCerrarDialogoAsync(this);
+        }
+
+        private async void ButtonAceptar(object sender, RoutedEventArgs e)
+        {
+            await AceptedCommand.TryEjecutarYCerrarDialogoAsync(this, Usuario);
+        }
+
+        public string DialogNameIdentifier { get; set; } = $"Dialog_{Guid.NewGuid():N}";
+        public required string DialogOpenIdentifier { get; set; }
     }
 }

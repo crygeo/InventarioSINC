@@ -10,14 +10,12 @@ using System.Collections.ObjectModel;
 using Shared.ObjectsResponse;
 using Utilidades.Interfaces;
 using Cliente.src.Extencions;
+using Shared.Interfaces.ModelsBase;
 
-namespace Cliente.src.Services
+namespace Cliente.src.Services.Model
 {
-    public class RolService : ServiceBase<Rol>
+    public class RolService : ServiceBase<Rol>, ICustomService
     {
-        private static readonly Lazy<RolService> _instance = new(() => new RolService());
-        public static RolService Instance => _instance.Value;
-
         public RolService() : base(new RolHubService()) { }
 
         public Rol? ObtenerPorId(string idRol) => Collection.FirstOrDefault((r) => r.Id == idRol);
@@ -26,7 +24,7 @@ namespace Cliente.src.Services
         public async Task<IResultResponse<List<string>>> GetAllPermisos()
         {
             var client = GetClient();
-            var request = await GetRequest(HttpMethod.Get, $"{BaseUrl}/Perms");
+            var request = await GetRequest<Rol>(HttpMethod.Get, $"{BaseUrl}/Perms");
             var response = await client.SendAsync(request);
 
             if (!response.IsSuccessStatusCode)

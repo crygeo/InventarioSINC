@@ -14,31 +14,35 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Cliente.src.Extencions;
+using CommunityToolkit.Mvvm.Input;
+using Utilidades.Interfaces;
 
 namespace Cliente.src.View.Dialog
 {
     /// <summary>
     /// Lógica de interacción para MessageDialog.xaml
     /// </summary>
-    public partial class ChangePassDialog : UserControl
+    public partial class ChangePassDialog : UserControl, IDialog
     {
-        public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptedCommand), typeof(ICommand), typeof(ChangePassDialog));
-        public static readonly DependencyProperty CancelCommandProperty = DependencyProperty.Register(nameof(CancelCommand), typeof(ICommand), typeof(ChangePassDialog));
+        public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptedCommand), typeof(IAsyncRelayCommand), typeof(ChangePassDialog));
+        public static readonly DependencyProperty CancelCommandProperty = DependencyProperty.Register(nameof(CancelCommand), typeof(IAsyncRelayCommand), typeof(ChangePassDialog));
         public static readonly DependencyProperty OldPasswordProperty = DependencyProperty.Register(nameof(OldPassword), typeof(string), typeof(ChangePassDialog), new PropertyMetadata(""));
         public static readonly DependencyProperty NewPasswordProperty = DependencyProperty.Register(nameof(NewPassword), typeof(string), typeof(ChangePassDialog));
         public static readonly DependencyProperty ConfirmPasswordProperty = DependencyProperty.Register(nameof(ConfirmPassword), typeof(string), typeof(ChangePassDialog));
         public static readonly DependencyProperty OldPasswordRequiredProperty = DependencyProperty.Register(nameof(OldPasswordRequired), typeof(Visibility), typeof(ChangePassDialog));
+        public static readonly DependencyProperty DialogNameIdentifierProperty = DependencyProperty.Register(nameof(DialogNameIdentifier), typeof(string), typeof(ChangePassDialog));
 
 
-        public ICommand CancelCommand
+        public IAsyncRelayCommand CancelCommand
         {
-            get => (ICommand)GetValue(CancelCommandProperty);
+            get => (IAsyncRelayCommand)GetValue(CancelCommandProperty);
             set => SetValue(CancelCommandProperty, value);
         }
 
-        public ICommand AceptedCommand
+        public IAsyncRelayCommand AceptedCommand
         {
-            get => (ICommand)GetValue(AceptedCommandProperty);
+            get => (IAsyncRelayCommand)GetValue(AceptedCommandProperty);
             set => SetValue(AceptedCommandProperty, value);
         }
 
@@ -62,21 +66,29 @@ namespace Cliente.src.View.Dialog
             get => (Visibility)GetValue(OldPasswordRequiredProperty);
             set => SetValue(OldPasswordRequiredProperty, value);
         }
+        public string DialogNameIdentifier { get; set; } = $"Dialog_{Guid.NewGuid():N}";
+
+        public required string DialogOpenIdentifier
+        {
+            get => (string)GetValue(DialogNameIdentifierProperty);
+            set => SetValue(DialogNameIdentifierProperty, value);
+        }
 
         public ChangePassDialog()
         {
             InitializeComponent();
         }
 
-        private void OnCancel(object sender, RoutedEventArgs e)
+        private async void OnCancel(object sender, RoutedEventArgs e)
         {
-            CancelCommand?.Execute(null); // Ejecuta la acción que te pasaron
+            await CancelCommand.TryEjecutarYCerrarDialogoAsync(this);
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             if (NewPassword == ConfirmPassword && !string.IsNullOrEmpty(NewPassword))
-                AceptedCommand?.Execute(this); // Ejecuta la acción que te pasaron
+                await AceptedCommand.TryEjecutarYCerrarDialogoAsync(this);
         }
+
     }
 }

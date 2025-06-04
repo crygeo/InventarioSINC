@@ -1,12 +1,14 @@
-﻿using MongoDB.Bson;
+﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using MongoDB.Driver;
 using Servidor.src.Objs;
 using Servidor.src.Repositorios;
 using Shared.Interfaces;
-using System.Collections.Generic;
-using System.Threading.Tasks;
+using Shared.Interfaces.ModelsBase;
 
-public abstract class ServiceBase<TObj> : IService<TObj> where TObj : IIdentifiable
+namespace Servidor.src.Services;
+
+public abstract class ServiceBase<TObj> : IService<TObj> where TObj : IModelObj
 {
     public abstract IRepository<TObj> Repository { get; }
     public abstract IHubService<TObj> HubService { get; }

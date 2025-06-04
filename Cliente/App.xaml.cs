@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Data;
 using System.Diagnostics;
 using System.Windows;
+using Cliente.src.Extencions;
 
 namespace Cliente
 {
@@ -16,11 +17,29 @@ namespace Cliente
             init();
         }
 
-        private async void init()
+        private void init()
         {
-            ////await AuthService.BorrarCredenciales();
-            //AuthService.DeleteToken();
+            ComponetesHelp.RegistrarComponentesFormulario();
+        }
 
+        private void ContarDijitos(int numero)
+        {
+            int copia = numero;
+            int contador = 0;
+
+            numero = Math.Abs(numero); // Asegurarse que sea positivo
+            if (numero == 0) contador = 1;
+            else
+            {
+                // Usar un bucle while para contar los dígitos
+                while (numero > 0)
+                {
+                    numero = numero / 10; // División entera
+                    contador++;
+                }
+            }
+
+            Console.WriteLine($"El número {copia} tiene {contador} dígitos.");
         }
 
         public static void ReiniciarAplicacion()

@@ -8,17 +8,21 @@ using Microsoft.AspNetCore.SignalR.Client;
 using Cliente.src.Model;
 using System.Windows;
 using System.Collections.ObjectModel;
+using Cliente.src.Converter;
 using Cliente.src.Services;
+using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json.Serialization;
+using Shared.Interfaces.ModelsBase;
 using Utilidades.Interfaces;
 
 namespace Cliente.src.ServicesHub
 {
 
-    public abstract class HubServiceBase<TEntity> : Utilidades.Interfaces.IHubService<TEntity> where TEntity : IIdentifiable, IUpdate
+    public class HubServiceBase<TEntity> : Utilidades.Interfaces.IHubService<TEntity> where TEntity : IModelObj
     {
         protected readonly HubConnection _hubConnection;
         private readonly string _hubUrl;
-        public abstract ObservableCollection<TEntity> Collection { get; }
+        public virtual ObservableCollection<TEntity> Collection { get; } = []; 
 
         public HubServiceBase()
         {

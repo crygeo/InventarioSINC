@@ -9,8 +9,7 @@ namespace Shared.Interfaces.ModelsBase
     public interface IEmpaqueUnidad
     {
         IRecepcionCarga RecepcionCarga { get; }
-        IClase Clase { get; set; }
-        ITalla Talla { get; set; }
+        IVariantes Variante { get; set; }
         float PesoUnidad { get; set; }
         float PesoBruto { get => PesoUnidad * Unidades; }
         int Unidades { get; set; }

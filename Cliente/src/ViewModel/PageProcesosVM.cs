@@ -41,29 +41,23 @@ namespace Cliente.src.ViewModel
 
         public List<ItemNavigationM> ListItemsNav { get; } = [
            new() {
-                Title = "Color",
-                SelectedIcon = PackIconKind.AlphaABox,
-                UnselectedIcon = PackIconKind.AlphaABoxOutline,
+                Title = "Producto",
+                SelectedIcon = PackIconKind.AlphaPBox,
+                UnselectedIcon = PackIconKind.AlphaPBoxOutline,
                 Notification = 1,
-                Page = new PageCalidad()
+                Page = new PageProductoVM()
             },
             new() {
-                Title = "Clase",
+                Title = "Identificador",
                 SelectedIcon = PackIconKind.AlphaBBox,
                 UnselectedIcon = PackIconKind.AlphaBBoxOutline,
-                Page = new PageClase()
+                Page = new PageIdentificadorVM()
             },
             new() {
-                Title = "Liquidacion",
+                Title = "Clasificacion",
                 SelectedIcon = PackIconKind.AlphaCBox,
                 UnselectedIcon = PackIconKind.AlphaCBoxOutline,
-                Page = new PageClasificacion()
-            },
-            new() {
-                Title = "Proveedor",
-                SelectedIcon = PackIconKind.AlphaDBox,
-                UnselectedIcon = PackIconKind.AlphaDBoxOutline,
-                Page = new PageProveedor()
+                Page = new PageClasificacionVM()
             },
             new() {
                 Title = "Recepcion",
@@ -72,11 +66,17 @@ namespace Cliente.src.ViewModel
                 Page = new PageRecepcionCarga()
             },
             new() {
-                Title = "Talla",
-                SelectedIcon = PackIconKind.AlphaFBox,
-                UnselectedIcon = PackIconKind.AlphaFBoxOutline,
-                Page = new PageTalla()
+                Title = "Proveedor Empresa",
+                SelectedIcon = PackIconKind.AlphaDBox,
+                UnselectedIcon = PackIconKind.AlphaDBoxOutline,
+                Page = new PageProveedorEmpresa()
+            }, new() {
+                Title = "Proveedor Persona",
+                SelectedIcon = PackIconKind.AlphaDBox,
+                UnselectedIcon = PackIconKind.AlphaDBoxOutline,
+                Page = new PageProveedorPersona()
             },
+
            ];
 
         // Constructor, inicializa el servicio y carga los usuarios

@@ -8,9 +8,13 @@
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
 >>>>>>> 29/05/2025
              xmlns:local="clr-namespace:Cliente.src.View.Items"
+             xmlns:ex="clr-namespace:Cliente.src.Extencions"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
 
+    <UserControl.Resources>
+        <ex:BindingProxy x:Key="Proxy" Data="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}" />
+    </UserControl.Resources>
     <Grid>
 <<<<<<< HEAD
         <Grid.RowDefinitions>
@@ -48,7 +52,28 @@
         <DataGrid x:Name="DataGridSolicitados"
                   IsReadOnly="True"
                   AutoGenerateColumns="False"
-                  ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=ItemsSource}" />
+                  SelectedItem="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=Item, Mode=TwoWay}"
+                  ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=ItemsSource}"
+                  >
+            <DataGrid.Resources>
+                <Style TargetType="DataGridRow" BasedOn="{StaticResource MaterialDesignDataGridRow}">
+                    <Setter Property="ContextMenu">
+                        <Setter.Value>
+                            <ContextMenu>
+                                <MenuItem Header="Editar"
+                                          Command="{Binding Data.EditarItemCommand, Source={StaticResource Proxy}}"
+                                          CommandParameter="{Binding Data.Item, Source={StaticResource Proxy}}"
+                                          Icon="{md:PackIcon Kind=Edit}" />
+                                <MenuItem Header="Eliminar"
+                                          Command="{Binding Data.EliminarItemCommand, Source={StaticResource Proxy}}"
+                                          CommandParameter="{Binding Data.Item, Source={StaticResource Proxy}}"
+                                          Icon="{md:PackIcon Kind=Delete}" />
+                            </ContextMenu>
+                        </Setter.Value>
+                    </Setter>
+                </Style>
+            </DataGrid.Resources>
+        </DataGrid>
 
 >>>>>>> 29/05/2025
     </Grid>

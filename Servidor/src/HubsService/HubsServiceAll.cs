@@ -5,34 +5,34 @@ using Shared.Interfaces.ModelsBase;
 
 namespace Servidor.src.HubsService
 {
-    public class HubsServiceProveedor : HubServiceBase<IProveedor>
+    public class HubsServiceProveedorEmpresa : HubServiceBase<ProveedorEmpresa>
     {
-        public HubsServiceProveedor(IHubContext<HubProveedor> hubContext) : base(hubContext) { }
+        public HubsServiceProveedorEmpresa(IHubContext<HubProveedorEmpresa> hubContext) : base(hubContext) { }
     }
 
-    public class HubsServiceTalla : HubServiceBase<ITalla>
+    public class HubsServiceProveedorPersona : HubServiceBase<ProveedorPersona>
     {
-        public HubsServiceTalla(IHubContext<HubTalla> hubContext) : base(hubContext) { }
+        public HubsServiceProveedorPersona(IHubContext<HubProveedorPersona> hubContext) : base(hubContext) { }
     }
 
-    public class HubsServiceRecepcionCarga : HubServiceBase<IRecepcionCarga>
+    public class HubsServiceRecepcionCarga : HubServiceBase<RecepcionCarga>
     {
         public HubsServiceRecepcionCarga(IHubContext<HubRecepcionCarga> hubContext) : base(hubContext) { }
     }
 
-    public class HubsServiceClasificacion : HubServiceBase<IClasificacion>
+    public class HubsServiceClasificacion : HubServiceBase<Clasificacion>
     {
         public HubsServiceClasificacion(IHubContext<HubClasificacion> hubContext) : base(hubContext) { }
     }
 
-    public class HubsServiceClase : HubServiceBase<Clase>
+    public class HubsServiceIdentificador : HubServiceBase<Identificador>
     {
-        public HubsServiceClase(IHubContext<HubClase> hubContext) : base(hubContext) { }
+        public HubsServiceIdentificador(IHubContext<HubIdentificador> hubContext) : base(hubContext) { }
     }
 
-    public class HubsServiceCalidad : HubServiceBase<Calidad>
+    public class HubsServiceProducto : HubServiceBase<Producto>
     {
-        public HubsServiceCalidad(IHubContext<HubCalidad> hubContext) : base(hubContext) { }
+        public HubsServiceProducto(IHubContext<HubProducto> hubContext) : base(hubContext) { }
     }
 
 }

@@ -16,26 +16,26 @@ namespace Servidor.src.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class ProveedorController(ServiceProveedor servicio) : BaseController<IProveedor>(servicio) { }
+    public class ProveedorEmpresaController(ServiceProveedorEmpresa servicio) : BaseController<ProveedorEmpresa>(servicio) { }
 
     [ApiController]
     [Route("api/[controller]")]
-    public class TallaController(ServiceTalla servicio) : BaseController<ITalla>(servicio) { }
+    public class ProveedorPersonaController(ServiceProveedorPersona servicio) : BaseController<ProveedorPersona>(servicio) { }
 
     [ApiController]
     [Route("api/[controller]")]
-    public class CalidadController(ServiceCalidad servicio) : BaseController<Calidad>(servicio) { }
+    public class ClasificacionController(ServiceClasificacion servicio) : BaseController<Clasificacion>(servicio) { }
 
     [ApiController]
     [Route("api/[controller]")]
-    public class ClaseController(ServiceClase servicio) : BaseController<Clase>(servicio) { }
+    public class RecepcionCargaController(ServiceRecepcionCarga servicio) : BaseController<RecepcionCarga>(servicio) { }
 
     [ApiController]
     [Route("api/[controller]")]
-    public class ClasificacionController(ServiceClasificacion servicio) : BaseController<IClasificacion>(servicio) { }
+    public class IdentificadorController(ServiceIdentificador servicio) : BaseController<Identificador>(servicio) { }
 
     [ApiController]
     [Route("api/[controller]")]
-    public class RecepcionCargaController(ServiceRecepcionCarga servicio) : BaseController<IRecepcionCarga>(servicio) { }
+    public class ProductoController(ServiceProducto servicio) : BaseController<Producto>(servicio) { }
 
 }

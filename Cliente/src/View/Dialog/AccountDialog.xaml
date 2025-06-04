@@ -16,27 +16,28 @@
         <conver:InputBoxConverter x:Key="InputBoxConverter"/>
 
     </UserControl.Resources>
-    <Grid Background="Transparent" MinWidth="300">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="80"/>
-            <RowDefinition Height="80"/>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="30"/>
-            <RowDefinition Height="70"/>
-        </Grid.RowDefinitions>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition/>
-        </Grid.ColumnDefinitions>
+    <md:DialogHost Identifier="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DialogNameIdentifier}">
+        <Grid Background="Transparent" MinWidth="300">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="80"/>
+                <RowDefinition Height="50"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="30"/>
+                <RowDefinition Height="70"/>
+            </Grid.RowDefinitions>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
 
-        <md:PackIcon Kind="AccountCircle" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="50" Height="50"    Foreground="White"/>
-        <TextBlock Text="{Binding Usuario.User, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}" 
+            <md:PackIcon Kind="AccountCircle" Grid.Row="0" Grid.Column="0" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="50" Height="50"    Foreground="White"/>
+            <TextBlock Text="{Binding Usuario.User, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}" 
                    d:Text="CryGeo" Grid.Column="0" Grid.Row="1" MinWidth="150"
                    VerticalAlignment="Center" TextAlignment="Center" FontSize="30"
                    Style="{StaticResource MaterialDesignBody1TextBlock}"/>
 
-        <TextBlock  Text="{Binding Usuario.NombreCompleto, RelativeSource={RelativeSource AncestorType=UserControl}}" 
+            <TextBlock  Text="{Binding Usuario.NombreCompleto, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                     d:Text="Geovanny Wellington Zambrano Jaramillo"
                     TextWrapping="Wrap"
                     MaxWidth="300"
@@ -44,41 +45,43 @@
                     Grid.ColumnSpan="2" Grid.Row="2" TextAlignment="Center"
                     Style="{StaticResource MaterialDesignBody1TextBlock}"/>
 
-        <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <md:PackIcon Kind="CardAccountDetails" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <TextBlock Text="{Binding Usuario.Cedula, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InputBoxConverter}, ConverterParameter='Dni'}"
+            <StackPanel Grid.Row="3" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <md:PackIcon Kind="CardAccountDetails" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock Text="{Binding Usuario.Cedula, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InputBoxConverter}, ConverterParameter='Dni'}"
                    Grid.Row="3" TextAlignment="Center"
                    Style="{StaticResource MaterialDesignBody1TextBlock}"/>
-        </StackPanel>
+            </StackPanel>
 
-        <StackPanel Grid.Row="4" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <md:PackIcon Kind="Phone" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <TextBlock Text="{Binding Usuario.Celular, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InputBoxConverter}, ConverterParameter='Phone'}"  
+            <StackPanel Grid.Row="4" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <md:PackIcon Kind="Phone" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock Text="{Binding Usuario.Celular, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource InputBoxConverter}, ConverterParameter='Phone'}"  
                    TextAlignment="Center"
                    Style="{StaticResource MaterialDesignBody1TextBlock}"/>
-        </StackPanel>
+            </StackPanel>
 
-        <StackPanel Grid.Row="5" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
-            <md:PackIcon Kind="CalendarRange" VerticalAlignment="Center" Margin="0,0,10,0"/>
-            <TextBlock Text="{Binding Usuario.FechaNacimiento, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat='{}{0:dd-MMM-yyyy}'}"
+            <StackPanel Grid.Row="5" Orientation="Horizontal" VerticalAlignment="Center" HorizontalAlignment="Center">
+                <md:PackIcon Kind="CalendarRange" VerticalAlignment="Center" Margin="0,0,10,0"/>
+                <TextBlock Text="{Binding Usuario.FechaNacimiento, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat='{}{0:dd-MMM-yyyy}'}"
                     TextAlignment="Center" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
-        </StackPanel>
+            </StackPanel>
 
-        <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center">
-            <Button Content="Log out" Command="{Binding CloseSeccionCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" Margin="10,0" Width="100" HorizontalAlignment="Center" />
+            <StackPanel Grid.Row="6" Orientation="Horizontal" HorizontalAlignment="Center">
+                <Button Content="Log out"
+                    Click="ButtonLogOut_OnClick"
+                    Margin="10,0" Width="100" HorizontalAlignment="Center" />
 
-            <Button Content="Close"  Margin="10,0"
-                    Command="{x:Static md:DialogHost.CloseDialogCommand}"
+                <Button Content="Close"  Margin="10,0"
+                    Click="ButtonClose_OnClick"
                     Width="100" HorizontalAlignment="Center"/>
-        </StackPanel>
+            </StackPanel>
 
-        <Button Width="30" Height="30"
+            <Button Width="30" Height="30"
                 Style="{StaticResource MaterialDesignFloatingActionMiniButton}" VerticalAlignment="Top" 
                 HorizontalAlignment="Left" Margin="20"
                 ToolTip="Cambiar Contraseña"
-                Command="{Binding ChangedPasswordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                CommandParameter="{Binding Usuario, RelativeSource={RelativeSource AncestorType=UserControl}}">
-            <md:PackIcon Kind="Key"/>
-        </Button>
-    </Grid>
+                Click="ButtonChangedPass_OnClick">
+                <md:PackIcon Kind="Key"/>
+            </Button>
+        </Grid>
+    </md:DialogHost>
 </UserControl>

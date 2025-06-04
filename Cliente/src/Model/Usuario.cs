@@ -84,25 +84,12 @@ namespace Cliente.src.Model
             get => _roles;
             set => SetProperty(ref _roles, value);
         }
-        private string _id = string.Empty;
-        public override string Id
-        {
-            get => _id;
-            set => SetProperty(ref _id, value);
-        }
-
-        private bool _deleteable = false;
-        public bool Deleteable
-        {
-            get => _deleteable;
-            set => SetProperty(ref _deleteable, value);
-        }
 
         public string NombreCompleto { get => $"{PrimerNombre} {SegundoNombre} {PrimerApellido} {SegundoApellido}"; set { } }
         public string NombreAndApellido { get => $"{PrimerNombre} {PrimerApellido}"; set { } }
 
 
-        public override void Update(IIdentifiable identity)
+        public override void Update(IModelObj identity)
         {
             if (identity is not IUsuario user)
                 throw new ArgumentException("El objeto no es un usuario");

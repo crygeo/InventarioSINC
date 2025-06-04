@@ -6,16 +6,15 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface IClasificacion: IIdentifiable, IDeleteable
+    public interface IClasificacion: IModelObj
     {
-        IRecepcionCarga RecepcionCarga { get; }
-        ICalidad Calidad { get; set; }
+        IRecepcionCarga RecepcionCarga { get; set; }
         float PesoDesecho { get; set; }
         float PesoNeto { get; set; }
         float PesoBruto { get; }
-        float PesoBrutoProcesado { get; }
-        float Rendimiento { get; }
-        IReadOnlyList<ICoche> CochesList { get; }
+        float PesoBrutoProcesado { get;}
+        float Rendimiento { get;}
+        IReadOnlyList<ICoche> CochesList { get; set; }
 
         void AgregarProducto(IEmpaqueUnidad empaqueUnidad);
         void QuitarProducto(IEmpaqueUnidad empaqueUnidad);

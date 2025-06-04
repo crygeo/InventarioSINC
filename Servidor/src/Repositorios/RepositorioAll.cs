@@ -4,11 +4,11 @@ using Shared.Interfaces.ModelsBase;
 
 namespace Servidor.src.Repositorios
 {
-    public class RepositorioTalla : RepositorioBase<ITalla> { }
-    public class RepositorioRecepcionCarga : RepositorioBase<IRecepcionCarga> { }
-    public class RepositorioProveedor : RepositorioBase<IProveedor> { }
-    public class RepositorioClasificacion : RepositorioBase<IClasificacion> { }
-    public class RepositorioClase : RepositorioBase<Clase> { }
-    public class RepositorioCalidad : RepositorioBase<Calidad> { }
+    public class RepositorioProveedorEmpresa : RepositorioBase<ProveedorEmpresa> { }
+    public class RepositorioProveedorPersona: RepositorioBase<ProveedorPersona> { }
+    public class RepositorioClasificacion : RepositorioBase<Clasificacion> { }
+    public class RepositorioRecepcionCarga : RepositorioBase<RecepcionCarga> { }
+    public class RepositorioIdentificador : RepositorioBase<Identificador> { }
+    public class RepositorioProducto : RepositorioBase<Producto> { }
 
 }

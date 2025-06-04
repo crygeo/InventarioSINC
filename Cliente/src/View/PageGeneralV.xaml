@@ -19,7 +19,7 @@
         </Grid.RowDefinitions>
         <items:ObjectIList Grid.Row="0"
                            ItemsSource="{Binding Entitys}"
-                           Item="{Binding EntitySelect}"
+                           Item="{Binding EntitySelect, Mode=TwoWay}"
                            EditarItemCommand="{Binding EditarEntityCommand}"
                            EliminarItemCommand="{Binding EliminarEntityCommand}"
                            TypeItem="{Binding TypeEntity}"

@@ -1,14 +1,16 @@
-﻿using System;
-using System.IO.IsolatedStorage;
+﻿using Newtonsoft.Json;
+using Shared.Response;
+using System;
+using System.Diagnostics.Metrics;
 using System.IO;
+using System.IO.IsolatedStorage;
 using System.Net.Http;
+using System.Net.Http.Headers;
 using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Windows.Documents;
-using System.Net.Http.Headers;
-using Shared.Response;
-using Newtonsoft.Json;
+using Utilidades.Interfaces;
 
 namespace Cliente.src.Services
 {
@@ -18,33 +20,22 @@ namespace Cliente.src.Services
         public override string BaseUrl { get; } = $"{Config.FullUrl}/auth"; // Ajusta la URL de tu API
 
 
-        public async Task<(bool, string)> LoginAsync(string username, string password)
+        public async Task<IResultResponse<TokenResponse>> LoginAsync(string username, string password)
         {
             var loginData = new { User = username, Password = password };
 
-            var client = GetClient();
-            var reques = await GetRequest(HttpMethod.Post, $"{BaseUrl}/login", loginData);
-
-            var response = await client.SendAsync(reques);
-
-            var responseBody = await response.Content.ReadAsStringAsync();
-            if (response.IsSuccessStatusCode)
-            {
-                var jsonDoc = JsonDocument.Parse(responseBody);
-                string token = jsonDoc.RootElement.GetProperty("token").GetString() ?? string.Empty;
-
-                if (!string.IsNullOrEmpty(token))
-                    return (await SetToken(token), "");
-            }
-
-            return (false, responseBody); // Login fallido
+            var reques = await GetRequest<AuthService>(HttpMethod.Post, $"{BaseUrl}/login", loginData);
+            var resut = await HandleResponseAsync<TokenResponse, AuthService>(reques, "Seccion Iniciado Exitosamente.", false);
+            if (resut.Success && !string.IsNullOrEmpty(resut.EntityGet.Token))
+                await SetToken(resut.EntityGet.Token);
+            return resut;
         }
         public async Task<TimeSpan> VerificarLogin()
         {
             try
             {
                 var client = GetClient();
-                var reques = await GetRequest(HttpMethod.Get, $"{BaseUrl}/validate-token");
+                var reques = await GetRequest<AuthService>(HttpMethod.Get, $"{BaseUrl}/validate-token");
 
                 var response = await client.SendAsync(reques);
 
@@ -72,7 +63,7 @@ namespace Cliente.src.Services
             {
                 Console.WriteLine($"Intento de coneccion a {BaseUrl}");
                 var client = GetClient();
-                var reques = await GetRequest(HttpMethod.Get, $"{BaseUrl}/check");
+                var reques = await GetRequest<AuthService>(HttpMethod.Get, $"{BaseUrl}/check");
 
                 var response = await client.SendAsync(reques);
                 response.EnsureSuccessStatusCode();
@@ -111,7 +102,6 @@ namespace Cliente.src.Services
                     storage.DeleteFile("credentials.txt");
             });
         }
-
         public static async Task<(string, string, bool)> CargarCredenciales()
         {
             using (var storage = IsolatedStorageFile.GetUserStoreForApplication())
@@ -133,6 +123,11 @@ namespace Cliente.src.Services
             }
 
             return (string.Empty, string.Empty, false); // Si no existe el archivo, devuelves el valor por defecto
+        }
+
+        public class TokenResponse
+        {
+            public string Token { get; set; } = string.Empty;
         }
 
 

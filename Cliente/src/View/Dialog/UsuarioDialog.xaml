@@ -41,9 +41,11 @@
         <TextBox Text="{Binding Usuario.User, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay, Converter={StaticResource InputBoxConverter}, ConverterParameter='NickName'}" MaxLength="20" md:HintAssist.Hint="Nombre Usuario" Grid.Column="0" Grid.Row="4" MinWidth="150" Margin="10,10,10,20" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
         <DatePicker SelectedDate="{Binding Usuario.FechaNacimiento, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" md:HintAssist.Hint="Fecha Nacimiento" Grid.Column="1" Grid.Row="4"  MinWidth="150" Margin="10,10,10,20" Style="{StaticResource MaterialDesignFloatingHintDatePicker}"/>
 
-        <Button Content="Cancelar" Command="{x:Static md:DialogHost.CloseDialogCommand}" Grid.Row="6" Grid.Column="0" Width="100" HorizontalAlignment="Right" Margin="0,0,15,20" />
-        <Button Content="Guardar" 
-                Command="{Binding AceptedCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                CommandParameter="{Binding Usuario, RelativeSource={RelativeSource AncestorType=UserControl}}" Grid.Row="6" Grid.Column="1" Width="100" HorizontalAlignment="Left" Margin="15,0,0,20"/>
+        <Button Content="Cancelar" 
+                Click="ButtonCancelar"
+                Grid.Row="6" Grid.Column="0" Width="100" HorizontalAlignment="Right" Margin="0,0,15,20" />
+        <Button Content="Guardar"
+                Click="ButtonAceptar"
+                Grid.Row="6" Grid.Column="1" Width="100" HorizontalAlignment="Left" Margin="15,0,0,20"/>
     </Grid>
 </UserControl>

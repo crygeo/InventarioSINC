@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface IVariantes : IAtributosEntity, INameDescrition
+    public interface IVariantes : IAtributo
     {
 
     }

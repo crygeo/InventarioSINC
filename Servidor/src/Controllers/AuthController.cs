@@ -113,7 +113,7 @@ namespace Servidor.src.Controllers
 
                 var token = GenerateTokenForUser.GenerateToken(usuario);
 
-                return Ok(new { token });
+                return Ok(new { token});
             }
             catch (Exception ex)
             {

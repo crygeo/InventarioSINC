@@ -14,15 +14,17 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using Utilidades.Interfaces;
 
 namespace Cliente.src.View.Dialog
 {
     /// <summary>
     /// Lógica de interacción para MessageDialog.xaml
     /// </summary>
-    public partial class MessageDialog : UserControl
+    public partial class MessageDialog : UserControl, IDialog
     {
         public static readonly DependencyProperty MessageProperty = DependencyProperty.Register(nameof(Message), typeof(string), typeof(MessageDialog));
+
         public string Message
         {
             get => (string)GetValue(MessageProperty);
@@ -33,5 +35,8 @@ namespace Cliente.src.View.Dialog
         {
             InitializeComponent();
         }
+
+        public string DialogNameIdentifier { get; set; } = $"Dialog_{Guid.NewGuid():N}";
+        public required string DialogOpenIdentifier { get; set; }
     }
 }

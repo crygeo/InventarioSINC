@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface IProducto : IIdentifiable, INameDescrition, IAtributosEntity
+    public interface IProducto : IModelObj, INameDescrition
     {
+        IEnumerable<IAtributosEntity> Atributos { get; set; }
         IEnumerable<IVariantes> Variantes { get; set; }
     }
 }

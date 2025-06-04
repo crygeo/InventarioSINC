@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface ITalla : IIdentifiable, IDeleteable
+    public interface ITalla : IModelObj, IAtributosEntity
     {
-        string Name { get; }
-        string Description { get; }
-        List<IClase> ClasesPermitidas { get; }
+        string Description { get; set; }
     }
 }

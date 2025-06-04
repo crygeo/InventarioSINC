@@ -8,5 +8,6 @@ namespace Shared.Interfaces.ModelsBase
 {
     public interface IAtributo : INameDescrition
     {
+        string Value { get; set; }
     }
 }

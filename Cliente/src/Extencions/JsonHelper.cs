@@ -6,6 +6,7 @@ using System.Linq;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
+using Cliente.src.Services.Model;
 using Utilidades.Interfaces;
 
 namespace Cliente.src.Extencions
@@ -23,7 +24,7 @@ namespace Cliente.src.Extencions
                     return new ResultResponse<T>
                     {
                         Success = false,
-                        Entity = default!,
+                        EntityGet = default!,
                         Message = "No se pudo deserializar el objeto.",
                         Error = "El contenido fue nulo o incompatible con el tipo esperado."
                     };
@@ -32,7 +33,7 @@ namespace Cliente.src.Extencions
                 return new ResultResponse<T>
                 {
                     Success = true,
-                    Entity = obj,
+                    EntityGet = obj,
                     Message = successMessage,
                     Error = ""
                 };
@@ -42,7 +43,7 @@ namespace Cliente.src.Extencions
                 return new ResultResponse<T>
                 {
                     Success = false,
-                    Entity = default!,
+                    EntityGet = default!,
                     Message = "Error al procesar la respuesta.",
                     Error = $"Excepción durante la deserialización: {ex.Message}"
                 };
@@ -53,6 +54,7 @@ namespace Cliente.src.Extencions
         {
             try
             {
+                var tu = typeof(T);
                 var json = await response.Content.ReadAsStringAsync();
 
                 var obj = JsonConvert.DeserializeObject<T>(json);
@@ -62,18 +64,18 @@ namespace Cliente.src.Extencions
                     return new ResultResponse<T>
                     {
                         Success = false,
-                        Entity = default!,
+                        EntityGet = default!,
                         Message = "No se pudo deserializar el objeto.",
-                        Error = "El contenido fue nulo o incompatible con el tipo esperado."
+                        Error = "El contenido fue nulo o incompatible con el tipo esperado.",
                     };
                 }
 
                 return new ResultResponse<T>
                 {
                     Success = true,
-                    Entity = obj,
+                    EntityGet = obj,
                     Message = successMessage,
-                    Error = ""
+                    Error = "",
                 };
             }
             catch (Exception ex)
@@ -81,9 +83,10 @@ namespace Cliente.src.Extencions
                 return new ResultResponse<T>
                 {
                     Success = false,
-                    Entity = default!,
+                    EntityGet = default!,
                     Message = "Error al procesar la respuesta.",
-                    Error = $"Excepción durante la deserialización: {ex.Message}"
+                    Error = $"Excepción durante la deserialización: {ex.Message}",
+
                 };
             }
         }

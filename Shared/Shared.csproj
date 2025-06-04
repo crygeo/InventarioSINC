@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="ClassModel\" />
     <Folder Include="Interfaces\Client\" />
   </ItemGroup>
 
