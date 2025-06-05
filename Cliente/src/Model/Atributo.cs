@@ -1,11 +1,12 @@
-﻿using System;
+﻿using Cliente.src.Attributes;
+using Shared.Interfaces.ModelsBase;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Cliente.src.Attributes;
-using Shared.Interfaces.ModelsBase;
+using Utilidades.Controls;
 
 namespace Cliente.src.Model
 {
@@ -37,7 +38,7 @@ namespace Cliente.src.Model
             set => SetProperty(ref _descripcion, value);
         }
 
-        [Solicitar("Valor", Requerido = true, ItemType = typeof(TextBox))]
+        [Solicitar("Valor", Requerido = true, ItemType = typeof(TextBox), InputBoxConvert = InputBoxType.Text, MaxLength = 20)]
         public string Value
         {
             get => _value;

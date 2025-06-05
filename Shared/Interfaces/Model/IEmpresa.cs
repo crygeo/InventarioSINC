@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface IVariantes : IAtributo
+    public interface IEmpresa
     {
-
+        public string RazonSocial { get; set; }
+        public string RepresentanteLegal { get; set; }
     }
 }

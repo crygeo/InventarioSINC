@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Driver;
 using Servidor.src.Objs;
@@ -62,7 +63,7 @@ public abstract class ServiceBase<TObj> : IService<TObj> where TObj : IModelObj
     public async Task<bool> VerificarPermiso(string idUser, string NamePermiso)
     {
         var database = MongoDBConnection._database;
-        if(database == null) return false;
+        if (database == null) throw new Exception("Base de datos null");
 
         var repUser = database.GetCollection<Usuario>("RepUsuario");
 

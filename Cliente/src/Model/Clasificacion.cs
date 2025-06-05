@@ -1,6 +1,7 @@
 ﻿using Cliente.src.Attributes;
 using MaterialDesignColors.Recommended;
 using Shared.Interfaces;
+using Shared.Interfaces.Model.Obj;
 using Shared.Interfaces.ModelsBase;
 using System;
 using System.Collections.Generic;
@@ -8,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using Utilidades.Controls;
 
 namespace Cliente.src.Model
 {
@@ -24,9 +26,9 @@ namespace Cliente.src.Model
             get => _recepcionCarga;
             set => SetProperty(ref _recepcionCarga, value);
         }
-        [Solicitar("Peso Neto", ItemType = typeof(TextBox))]
+        [Solicitar("Peso Neto", ItemType = typeof(TextBox), InputBoxConvert = InputBoxType.Decimal)]
         public float PesoNeto { get => _pesoNeto; set { SetProperty(ref _pesoNeto, value); UpdateChanged(); } }
-        [Solicitar("Peso Desecho", ItemType = typeof(TextBox))]
+        [Solicitar("Peso Desecho", ItemType = typeof(TextBox), InputBoxConvert = InputBoxType.Decimal)]
         public float PesoDesecho { get => _pesoDesecho; set { SetProperty(ref _pesoDesecho, value); UpdateChanged(); } }
 
         public float PesoBruto { get => PesoNeto - PesoDesecho;}

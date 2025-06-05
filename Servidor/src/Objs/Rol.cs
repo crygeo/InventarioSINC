@@ -4,6 +4,7 @@ using Shared.Interfaces.ModelsBase;
 using Shared.Interfaces;
 using System.Collections.Generic;
 using Microsoft.AspNetCore.DataProtection.Repositories;
+using Shared.Interfaces.Model.Obj;
 
 namespace Servidor.src.Objs
 {

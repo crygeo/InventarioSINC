@@ -1,5 +1,6 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using Shared.Interfaces.Model.Obj;
 using Shared.Interfaces.ModelsBase;
 using System.Collections.Generic;
 

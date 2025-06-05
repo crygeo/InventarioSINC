@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using Cliente.src.Attributes;
 using Cliente.src.View.Items;
+using Utilidades.Controls;
 
 namespace Cliente.src.Model
 {
@@ -21,7 +22,7 @@ namespace Cliente.src.Model
         private IEnumerable<AtributosEntity> _atributos = new ObservableCollection<AtributosEntity>();
         private IEnumerable<Variantes> _variantes = new ObservableCollection<Variantes>();
 
-        [Solicitar("Nombre",  Requerido = true, MinLength = 2, ItemType = typeof(TextBox))]
+        [Solicitar("Nombre",  Requerido = true, MinLength = 2, ItemType = typeof(TextBox), InputBoxConvert = InputBoxType.Name)]
         public string Name
         {
             get => _name;
@@ -32,7 +33,7 @@ namespace Cliente.src.Model
             get => _nickName;
             set => SetProperty(ref _nickName, value);
         }
-        [Solicitar("Descripcion", ItemType = typeof(TextBox))]
+        [Solicitar("Descripcion", ItemType = typeof(TextBox), InputBoxConvert = InputBoxType.Name)]
         public string Descripcion
         {
             get => _descripcion;
@@ -40,13 +41,13 @@ namespace Cliente.src.Model
         }
 
 
-        IEnumerable<IAtributosEntity> IProducto.Atributos
+        IEnumerable<IValorAtributo> IProducto.Atributos
         {
             get => Atributos;
             set => Atributos = value.Cast<AtributosEntity>();
         }
 
-        [Solicitar("Atributos", MinItem = 1, ItemType = typeof(AtributesAdd))]
+        [Solicitar("Atributos", MinItem = 1, ItemType = typeof(AtributesAdd), InputBoxConvert = InputBoxType.None)]
         public IEnumerable<AtributosEntity> Atributos
         {
             get => _atributos;
@@ -58,7 +59,7 @@ namespace Cliente.src.Model
             get => Variantes;
             set => Variantes = value.Cast<Variantes>();
         }
-        [Solicitar("Variantes", MinItem = 1, ItemType = typeof(VariantesAdd))]  
+        [Solicitar("Variantes", MinItem = 1, ItemType = typeof(VariantesAdd), InputBoxConvert = InputBoxType.None)]  
         public IEnumerable<Variantes> Variantes
         {
             get => _variantes;

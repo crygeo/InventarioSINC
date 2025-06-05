@@ -33,15 +33,15 @@ namespace Cliente.src.View.Items
     /// </summary>
     public partial class AtributesAdd : UserControl
     {
-        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable<IAtributosEntity>), typeof(AtributesAdd));
+        public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable<IValorAtributo>), typeof(AtributesAdd));
         public static readonly DependencyProperty EditarAtributoCommandProperty = DependencyProperty.Register(nameof(EditarAtributoCommand), typeof(IAsyncRelayCommand), typeof(AtributesAdd));
         public static readonly DependencyProperty EliminarAtributoCommandProperty = DependencyProperty.Register(nameof(EliminarAtributoCommand), typeof(IAsyncRelayCommand), typeof(AtributesAdd));
         public static readonly DependencyProperty EditarValorCommandProperty = DependencyProperty.Register(nameof(EditarValorCommand), typeof(IAsyncRelayCommand), typeof(AtributesAdd));
         public static readonly DependencyProperty EliminarValorCommandProperty = DependencyProperty.Register(nameof(EliminarValorCommand), typeof(IAsyncRelayCommand), typeof(AtributesAdd));
 
-        public IEnumerable<IAtributosEntity> ItemsSource
+        public IEnumerable<IValorAtributo> ItemsSource
         {
-            get => (IEnumerable<IAtributosEntity>)GetValue(ItemsSourceProperty);
+            get => (IEnumerable<IValorAtributo>)GetValue(ItemsSourceProperty);
             set => SetValue(ItemsSourceProperty, value);
         }
         public IAsyncRelayCommand EditarAtributoCommand

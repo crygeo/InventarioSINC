@@ -9,6 +9,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Utilidades.Interfaces;
 using System.Security.Principal;
+using Shared.Interfaces.Model.Obj;
 namespace Cliente.src.Model
 {
     public class Rol : ModelBase<IRol>, IRol, IClassified

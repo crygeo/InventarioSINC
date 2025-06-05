@@ -1,4 +1,5 @@
 ﻿using Cliente.src.Attributes;
+using Cliente.src.Model;
 using Cliente.src.Services;
 using Cliente.src.View.Items;
 using MaterialDesignThemes.Wpf;
@@ -12,7 +13,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Cliente.src.Model;
+using Utilidades.Controls;
+using Utilidades.Converters;
 
 namespace Cliente.src.Extencions
 {
@@ -24,21 +26,19 @@ namespace Cliente.src.Extencions
         public static FrameworkElement CrearComponente(object objetoModelo, string nombrePropiedad, string hint)
         {
             var tipo = objetoModelo.GetType();
-            var propInfo = tipo.GetProperty(nombrePropiedad);
+            var propInfo = tipo.GetProperty(nombrePropiedad)
+                           ?? throw new ArgumentException($"La propiedad '{nombrePropiedad}' no existe en {tipo.Name}");
 
-            if (propInfo == null)
-                throw new ArgumentException($"La propiedad '{nombrePropiedad}' no existe en {tipo.Name}");
-
-            var solicitarAttr = propInfo.GetCustomAttribute<SolicitarAttribute>();
-
-            if (solicitarAttr?.ItemType == null)
-                throw new Exception($"La propiedad '{nombrePropiedad}' no tiene definido ItemType en el atributo [Solicitar].");
+            var solicitarAttr = propInfo.GetCustomAttribute<SolicitarAttribute>()
+                                ?? throw new InvalidOperationException($"La propiedad '{nombrePropiedad}' no tiene el atributo [Solicitar].");
 
             if (TryCreate(solicitarAttr.ItemType, objetoModelo, nombrePropiedad, hint, out var componente))
                 return componente;
 
-            throw new Exception($"No se ha registrado ningún generador de componente para el tipo {solicitarAttr.ItemType.Name}.");
+            throw new Exception($"No se pudo crear el componente para '{nombrePropiedad}'.");
         }
+
+
         public static AtributesAdd CrearAtributesAdd(object objetoModelo, string nombrePropiedad, string hint)
         {
             var atradd = new AtributesAdd
@@ -69,7 +69,6 @@ namespace Cliente.src.Extencions
                 TypeItem = typeof(Variantes)
 
             };
-            HintAssist.SetHint(atradd, hint);
 
             var binding = new Binding(nombrePropiedad)
             {
@@ -84,6 +83,19 @@ namespace Cliente.src.Extencions
         }
         public static TextBox CrearTextBoxConEstilo(object dataContext, string propiedad, string hint)
         {
+            var tipo = dataContext.GetType();
+            var propInfo = tipo.GetProperty(propiedad);
+
+            if (propInfo == null)
+                throw new ArgumentException($"La propiedad '{propiedad}' no existe en {tipo.Name}");
+
+            var attr = propInfo.GetCustomAttribute<SolicitarAttribute>()
+                       ?? throw new InvalidOperationException($"La propiedad '{propiedad}' no tiene el atributo [Solicitar].");
+
+            // Verificación: InputBoxConvert debe estar definido
+            if (attr.InputBoxConvert == InputBoxType.None)
+                throw new InvalidOperationException($"Debe especificar InputBoxConvert en la propiedad '{propiedad}'.");
+
             var txt = new TextBox
             {
                 DataContext = dataContext,
@@ -98,13 +110,51 @@ namespace Cliente.src.Extencions
             {
                 Mode = BindingMode.TwoWay,
                 UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-                ValidatesOnNotifyDataErrors = true
+                ValidatesOnNotifyDataErrors = true,
+                Converter = new InputBoxConverter(),
+                ConverterParameter = attr.InputBoxConvert.ToString()
             };
 
             txt.SetBinding(TextBox.TextProperty, binding);
 
             return txt;
         }
+        public static IdentificadoresSelect CrearIdentificadorSelect(object dataContext, string nombrePropiedad, string hint)
+        {
+            var identificadorSelect = new IdentificadoresSelect
+            {
+                DataContext = dataContext,
+                Margin = new Thickness(5, 0, 5, 10),
+                MinWidth = 200,
+            };
+
+            return identificadorSelect;
+        }
+
+        public static DatePicker CrearDatePickerConEstilo(object dataContext, string propiedad, string hint)
+        {
+            var datePicker = new DatePicker
+            {
+                DataContext = dataContext,
+                Margin = new Thickness(5, 0, 5, 10),
+                Style = (Style)Application.Current.FindResource("MaterialDesignFloatingHintDatePicker"),
+                MinWidth = 150
+            };
+
+            HintAssist.SetHint(datePicker, hint);
+
+            var binding = new Binding(propiedad)
+            {
+                Mode = BindingMode.TwoWay,
+                UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+                ValidatesOnNotifyDataErrors = true
+            };
+
+            datePicker.SetBinding(DatePicker.SelectedDateProperty, binding);
+
+            return datePicker;
+        }
+
 
         public static void Register(Type itemType, Func<object, string, string, FrameworkElement> factory)
         {
@@ -148,6 +198,9 @@ namespace Cliente.src.Extencions
             Register(typeof(AtributesAdd), CrearAtributesAdd);
             Register(typeof(TextBox), CrearTextBoxConEstilo);
             Register(typeof(VariantesAdd), CrearVariantesAdd);
+            Register(typeof(DatePicker), CrearDatePickerConEstilo);
+            Register(typeof(IdentificadoresSelect), CrearIdentificadorSelect);
+
         }
     }
     public enum Pluralidad

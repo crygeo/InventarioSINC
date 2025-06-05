@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using Cliente.src.Attributes;
 using MaterialDesignThemes.Wpf;
+using Utilidades.Controls;
 
 namespace Cliente.src.Model
 {
@@ -30,14 +31,14 @@ namespace Cliente.src.Model
             set => SetProperty(ref _nickName, value);
         }
 
-        [Solicitar("Variante", Requerido = true, ItemType = typeof(TextBox))]
+        [Solicitar("Variante", Requerido = true, ItemType = typeof(TextBox), InputBoxConvert = InputBoxType.Text)]
         public string Value
         {
             get => _value;
             set => SetProperty(ref _value, value);
         }
 
-        [Solicitar("Descripcion", Requerido = true, ItemType = typeof(TextBox))]
+        [Solicitar("Descripcion", Requerido = true, ItemType = typeof(TextBox), InputBoxConvert = InputBoxType.Text)]
         public string Descripcion
         {
             get => _descripcion;

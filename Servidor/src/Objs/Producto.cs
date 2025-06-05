@@ -20,7 +20,7 @@ namespace Servidor.src.Objs
         public IEnumerable<AtributosEntity> Atributos { get; set; } = [];
         public IEnumerable<Variantes> Variantes { get; set; } = [];
 
-        IEnumerable<IAtributosEntity> IProducto.Atributos
+        IEnumerable<IValorAtributo> IProducto.Atributos
         {
             get => Atributos;
             set => Atributos = value.Cast<AtributosEntity>();

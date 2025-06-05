@@ -205,6 +205,9 @@ namespace Cliente.src.Services
             else
                 mensaje = "Operación exitosa.";
 
+            if (!string.IsNullOrEmpty(dialog))
+                mensaje = dialog;
+
             MensajeQueue.Enqueue(mensaje);
         }
 

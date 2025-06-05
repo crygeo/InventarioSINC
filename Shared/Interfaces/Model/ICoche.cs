@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Shared.Interfaces.ModelsBase
 {
-    public interface ICoche
+    public interface ICoche : IModelObj
     {
         int Numero { get; set; }
         int Descripcion { get; set; }

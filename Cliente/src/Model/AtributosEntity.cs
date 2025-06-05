@@ -1,17 +1,18 @@
-﻿using System;
+﻿using Cliente.src.Attributes;
+using Shared.Interfaces.ModelsBase;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
-using Cliente.src.Attributes;
-using Shared.Interfaces.ModelsBase;
+using Utilidades.Controls;
 
 namespace Cliente.src.Model
 {
     [NombreEntidad("Atributo")]
-    public class AtributosEntity : ModelBase, IAtributosEntity
+    public class AtributosEntity : ModelBase, IValorAtributo
     {
         private string _name = string.Empty;
         private string _nickName = string.Empty;
@@ -20,7 +21,7 @@ namespace Cliente.src.Model
 
 
         
-        [Solicitar("Nombre", Requerido = true, ItemType = typeof(TextBox))]
+        [Solicitar("Nombre", Requerido = true, ItemType = typeof(TextBox), InputBoxConvert = InputBoxType.Name)]
         public string Name
         {
             get => _name;
@@ -37,7 +38,7 @@ namespace Cliente.src.Model
             set => SetProperty(ref _descripcion, value);
         }
 
-        IEnumerable<IAtributo> IAtributosEntity.Atributos
+        IEnumerable<IAtributo> IValorAtributo.Atributos
         {
             get => Atributos;
             set => Atributos = value.Cast<Atributo>();

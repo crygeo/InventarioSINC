@@ -3,6 +3,7 @@ using MongoDB.Bson;
 using Shared.Interfaces.ModelsBase;
 using System;
 using System.Collections.Generic;
+using Shared.Interfaces.Model.Obj;
 
 namespace Servidor.src.Objs
 {

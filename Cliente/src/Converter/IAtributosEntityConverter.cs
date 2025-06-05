@@ -11,15 +11,15 @@ using Cliente.src.Model;
 
 namespace Cliente.src.Converter
 {
-    public class IAtributosEntityConverter : JsonConverter<IEnumerable<IAtributosEntity>>
+    public class IAtributosEntityConverter : JsonConverter<IEnumerable<IValorAtributo>>
     {
-        public override void WriteJson(JsonWriter writer, IEnumerable<IAtributosEntity>? value, JsonSerializer serializer)
+        public override void WriteJson(JsonWriter writer, IEnumerable<IValorAtributo>? value, JsonSerializer serializer)
         {
             var lista = value as IEnumerable<AtributosEntity>;
             serializer.Serialize(writer, lista);
         }
 
-        public override IEnumerable<IAtributosEntity>? ReadJson(JsonReader reader, Type objectType, IEnumerable<IAtributosEntity>? existingValue, bool hasExistingValue,
+        public override IEnumerable<IValorAtributo>? ReadJson(JsonReader reader, Type objectType, IEnumerable<IValorAtributo>? existingValue, bool hasExistingValue,
             JsonSerializer serializer)
         {
             var array = JArray.Load(reader);

@@ -145,6 +145,7 @@ namespace Servidor.src.Controllers
             if (!IdValidator.IsValidObjectId(userId))
                 return BadRequest(new ErrorResponse(400, "El usuario del solicitante no es válido."));
 
+
             if (!await _service.VerificarPermiso(userId, NamePermiso))
                 return Unauthorized(new ErrorResponse(401, "Permisos insuficientes."));
 
