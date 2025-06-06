@@ -23,7 +23,7 @@ namespace Cliente.src.ViewModel
     public class MainVM : ViewModelBase, IBarNavegacion
     {
         private DialogService DialogService => DialogService.Instance;
-        public UsuarioService ServicioUsuario => (UsuarioService)ServiceFactory.GetService<Usuario>();
+        public UsuarioObjs ServicioUsuario => (UsuarioObjs)ServiceFactory.GetService<Usuario>();
 
         private ViewModelBase _pageSelectViewModel = null!;
         public ViewModelBase PageSelectViewModel

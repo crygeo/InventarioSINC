@@ -1,6 +1,7 @@
 ﻿using Cliente.src.Services.Model;
 using Cliente.src.ServicesHub;
 using Shared.Interfaces;
+using Shared.Interfaces.Model;
 using Shared.Interfaces.ModelsBase;
 using System;
 using System.Collections.Generic;
@@ -24,7 +25,7 @@ namespace Cliente.src.Services
             // Verificar si hay un servicio personalizado
             var customServiceType = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(a => a.GetTypes())
-                .FirstOrDefault(t => typeof(ServiceBase<T>).IsAssignableFrom(t) && typeof(ICustomService).IsAssignableFrom(t));
+                .FirstOrDefault(t => typeof(ServiceBase<T>).IsAssignableFrom(t) && typeof(ICustomObjs).IsAssignableFrom(t));
 
             if (customServiceType != null)
             {

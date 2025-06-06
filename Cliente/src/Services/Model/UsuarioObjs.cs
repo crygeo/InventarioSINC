@@ -12,9 +12,9 @@ using Utilidades.Interfaces;
 
 namespace Cliente.src.Services.Model
 {
-    public class UsuarioService : ServiceBase<Usuario>, ICustomService
+    public class UsuarioObjs : ServiceBase<Usuario>, ICustomObjs
     {
-        public UsuarioService() : base(new UsuarioHubService()){}
+        public UsuarioObjs() : base(new UsuarioHubService()){}
 
         public async Task<IResultResponse<Usuario>> GetThisUser()
         {

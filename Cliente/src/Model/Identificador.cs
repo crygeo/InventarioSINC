@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using Cliente.src.Attributes;
 using Cliente.src.Extencions;
+using Shared.Interfaces.Model;
 using Shared.Interfaces.Model.Obj;
-using Shared.Interfaces.ModelsBase;
 using Utilidades.Controls;
 
 namespace Cliente.src.Model

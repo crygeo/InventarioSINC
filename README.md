@@ -69,6 +69,57 @@ Una vez finalizada y testeada, será fusionada con main o develop.
 ## 📅 Fecha de inicio
 Junio 2025
 
+----
+## Actualización
+Junio 2025-06-06
+
+# 🧬 Generador Automático de Controladores `.tt`
+
+Este archivo `.tt` genera automáticamente controladores para todos los modelos definidos en la carpeta `/Model`, **ignorando aquellos que ya tienen un controlador manual**.
+
+## ⚙️ ¿Cómo funciona?
+
+- Busca todos los archivos `.cs` dentro de la carpeta `Model/`.
+- Compara con los archivos existentes en la carpeta `Controllers/`.
+- Genera un archivo `.g.cs` con controladores base (`BaseController<T>`) **solo para aquellos modelos que aún no tienen controlador personalizado**.
+
+## 📁 Estructura esperada
+```mathematica
+Servidor/
+├── Controllers/
+│ ├── GenerarControladores.tt ← Este archivo
+│ ├── ProductoController.cs ← Personalizado
+│ └── ... ← Otros controladores
+├── Model/
+│ ├── Producto.cs
+│ ├── Clasificacion.cs
+│ └── ...
+|
+```
+
+
+## 📄 Ejemplo generado
+
+```csharp
+[ApiController]
+[Route("api/[controller]")]
+public class ClasificacionController : BaseController<Clasificacion> { }
+```
+
+## ✅ Requisitos
+El archivo .tt debe estar ubicado dentro de la carpeta Controllers/.
+
+Los modelos deben estar dentro de la carpeta Model/ (hermanos de Controllers/).
+
+Proyecto compilado al menos una vez para evitar errores de dependencias.
+
+## 🚫 Limitaciones
+No analiza directamente los ensamblados (.dll), trabaja solo con nombres de archivo.
+
+No recomendado para producción. Usar solo como ayuda en desarrollo para reducir boilerplate.
+
+## 🛠️ Créditos
+Plantilla generada por [ChatGPT + CryGeo], con ❤️ al código limpio y DRY.
 
 ---
 

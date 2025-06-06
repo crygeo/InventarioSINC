@@ -12,8 +12,8 @@ using Cliente.src.Converter;
 using Cliente.src.Services;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json.Serialization;
-using Shared.Interfaces.ModelsBase;
 using Utilidades.Interfaces;
+using Shared.Interfaces.Model;
 
 namespace Cliente.src.ServicesHub
 {

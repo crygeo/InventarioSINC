@@ -21,7 +21,7 @@ namespace Cliente.src.ViewModel
 {
     public class PageRolesVM : ViewModelServiceBase<Rol>
     {
-        public RolService ServiceRol => (RolService)ServicioBase;
+        public RolObjs ObjsRol => (RolObjs)ServicioBase;
 
         public async override Task CrearEntityAsync()
         {
@@ -34,7 +34,7 @@ namespace Cliente.src.ViewModel
                     await CrearNuevoRolAsync(user);
                 }),
                 Item = nuevoRol,
-                ListPerms = (await ServiceRol.GetAllPermisos()).EntityGet.ConstruirArbol(),
+                ListPerms = (await ObjsRol.GetAllPermisos()).EntityGet.ConstruirArbol(),
                 TextHeader = "Nuevo Rol",
                 DialogOpenIdentifier = DialogService.DialogIdentifierMain
             };
@@ -77,7 +77,7 @@ namespace Cliente.src.ViewModel
                     await EditarRolAsync(entity);
                 }),
                 Item = EntitySelect.Clone(),
-                ListPerms = (await ServiceRol.GetAllPermisos())
+                ListPerms = (await ObjsRol.GetAllPermisos())
                                 .EntityGet
                                 .ConstruirArbol()
                                 .SeleccionarNodos(EntitySelect.Permisos),

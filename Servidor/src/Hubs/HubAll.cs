@@ -1,4 +1,4 @@
-﻿using Servidor.src.Objs;
+﻿using Servidor.src.Model;
 using Shared.Interfaces.ModelsBase;
 
 namespace Servidor.src.Hubs

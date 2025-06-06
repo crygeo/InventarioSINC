@@ -23,7 +23,7 @@ namespace Cliente.src.ViewModel
         public IAsyncRelayCommand CambiarPasswordCommand { get; }
         public IAsyncRelayCommand<object?> AsignarRolCommand { get; }
 
-        public UsuarioService ServicioUsuario => (UsuarioService)ServiceFactory.GetService<Usuario>();
+        public UsuarioObjs ServicioUsuario => (UsuarioObjs)ServiceFactory.GetService<Usuario>();
 
         public PageUsuarioVM()
         {

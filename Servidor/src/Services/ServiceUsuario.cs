@@ -1,7 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Servidor.src.Hubs;
 using Servidor.src.HubsService;
-using Servidor.src.Objs;
 using Servidor.src.Repositorios;
 using Shared.Extensions;
 using Shared.Interfaces;
@@ -10,6 +9,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
+using Servidor.Services;
+using Servidor.src.Model;
 
 namespace Servidor.src.Services
 {
@@ -23,10 +24,6 @@ namespace Servidor.src.Services
         public override IHubService<Usuario> HubService { get; }
 
 
-        public ServiceUsuario(HubsServiceUsuario hubService)
-        {
-            HubService = hubService;
-        }
         public Task<Usuario> GetByUser(string user) => ((RepositorioUsuario)Repository).GetByUser(user);
 
         public async Task<bool> ActualizarPasswordAsync(string userId, string newPassword)

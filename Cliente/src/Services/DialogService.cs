@@ -1,7 +1,7 @@
 ﻿using Cliente.src.View.Dialog;
 using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
-using Shared.Interfaces.ModelsBase;
+using Shared.Interfaces.Model;
 using System.Net.Http;
 using Utilidades.Interfaces;
 

@@ -14,9 +14,9 @@ using Shared.Interfaces.ModelsBase;
 
 namespace Cliente.src.Services.Model
 {
-    public class RolService : ServiceBase<Rol>, ICustomService
+    public class RolObjs : ServiceBase<Rol>, ICustomObjs
     {
-        public RolService() : base(new RolHubService()) { }
+        public RolObjs() : base(new RolHubService()) { }
 
         public Rol? ObtenerPorId(string idRol) => Collection.FirstOrDefault((r) => r.Id == idRol);
         public async Task InicializarAsync() => await InitAsync(); // ✅ Se ejecuta después de que `HubService` ya esté listo

@@ -36,26 +36,6 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSignalR();
 
-
-builder.Services.AddScoped<HubsServiceUsuario>();
-builder.Services.AddScoped<HubsServiceRol>();
-builder.Services.AddScoped<HubsServiceProveedorEmpresa>();
-builder.Services.AddScoped<HubsServiceProveedorPersona>();
-builder.Services.AddScoped<HubsServiceClasificacion>();
-builder.Services.AddScoped<HubsServiceProducto>();
-builder.Services.AddScoped<HubsServiceRecepcionCarga>();
-builder.Services.AddScoped<HubsServiceIdentificador>();
-
-// Configurar la inyección de dependencias para MongoDB y tus repositorios
-builder.Services.AddScoped<ServiceUsuario>();
-builder.Services.AddScoped<ServiceRol>();
-builder.Services.AddScoped<ServiceProveedorEmpresa>();
-builder.Services.AddScoped<ServiceProveedorPersona>();
-builder.Services.AddScoped<ServiceClasificacion>();
-builder.Services.AddScoped<ServiceProducto>();
-builder.Services.AddScoped<ServiceRecepcionCarga>();
-builder.Services.AddScoped<ServiceIdentificador>();
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
@@ -117,6 +97,7 @@ app.Use(async (context, next) =>
 });
 
 app.MapControllers();
+
 app.MapHubByConvention<HubUsuario>();
 app.MapHubByConvention<HubRol>();
 app.MapHubByConvention<HubProveedorEmpresa>();

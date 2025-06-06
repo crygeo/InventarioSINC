@@ -18,9 +18,9 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using Cliente.src.Services;
-using Shared.Interfaces.ModelsBase;
 using Utilidades.Interfaces;
 using Utilidades.Mvvm;
+using Shared.Interfaces.Model;
 
 namespace Cliente.src.ViewModel
 {

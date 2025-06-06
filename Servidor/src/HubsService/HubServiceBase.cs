@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Servidor.src.Hubs;
 using Shared.Interfaces;
-using Shared.Interfaces.ModelsBase;
+using Shared.Interfaces.Model;
 using System.Threading.Tasks;
 
 namespace Servidor.src.HubsService

@@ -1,5 +1,4 @@
 ﻿using Shared.Interfaces;
-using Shared.Interfaces.ModelsBase;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +9,7 @@ using Cliente.src.Attributes;
 using Utilidades.Controls;
 using Utilidades.Interfaces;
 using Shared.Interfaces.Model.Obj;
+using Shared.Interfaces.Model;
 
 namespace Cliente.src.Model
 {

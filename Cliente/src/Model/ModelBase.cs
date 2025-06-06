@@ -1,6 +1,6 @@
 ﻿using Cliente.src.Extencions;
 using Shared.Interfaces;
-using Shared.Interfaces.ModelsBase;
+using Shared.Interfaces.Model;
 using System;
 using System.Collections;
 using System.Collections.Generic;

@@ -1,5 +1,6 @@
 ﻿using MongoDB.Driver;
-using Servidor.src.Objs;
+using Servidor.src.Model;
+using Shared.Interfaces.ModelsBase;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 

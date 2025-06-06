@@ -13,8 +13,8 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using Shared.Interfaces.ModelsBase;
 using Utilidades.Interfaces;
+using Shared.Interfaces.Model;
 
 namespace Cliente.src.Services.Model
 {

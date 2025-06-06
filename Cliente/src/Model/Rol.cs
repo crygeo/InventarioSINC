@@ -4,12 +4,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Shared.Interfaces.ModelsBase;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Utilidades.Interfaces;
 using System.Security.Principal;
 using Shared.Interfaces.Model.Obj;
+using Shared.Interfaces.Model;
 namespace Cliente.src.Model
 {
     public class Rol : ModelBase<IRol>, IRol, IClassified

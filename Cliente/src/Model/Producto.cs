@@ -11,6 +11,7 @@ using System.Windows.Controls;
 using Cliente.src.Attributes;
 using Cliente.src.View.Items;
 using Utilidades.Controls;
+using Shared.Interfaces.Model;
 
 namespace Cliente.src.Model
 {
