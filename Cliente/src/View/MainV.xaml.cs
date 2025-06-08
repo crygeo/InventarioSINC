@@ -1,29 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
-using Cliente.src.Services;
+﻿using System.Windows;
+using Cliente.Services;
 
-namespace Cliente.src.View
+namespace Cliente.View;
+
+/// <summary>
+/// Lógica de interacción para MainV.xaml
+/// </summary>
+public partial class MainV : Window
 {
-    /// <summary>
-    /// Lógica de interacción para MainV.xaml
-    /// </summary>
-    public partial class MainV : Window
+    public MainV()
     {
-        public MainV()
-        {
-            InitializeComponent();
-            SnackbarThree.MessageQueue = DialogService.Instance.MensajeQueue;
-        }
+        InitializeComponent();
+        SnackbarThree.MessageQueue = DialogService.Instance.MensajeQueue;
     }
 }

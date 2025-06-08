@@ -8,6 +8,8 @@ namespace Servidor.src.Model
 {
     public class ProveedorPersona : IProveedorPersona
     {
+        private bool _verView;
+
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
@@ -33,5 +35,8 @@ namespace Servidor.src.Model
         {
             throw new NotImplementedException();
         }
+
+        public bool VerView { get; set; }
+
     }
 }

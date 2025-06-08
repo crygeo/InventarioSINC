@@ -1,7 +1,7 @@
 ﻿using System.Windows.Controls;
 using Utilidades.Interfaces;
 
-namespace Cliente.src.View.Dialog;
+namespace Cliente.View.Dialog;
 /// <summary>
 /// Interaction logic for SampleProgressDialog.xaml
 /// </summary>

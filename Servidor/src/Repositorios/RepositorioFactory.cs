@@ -1,10 +1,10 @@
-﻿using Servidor.src.Factory;
-using Shared.Interfaces;
+﻿using Shared.Interfaces;
 using Shared.Interfaces.Model;
 using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using Shared.Factory;
 
 namespace Servidor.src.Repositorios
 {

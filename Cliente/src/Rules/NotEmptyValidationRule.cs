@@ -1,7 +1,7 @@
 ﻿using System.Globalization;
 using System.Windows.Controls;
 
-namespace Cliente.src.Rules;
+namespace Cliente.Rules;
 
 public class NotEmptyValidationRule : ValidationRule
 {

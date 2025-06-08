@@ -9,6 +9,8 @@ namespace Servidor.src.Model
 {
     public class Usuario : IUsuario
     {
+        private bool _verView;
+
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
@@ -23,11 +25,15 @@ namespace Servidor.src.Model
         public DateTime FechaNacimiento { get; set; }
         public string User { get; set; }
         public string Password { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
         public List<string> Roles { get; set; }
+        public bool VerView { get; set; }
         public void Update(IModelObj entity)
         {
             throw new NotImplementedException();
         }
+
+
     }
 
 }

@@ -1,22 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using System.Windows;
 
-namespace Cliente.src.Extencions
+namespace Cliente.Extencions;
+
+public class BindingProxy : Freezable
 {
-    public class BindingProxy : Freezable
+    protected override Freezable CreateInstanceCore() => new BindingProxy();
+    public object Data
     {
-        protected override Freezable CreateInstanceCore() => new BindingProxy();
-        public object Data
-        {
-            get => GetValue(DataProperty);
-            set => SetValue(DataProperty, value);
-        }
-        public static readonly DependencyProperty DataProperty =
-            DependencyProperty.Register("Data", typeof(object), typeof(BindingProxy), new PropertyMetadata(null));
+        get => GetValue(DataProperty);
+        set => SetValue(DataProperty, value);
     }
-
+    public static readonly DependencyProperty DataProperty =
+        DependencyProperty.Register("Data", typeof(object), typeof(BindingProxy), new PropertyMetadata(null));
 }

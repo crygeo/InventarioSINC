@@ -9,6 +9,8 @@ namespace Servidor.src.Model
 {
     public class Clasificacion : IClasificacion
     {
+        private bool _verView;
+
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; } = string.Empty;
@@ -21,5 +23,8 @@ namespace Servidor.src.Model
         {
             throw new System.NotImplementedException();
         }
+
+        public bool VerView { get; set; }
+
     }
 }

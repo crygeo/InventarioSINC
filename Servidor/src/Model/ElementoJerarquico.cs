@@ -1,11 +1,18 @@
-﻿using Shared.Interfaces.Model;
+﻿using MongoDB.Bson;
+using MongoDB.Bson.Serialization.Attributes;
+using Shared.Interfaces.Model;
 using Shared.Interfaces.Model.Obj;
 
 namespace Servidor.src.Model
 {
     public class ElementoJerarquico : IElementoJerarquico
     {
+        private bool _verView;
+
+        [BsonId]
+        [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
         public string IdPerteneciente { get; set; }
         public string Nombre { get; set; }
         public string Valor { get; set; }
@@ -16,5 +23,8 @@ namespace Servidor.src.Model
         {
             throw new System.NotImplementedException();
         }
+
+        public bool VerView { get; set; }
+
     }
 }

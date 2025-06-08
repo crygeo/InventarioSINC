@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:Cliente" 
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewModel="clr-namespace:Cliente.ViewModel"
+             xmlns:helpers="clr-namespace:Cliente.Helpers"
              StartupUri="src/View/LoadV.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -16,7 +18,10 @@
                 <ResourceDictionary Source="pack://application:,,,/Cliente;component/src/Styles/StylesMainView.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Cliente;component/src/Styles/StyleItems.xaml"/>
                 <ResourceDictionary Source="pack://application:,,,/Cliente;component/src/Resource/DataTemplate.xaml"/>
+
+
             </ResourceDictionary.MergedDictionaries>
+            <helpers:ViewModelToViewTemplateSelector x:Key="ViewModelTemplateSelector" />
         </ResourceDictionary>
     </Application.Resources>
 </Application>

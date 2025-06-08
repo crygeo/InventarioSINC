@@ -10,6 +10,7 @@ namespace Servidor.src.Model
 {
     public class RecepcionCarga : IRecepcionCarga
     {
+
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
@@ -22,9 +23,11 @@ namespace Servidor.src.Model
         public string Nota { get; set; }
         public bool Updatable { get; set; }
         public bool Deleteable { get; set; }
+        public bool VerView { get; set; }
         public void Update(IModelObj entity)
         {
             throw new NotImplementedException();
         }
+
     }
 }

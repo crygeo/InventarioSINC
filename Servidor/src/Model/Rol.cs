@@ -10,11 +10,13 @@ namespace Servidor.src.Model
 {
     public class Rol : IRol
     {
+        private bool _verView;
+
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
         public string Nombre { get; set; }
-        public IEnumerable<string> Permisos { get; set; }
+        public List<string> Permisos { get; set; }
         public bool IsAdmin { get; set; }
         public bool Deleteable { get; set; }
         public bool Updatable { get; set; }
@@ -27,5 +29,8 @@ namespace Servidor.src.Model
         {
 
         }
+
+        public bool VerView { get; set; }
+
     }
 }

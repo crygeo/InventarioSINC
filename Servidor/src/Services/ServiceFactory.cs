@@ -1,5 +1,5 @@
 ﻿using Servidor.Services;
-using Servidor.src.Factory;
+using Shared.Factory;
 using Shared.Interfaces.Model;
 
 namespace Servidor.src.Services

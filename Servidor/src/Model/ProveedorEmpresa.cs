@@ -8,6 +8,8 @@ namespace Servidor.src.Model
 {
     public class ProveedorEmpresa : IProveedorEmpresa
     {
+        private bool _verView;
+
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
@@ -17,11 +19,14 @@ namespace Servidor.src.Model
         public string RepresentanteLegal { get; set; }
         public bool Deleteable { get; set; }
         public bool Updatable { get; set; }
+        public bool VerView { get; set; }
         public void Update(IModelObj entity)
         {
             throw new NotImplementedException();
         }
+
+
     }
 
-    
+
 }

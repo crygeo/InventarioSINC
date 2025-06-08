@@ -1,14 +1,9 @@
-﻿using Cliente.src.Model;
-using Cliente.src.Services;
-using Shared.Interfaces.ModelsBase;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Windows;
+﻿using System.Collections.ObjectModel;
+using Cliente.Obj.Model;
 
-namespace Cliente.src.ServicesHub
+namespace Cliente.ServicesHub;
+
+public class UsuarioHubService : HubServiceBase<Usuario>
 {
-    public class UsuarioHubService : HubServiceBase<Usuario>
-    {
-        public override ObservableCollection<Usuario> Collection { get; } = new();
-    }
+    public override ObservableCollection<Usuario> Collection { get; } = new();
 }

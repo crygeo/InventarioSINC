@@ -15,6 +15,7 @@ using System;
 using System.Linq;
 using System.Text;
 using Servidor;
+using Shared.Interfaces.Model;
 
 var builder = WebApplication.CreateBuilder(args);
 //var secretKey = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key not found"));
@@ -65,8 +66,14 @@ builder.Services.AddAuthentication("Bearer")
 builder.Services.AddScoped<AppInitializer>();
 
 
+
 var app = builder.Build();
 
+
+// ✅ Asignar el service provider global al HubFactory
+HubFactory.ServiceProvider = app.Services;
+
+// Inicialización con scope
 using (var scope = app.Services.CreateScope())
 {
     var initializer = scope.ServiceProvider.GetRequiredService<AppInitializer>();
@@ -98,14 +105,7 @@ app.Use(async (context, next) =>
 
 app.MapControllers();
 
-app.MapHubByConvention<HubUsuario>();
-app.MapHubByConvention<HubRol>();
-app.MapHubByConvention<HubProveedorEmpresa>();
-app.MapHubByConvention<HubProveedorPersona>();
-app.MapHubByConvention<HubClasificacion>();
-app.MapHubByConvention<HubRecepcionCarga>();
-app.MapHubByConvention<HubIdentificador>();
-app.MapHubByConvention<HubProducto>();
+app.MapAllGenericHubs<IModelObj>();
 
 app.Run();
 

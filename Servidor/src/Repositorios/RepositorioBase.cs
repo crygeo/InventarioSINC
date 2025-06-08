@@ -70,6 +70,7 @@ namespace Servidor.src.Repositorios
         {
             try
             {
+
                 await Collection.InsertOneAsync(entity);
                 return true;  // Inserción exitosa
             }
