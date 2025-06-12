@@ -2,24 +2,24 @@
 using Cliente.Obj.Model;
 using Cliente.Services;
 using Cliente.Services.Model;
-using Cliente.src.Services.Model;
+using Cliente.ViewModel.Model;
 using Cliente.View.Dialog;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Extensions;
 
-namespace Cliente.src.ViewModel.Model;
+namespace Cliente.ViewModel.Model;
 
 public class PageUsuarioVM : ViewModelServiceBase<Usuario>
 {
     public IAsyncRelayCommand CambiarPasswordCommand { get; }
-    public IAsyncRelayCommand<object?> AsignarRolCommand { get; }
+    public IAsyncRelayCommand<Rol> AsignarRolCommand { get; }
 
     public ServiceUsuario ServicioServiceUsuario => (ServiceUsuario)ServiceFactory.GetService<Usuario>();
 
     public PageUsuarioVM()
     {
         CambiarPasswordCommand = new AsyncRelayCommand(CambiarPasswordAsync);
-        AsignarRolCommand = new AsyncRelayCommand<object?>(AsignarRolAsync);
+        AsignarRolCommand = new AsyncRelayCommand<Rol>(AsignarRolAsync);
     }
 
     private async Task CambiarPasswordAsync()
@@ -29,7 +29,7 @@ public class PageUsuarioVM : ViewModelServiceBase<Usuario>
 
         var dialog = new ChangePassDialog
         {
-            AceptedCommand = new AsyncRelayCommand<object?>(ConfirmarCambioPasswordAsync),
+            AceptarCommand = new AsyncRelayCommand<object?>(ConfirmarCambioPasswordAsync),
             OldPasswordRequired = Visibility.Collapsed,
             DialogOpenIdentifier = DialogService.DialogIdentifierMain,
         };
@@ -51,9 +51,9 @@ public class PageUsuarioVM : ViewModelServiceBase<Usuario>
         });
             
     }
-    private async Task AsignarRolAsync(object? arg)
+    private async Task AsignarRolAsync(Rol? rol)
     {
-        if (EntitySelect == null || arg is not Rol rol)
+        if (EntitySelect == null || rol == null)
             return;
 
         var result = await ServicioServiceUsuario.AsignarRol(EntitySelect.Id, rol.Id);
@@ -67,9 +67,9 @@ public class PageUsuarioVM : ViewModelServiceBase<Usuario>
     {
         var usuarioDialog = new UsuarioDialog
         {
-            AceptedCommand = new AsyncRelayCommand<object?>(ConfirmarCrearUsuarioAsync),
-            Usuario = new Usuario { FechaNacimiento = DateTime.Today },
-            TextHeader = "Nuevo Usuario",
+            AceptarCommand = new AsyncRelayCommand<object?>(ConfirmarCrearUsuarioAsync),
+            Entity = new Usuario { FechaNacimiento = DateTime.Today },
+            TextHeader = "Nuevo Entity",
             DialogOpenIdentifier = DialogService.DialogIdentifierMain
         };
 
@@ -82,9 +82,9 @@ public class PageUsuarioVM : ViewModelServiceBase<Usuario>
 
         var usuarioDialog = new UsuarioDialog
         {
-            AceptedCommand = new AsyncRelayCommand<object?>(ConfirmarEditarUsuarioAsync),
-            Usuario = EntitySelect.Clone(),
-            TextHeader = "Editar Usuario",
+            AceptarCommand = new AsyncRelayCommand<object?>(ConfirmarEditarUsuarioAsync),
+            Entity = EntitySelect.Clone(),
+            TextHeader = "Editar Entity",
             DialogOpenIdentifier = DialogService.DialogIdentifierMain
         };
 

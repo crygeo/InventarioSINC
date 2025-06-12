@@ -3,7 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Cliente.Obj.Model;
 using Cliente.Services;
-using Cliente.src.Services.Model;
+using Cliente.Services.Model;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Extensions;
 

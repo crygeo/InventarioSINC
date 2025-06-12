@@ -1,6 +1,6 @@
 ﻿using System.Windows.Controls;
 
-namespace Cliente.View;
+namespace Cliente.View.Model;
 
 /// <summary>
 /// Lógica de interacción para PageRolesV.xaml

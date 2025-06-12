@@ -1,8 +1,8 @@
 ﻿using System.Reflection;
 using Cliente.Attributes;
-using Cliente.Obj.Model;
-using Cliente.src.ViewModel.Model;
+using Cliente.Obj;
 using Cliente.ViewModel;
+using Cliente.ViewModel.Model;
 using Shared.Factory;
 using Shared.Interfaces.Model;
 using Utilidades.Interfaces;

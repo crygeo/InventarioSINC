@@ -1,11 +1,15 @@
-﻿using System.Reflection;
-using Cliente.Attributes;
+﻿using Cliente.Attributes;
+using Cliente.Obj.Model;
+using System.Linq.Expressions;
+using System.Reflection;
 using Utilidades.Controls;
 
 namespace Cliente.Helpers;
 
 public static class ValidacionHelper
 {
+    #region Validacion General
+
     public static List<string> ValidarCamposSolicitados(this object objeto)
     {
         var errores = new List<string>();
@@ -79,9 +83,43 @@ public static class ValidacionHelper
                     errores.Add($"{campo} debe tener exactamente 13 dígitos.");
                 break;
 
-            // Podés extender para Email, NickName, etc.
+                // Podés extender para Email, NickName, etc.
         }
 
         return errores;
     }
+
+    #endregion
+
+    #region Validacion Proveedor
+    public static List<string> ValidarCamposSolicitados(this Proveedor objeto)
+    {
+        var errores = new List<string>();
+
+        static List<string> Validar<T>(Proveedor obj, Expression<Func<Proveedor, T>> propExpr)
+        {
+            var prop = (propExpr.Body as MemberExpression)?.Member as PropertyInfo
+                       ?? throw new Exception("Expresión inválida");
+            return ValidacionHelper.ValidarPropiedad(obj, prop);
+        }
+
+        errores.AddRange(Validar(objeto, x => x.RUC));
+
+        if (!objeto.EsEmpresa)
+        {
+            errores.AddRange(Validar(objeto, x => x.Cedula));
+            errores.AddRange(Validar(objeto, x => x.PrimerNombre));
+            errores.AddRange(Validar(objeto, x => x.PrimerApellido));
+            errores.AddRange(Validar(objeto, x => x.Celular));
+        }
+        else
+        {
+            errores.AddRange(Validar(objeto, x => x.RazonSocial));
+            errores.AddRange(Validar(objeto, x => x.RepresentanteLegal));
+        }
+
+        return errores;
+    }
+
+    #endregion
 }

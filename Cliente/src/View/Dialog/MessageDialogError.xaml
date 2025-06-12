@@ -39,7 +39,7 @@
                 </Style>
             </Expander.Style>
             <StackPanel Margin="10,5,0,5" MouseLeftButtonDown="StackPanel_MouseLeftButtonDown">
-                <TextBlock Text="Objeto relacionado:" FontWeight="Bold" Foreground="White"/>
+                <TextBlock Text="Entity relacionado:" FontWeight="Bold" Foreground="White"/>
                 <TextBlock Text="{Binding ErrorResponse.ObjInteration.Name, RelativeSource={RelativeSource AncestorType=UserControl}}" 
                            Foreground="White" Margin="5,0,0,5"/>
 

@@ -1,7 +1,8 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
-using Cliente.src.ViewModel.Model;
 using Cliente.View;
+using Cliente.View.Model;
+using Cliente.ViewModel.Model;
 using Utilidades.Mvvm;
 
 namespace Cliente.Helpers;

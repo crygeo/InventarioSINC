@@ -14,9 +14,8 @@
     </UserControl.Resources>
 
     <Grid MinHeight="100" MinWidth="300">
-        <ScrollViewer VerticalScrollBarVisibility="Auto">
-            <StackPanel Margin="10">
-                <items:ObjectIList Grid.Row="0"
+        <StackPanel Margin="10">
+            <items:ObjectIList Grid.Row="0"
                                    ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=ItemsSource, Mode=TwoWay}"
                                    Item="{Binding  RelativeSource={RelativeSource AncestorType=UserControl}, Path=ItemSelect, Mode=TwoWay}"
                                    EditarItemCommand="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=EditarVarianteCommand}"
@@ -24,13 +23,12 @@
                                    TypeItem="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=TypeItem}"
                 />
 
-                <!-- Botón para agregar nueva variante -->
-                <Button Content="+ Variante"
+            <!-- Botón para agregar nueva variante -->
+            <Button Content="+ Variante"
                         Click="AddVariante"
                         Margin="0,15,0,0"
                         Width="120"
                         HorizontalAlignment="Left"/>
-            </StackPanel>
-        </ScrollViewer>
+        </StackPanel>
     </Grid>
 </UserControl>

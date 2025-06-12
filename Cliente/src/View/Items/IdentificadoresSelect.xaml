@@ -23,19 +23,13 @@
                 <ItemsControl.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Margin="10">
-                            <TextBlock Text="{Binding Name}" FontWeight="Bold" HorizontalAlignment="Center"/>
                             <ComboBox ItemsSource="{Binding Valores}"
+                                      md:HintAssist.Hint="{Binding Name}"
+                                      FontSize="15"
                                       SelectedItem="{Binding ValorSeleccionado, Mode=TwoWay}"
-                                      MinWidth="120" Margin="0,5">
-                                <ComboBox.ItemTemplate>
-                                    <DataTemplate>
-                                        <Border>
-                                            <Grid>
-                                                <TextBlock Text="{Binding Value}" VerticalAlignment="Center" />
-                                            </Grid>
-                                        </Border>
-                                    </DataTemplate>
-                                </ComboBox.ItemTemplate>
+                                      MinWidth="120" Margin="0,5"
+                                      DisplayMemberPath="{Binding Valor}">
+                                
                                 <ComboBox.ItemContainerStyle>
                                     <Style TargetType="ComboBoxItem" BasedOn="{StaticResource MaterialDesignComboBoxItemStyle}">
                                         <Setter Property="HorizontalContentAlignment" Value="Stretch" />

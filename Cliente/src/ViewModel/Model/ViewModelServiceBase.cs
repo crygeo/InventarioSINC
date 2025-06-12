@@ -2,7 +2,6 @@
 using Cliente.Helpers;
 using Cliente.Services;
 using Cliente.Services.Model;
-using Cliente.src.Services.Model;
 using Cliente.View.Dialog;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Extensions;
@@ -10,7 +9,7 @@ using Shared.Interfaces.Model;
 using Utilidades.Interfaces;
 using Utilidades.Mvvm;
 
-namespace Cliente.src.ViewModel.Model;
+namespace Cliente.ViewModel.Model;
 
 public class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : class, IModelObj, ISelectable, new()
 {
@@ -116,7 +115,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : class
     public async virtual Task CrearEntityAsync()
     {
 
-        await DialogService.MostrarFormularioDinamicoAsyncMain(
+        await DialogService.BuscarYMostrarFormularioAsyncMain(
             new TEntity(),
             $"Crear {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
             ConfirmarCrearEntityAsync
@@ -128,7 +127,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : class
             return;
 
 
-        await DialogService.MostrarFormularioDinamicoAsyncMain(
+        await DialogService.BuscarYMostrarFormularioAsyncMain(
             EntitySelect.Clone(),
             $"Editar {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
             ConfirmarEditarEntityAsync

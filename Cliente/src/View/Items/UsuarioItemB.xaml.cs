@@ -5,7 +5,8 @@ using System.Windows.Input;
 using Cliente.Extencions;
 using Cliente.Obj.Model;
 using Cliente.Services;
-using Cliente.src.Services.Model;
+using Cliente.Services.Model;
+using CommunityToolkit.Mvvm.Input;
 using Shared.Extensions;
 
 namespace Cliente.View.Items;
@@ -15,14 +16,14 @@ namespace Cliente.View.Items;
 /// </summary>
 public partial class UsuarioItemB : UserControl
 {
-    // Propiedad de Dependencia para el Usuario
+    // Propiedad de Dependencia para el Entity
     public static readonly DependencyProperty UsuarioProperty = DependencyProperty.Register(nameof(Usuario), typeof(Usuario), typeof(UsuarioItemB), new PropertyMetadata(null, OnUsuarioChanged));
     public static readonly DependencyProperty IsSelectProperty = DependencyProperty.Register(nameof(IsSelect), typeof(bool), typeof(UsuarioItemB), new PropertyMetadata(false));
     //public static readonly DependencyProperty SeleccionarUsuarioCommandProperty = DependencyProperty.Register(nameof(SeleccionarUsuarioCommand), typeof(ICommand), typeof(UsuarioItemB));
-    public static readonly DependencyProperty EditarUsuarioCommandProperty = DependencyProperty.Register(nameof(EditarUsuarioCommand), typeof(ICommand), typeof(UsuarioItemB));
-    public static readonly DependencyProperty EliminarUsuarioCommandProperty = DependencyProperty.Register(nameof(EliminarUsuarioCommand), typeof(ICommand), typeof(UsuarioItemB));
-    public static readonly DependencyProperty CambiarPasswordCommandProperty = DependencyProperty.Register(nameof(CambiarPasswordCommand), typeof(ICommand), typeof(UsuarioItemB));
-    public static readonly DependencyProperty AsignarRolCommandProperty = DependencyProperty.Register(nameof(AsignarRolCommand), typeof(ICommand), typeof(UsuarioItemB));
+    public static readonly DependencyProperty EditarUsuarioCommandProperty = DependencyProperty.Register(nameof(EditarUsuarioCommand), typeof(IAsyncRelayCommand), typeof(UsuarioItemB));
+    public static readonly DependencyProperty EliminarUsuarioCommandProperty = DependencyProperty.Register(nameof(EliminarUsuarioCommand), typeof(IAsyncRelayCommand), typeof(UsuarioItemB));
+    public static readonly DependencyProperty CambiarPasswordCommandProperty = DependencyProperty.Register(nameof(CambiarPasswordCommand), typeof(IAsyncRelayCommand), typeof(UsuarioItemB));
+    public static readonly DependencyProperty AsignarRolCommandProperty = DependencyProperty.Register(nameof(AsignarRolCommand), typeof(IAsyncRelayCommand), typeof(UsuarioItemB));
     public static readonly DependencyProperty ListRolesProperty = DependencyProperty.Register(nameof(ListRoles), typeof(ObservableCollection<Rol>), typeof(UsuarioItemB));
 
     public Usuario Usuario
@@ -44,26 +45,26 @@ public partial class UsuarioItemB : UserControl
     //    get => (ICommand)GetValue(SeleccionarUsuarioCommandProperty);
     //    set => SetValue(SeleccionarUsuarioCommandProperty, value);
     //}
-    public ICommand EditarUsuarioCommand
+    public IAsyncRelayCommand EditarUsuarioCommand
     {
-        get => (ICommand)GetValue(EditarUsuarioCommandProperty);
+        get => (IAsyncRelayCommand)GetValue(EditarUsuarioCommandProperty);
         set => SetValue(EditarUsuarioCommandProperty, value);
     }
 
-    public ICommand EliminarUsuarioCommand
+    public IAsyncRelayCommand EliminarUsuarioCommand
     {
-        get => (ICommand)GetValue(EliminarUsuarioCommandProperty);
+        get => (IAsyncRelayCommand)GetValue(EliminarUsuarioCommandProperty);
         set => SetValue(EliminarUsuarioCommandProperty, value);
     }
 
-    public ICommand CambiarPasswordCommand
+    public IAsyncRelayCommand CambiarPasswordCommand
     {
-        get => (ICommand)GetValue(CambiarPasswordCommandProperty);
+        get => (IAsyncRelayCommand)GetValue(CambiarPasswordCommandProperty);
         set => SetValue(CambiarPasswordCommandProperty, value);
     }
-    public ICommand AsignarRolCommand
+    public IAsyncRelayCommand AsignarRolCommand
     {
-        get => (ICommand)GetValue(AsignarRolCommandProperty);
+        get => (IAsyncRelayCommand)GetValue(AsignarRolCommandProperty);
         set => SetValue(AsignarRolCommandProperty, value);
     }
 
@@ -92,11 +93,11 @@ public partial class UsuarioItemB : UserControl
         }
     }
 
-    private void MenuItem_Click(object sender, RoutedEventArgs e)
+    private async void MenuItem_Click(object sender, RoutedEventArgs e)
     {
         if (sender is MenuItem menuitem && menuitem.DataContext is Rol rol)
         {
-            AsignarRolCommand?.Execute(rol);
+            await AsignarRolCommand.TryEjecutarAsync(rol);
         }
     }
 

@@ -1,21 +1,28 @@
-﻿using System.Reflection;
+﻿using Cliente.Attributes;
+using Cliente.Converter;
+using Cliente.Obj.Model;
+using Cliente.Services.Model;
+using Cliente.View.Items;
+using MaterialDesignThemes.Wpf;
+using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Cliente.Attributes;
-using Cliente.View.Items;
-using MaterialDesignThemes.Wpf;
 using Utilidades.Controls;
 using Utilidades.Converters;
+using Utilidades.Interfaces;
+using Utilidades.Interfaces.Dialogs;
+using static System.Net.Mime.MediaTypeNames;
+using Application = System.Windows.Application;
 
 namespace Cliente.Helpers;
 
 public static class ComponetesHelp
 {
 
-    private static readonly Dictionary<Type, Func<object, string, string, FrameworkElement>> _constructores = new();
+    private static readonly Dictionary<Type, Func<object, string, FrameworkElement>> _constructores = new();
 
-    public static FrameworkElement CrearComponente(object objetoModelo, string nombrePropiedad, string hint)
+    public static FrameworkElement CrearComponente(object objetoModelo, string nombrePropiedad)
     {
         var tipo = objetoModelo.GetType();
         var propInfo = tipo.GetProperty(nombrePropiedad)
@@ -24,14 +31,20 @@ public static class ComponetesHelp
         var solicitarAttr = propInfo.GetCustomAttribute<SolicitarAttribute>()
                             ?? throw new InvalidOperationException($"La propiedad '{nombrePropiedad}' no tiene el atributo [Solicitar].");
 
-        if (TryCreate(solicitarAttr.ItemType, objetoModelo, nombrePropiedad, hint, out var componente))
+        if (TryCreate(solicitarAttr.ItemType, objetoModelo, nombrePropiedad, out var componente))
             return componente;
 
         throw new Exception($"No se pudo crear el componente para '{nombrePropiedad}'.");
     }
 
+    public static void AgregarComponenteDinamico(this Panel Panel, object objetoModelo, string nombrePropiedad)
+    {
+        var comp = CrearComponente(objetoModelo, nombrePropiedad);
+        Panel.Children.Add(comp);
+    }
 
-    public static AtributesAdd CrearAtributesAdd(object objetoModelo, string nombrePropiedad, string hint)
+
+    public static AtributesAdd CrearAtributesAdd(object objetoModelo, string nombrePropiedad)
     {
         var atradd = new AtributesAdd
         {
@@ -39,7 +52,6 @@ public static class ComponetesHelp
             Margin = new Thickness(0, 0, 0, 10),
 
         };
-        HintAssist.SetHint(atradd, hint);
 
         var binding = new Binding(nombrePropiedad)
         {
@@ -73,7 +85,7 @@ public static class ComponetesHelp
 
     //    return atradd;
     //}
-    public static TextBox CrearTextBoxConEstilo(object dataContext, string propiedad, string hint)
+    public static TextBox CrearTextBoxConEstilo(object dataContext, string propiedad)
     {
         var tipo = dataContext.GetType();
         var propInfo = tipo.GetProperty(propiedad);
@@ -96,7 +108,7 @@ public static class ComponetesHelp
             MinWidth = 200
         };
 
-        HintAssist.SetHint(txt, hint);
+        HintAssist.SetHint(txt, attr.Nombre ?? propiedad);
 
         var binding = new Binding(propiedad)
         {
@@ -111,7 +123,7 @@ public static class ComponetesHelp
 
         return txt;
     }
-    public static IdentificadoresSelect CrearIdentificadorSelect(object dataContext, string nombrePropiedad, string hint)
+    public static IdentificadoresSelect CrearIdentificadorSelect(object dataContext, string nombrePropiedad)
     {
         var identificadorSelect = new IdentificadoresSelect
         {
@@ -122,8 +134,7 @@ public static class ComponetesHelp
 
         return identificadorSelect;
     }
-
-    public static DatePicker CrearDatePickerConEstilo(object dataContext, string propiedad, string hint)
+    public static DatePicker CrearDatePickerConEstilo(object dataContext, string propiedad)
     {
         var datePicker = new DatePicker
         {
@@ -133,7 +144,12 @@ public static class ComponetesHelp
             MinWidth = 150
         };
 
-        HintAssist.SetHint(datePicker, hint);
+        var tipo = dataContext.GetType();
+        var propInfo = tipo.GetProperty(propiedad);
+        if (propInfo == null) throw new ArgumentException($"La propiedad '{propiedad}' no existe en {tipo.Name}");
+        var attr = propInfo.GetCustomAttribute<SolicitarAttribute>() ?? throw new InvalidOperationException($"La propiedad '{propiedad}' no tiene el atributo [Solicitar].");
+
+        HintAssist.SetHint(datePicker, attr.Nombre ?? propiedad);
 
         var binding = new Binding(propiedad)
         {
@@ -146,17 +162,42 @@ public static class ComponetesHelp
 
         return datePicker;
     }
+    public static ProveedorSelect CrearProveedorSelect(object dataContext, string propiedad)
+    {
+        var proveedorSelect = new ProveedorSelect
+        {
+            DataContext = dataContext,
+            Margin = new Thickness(5, 0, 5, 10),
+            MinWidth = 200,
+        };
 
+        //var converter = new IdToProveedorConverter
+        //{
+        //    ListaProveedores = ServiceFactory.GetService<Proveedor>().Collection
+        //};
 
-    public static void Register(Type itemType, Func<object, string, string, FrameworkElement> factory)
+        //var binding = new Binding(propiedad)
+        //{
+        //    Mode = BindingMode.TwoWay,
+        //    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+        //    ValidatesOnNotifyDataErrors = true,
+        //    Converter = converter
+
+        //};
+        //proveedorSelect.SetBinding(ProveedorSelect.ProveedorProperty, binding);
+
+        return proveedorSelect;
+    }
+
+    public static void Register(Type itemType, Func<object, string, FrameworkElement> factory)
     {
         _constructores[itemType] = factory;
     }
-    public static bool TryCreate(Type? itemType, object modelo, string nombreProp, string hint, out FrameworkElement? control)
+    public static bool TryCreate(Type? itemType, object modelo, string nombreProp, out FrameworkElement? control)
     {
         if (itemType != null && _constructores.TryGetValue(itemType, out var factory))
         {
-            control = factory(modelo, nombreProp, hint);
+            control = factory(modelo, nombreProp);
             control.Margin = new Thickness(5);
             return true;
         }
@@ -192,8 +233,49 @@ public static class ComponetesHelp
         //Register(typeof(VariantesAdd), CrearVariantesAdd);
         Register(typeof(DatePicker), CrearDatePickerConEstilo);
         Register(typeof(IdentificadoresSelect), CrearIdentificadorSelect);
+        Register(typeof(ProveedorSelect), CrearProveedorSelect);
 
     }
+
+    public static IDialog<TEntity>? GetDialogoPersonalizado<TEntity>(TEntity intanciaEntity)
+    {
+        if (intanciaEntity == null)
+            throw new ArgumentNullException(nameof(intanciaEntity));
+
+        var modelo = typeof(TEntity);
+
+        var attr = modelo.GetCustomAttribute<NavegacionAttribute>();
+        if (attr?.DialogoPersonalizado == null)
+            return null;
+
+        var tipoDialogo = attr.DialogoPersonalizado;
+
+        if (!typeof(IDialogBase).IsAssignableFrom(tipoDialogo))
+        {
+            throw new InvalidOperationException($"El tipo {tipoDialogo.Name} no implementa IDialogBase.");
+        }
+
+        // Buscar constructor que acepte TEntity
+        var constructor = tipoDialogo.GetConstructor(new[] { modelo });
+
+        if (constructor != null)
+        {
+            return Activator.CreateInstance(tipoDialogo, intanciaEntity) as IDialog<TEntity>;
+        }
+
+        // Si no hay constructor con entidad, usar por defecto y asignar manualmente
+        var instancia = Activator.CreateInstance(tipoDialogo) as IDialog<TEntity>;
+        if (instancia != null)
+        {
+            instancia.Entity = intanciaEntity;
+        }
+
+        return instancia;
+    }
+
+
+
+
 }
 public enum Pluralidad
 {

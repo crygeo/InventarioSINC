@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using Cliente.Extencions;
 using CommunityToolkit.Mvvm.Input;
 using Utilidades.Interfaces;
+using Utilidades.Interfaces.Dialogs;
 
 namespace Cliente.View.Dialog;
 
@@ -11,13 +12,14 @@ namespace Cliente.View.Dialog;
 /// </summary>
 public partial class ChangePassDialog : UserControl, IDialog
 {
-    public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptedCommand), typeof(IAsyncRelayCommand), typeof(ChangePassDialog));
+    public static readonly DependencyProperty AceptarCommandProperty = DependencyProperty.Register(nameof(AceptarCommand), typeof(IAsyncRelayCommand), typeof(ChangePassDialog));
     public static readonly DependencyProperty CancelCommandProperty = DependencyProperty.Register(nameof(CancelCommand), typeof(IAsyncRelayCommand), typeof(ChangePassDialog));
     public static readonly DependencyProperty OldPasswordProperty = DependencyProperty.Register(nameof(OldPassword), typeof(string), typeof(ChangePassDialog), new PropertyMetadata(""));
     public static readonly DependencyProperty NewPasswordProperty = DependencyProperty.Register(nameof(NewPassword), typeof(string), typeof(ChangePassDialog));
     public static readonly DependencyProperty ConfirmPasswordProperty = DependencyProperty.Register(nameof(ConfirmPassword), typeof(string), typeof(ChangePassDialog));
     public static readonly DependencyProperty OldPasswordRequiredProperty = DependencyProperty.Register(nameof(OldPasswordRequired), typeof(Visibility), typeof(ChangePassDialog));
     public static readonly DependencyProperty DialogNameIdentifierProperty = DependencyProperty.Register(nameof(DialogNameIdentifier), typeof(string), typeof(ChangePassDialog));
+    private string _textHeader;
 
 
     public IAsyncRelayCommand CancelCommand
@@ -26,10 +28,10 @@ public partial class ChangePassDialog : UserControl, IDialog
         set => SetValue(CancelCommandProperty, value);
     }
 
-    public IAsyncRelayCommand AceptedCommand
+    public IAsyncRelayCommand AceptarCommand
     {
-        get => (IAsyncRelayCommand)GetValue(AceptedCommandProperty);
-        set => SetValue(AceptedCommandProperty, value);
+        get => (IAsyncRelayCommand)GetValue(AceptarCommandProperty);
+        set => SetValue(AceptarCommandProperty, value);
     }
 
     public string OldPassword
@@ -52,6 +54,13 @@ public partial class ChangePassDialog : UserControl, IDialog
         get => (Visibility)GetValue(OldPasswordRequiredProperty);
         set => SetValue(OldPasswordRequiredProperty, value);
     }
+
+    public string TextHeader
+    {
+        get => _textHeader;
+        set => _textHeader = value;
+    }
+
     public string DialogNameIdentifier { get; set; } = $"Dialog_{Guid.NewGuid():N}";
 
     public required string DialogOpenIdentifier
@@ -73,7 +82,7 @@ public partial class ChangePassDialog : UserControl, IDialog
     private async void Button_Click(object sender, RoutedEventArgs e)
     {
         if (NewPassword == ConfirmPassword && !string.IsNullOrEmpty(NewPassword))
-            await AceptedCommand.TryEjecutarYCerrarDialogoAsync(this);
+            await AceptarCommand.TryEjecutarYCerrarDialogoAsync(this);
     }
 
 }

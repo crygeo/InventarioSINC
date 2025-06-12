@@ -1,8 +1,7 @@
-﻿using Cliente.Services.Model;
-using Shared.Factory;
+﻿using Shared.Factory;
 using Shared.Interfaces.Model;
 
-namespace Cliente.src.Services.Model;
+namespace Cliente.Services.Model;
 
 public static class ServiceFactory
 {

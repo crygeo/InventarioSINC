@@ -5,6 +5,7 @@ using System;
 using System.Collections.Concurrent;
 using System.Linq;
 using System.Reflection;
+using Servidor.src.Hubs;
 using Shared.Factory;
 
 namespace Servidor.src.HubsService

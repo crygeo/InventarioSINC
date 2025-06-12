@@ -1,7 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 using System.Net.Http;
 using Cliente.Extencions;
-using Cliente.src.ServicesHub;
+using Cliente.ServicesHub;
 using Shared.Interfaces.Model;
 using Utilidades.Interfaces;
 
@@ -118,7 +118,7 @@ public class ResultResponse<TObj> : IResultResponse<TObj>, IResultResponse
             ? "Sin detalles disponibles."
             : string.Join("\n\t", Error.Split(new[] { '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries));
 
-        return $"Objeto relacionado: {nombreObjeto}\n\nDetalles del error:\n\t{detalles}";
+        return $"Entity relacionado: {nombreObjeto}\n\nDetalles del error:\n\t{detalles}";
     }
 
 }

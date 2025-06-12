@@ -9,7 +9,7 @@ using Cliente.Obj.Model;
 using Utilidades.Interfaces;
 using Utilidades.Mvvm;
 
-namespace Cliente.src.ViewModel.Model
+namespace Cliente.ViewModel.Model
 {
     public static class ViewModelFactory
     {

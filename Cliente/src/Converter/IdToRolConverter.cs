@@ -1,6 +1,6 @@
 ﻿using Cliente.Obj.Model;
 using Cliente.Services;
-using Cliente.src.Services.Model;
+using Cliente.Services.Model;
 using Utilidades.Converters.Generic;
 
 namespace Cliente.Converter;

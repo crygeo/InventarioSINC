@@ -9,7 +9,7 @@ namespace Cliente.View.Items;
 /// </summary>
 public partial class ObjectItem : UserControl
 {
-    // Propiedad de Dependencia para el Item
+    // Propiedad de Dependencia para el Entity
     public static readonly DependencyProperty ItemProperty = DependencyProperty.Register(nameof(Item), typeof(object), typeof(ObjectItem));
     public static readonly DependencyProperty IsSelectProperty = DependencyProperty.Register(nameof(IsSelect), typeof(bool), typeof(ObjectItem), new PropertyMetadata(false));
     public static readonly DependencyProperty EditarItemCommandProperty = DependencyProperty.Register(nameof(EditarItemCommand), typeof(ICommand), typeof(ObjectItem));

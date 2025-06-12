@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using Cliente.Extencions;
 using CommunityToolkit.Mvvm.Input;
 using Utilidades.Interfaces;
+using Utilidades.Interfaces.Dialogs;
 
 namespace Cliente.View.Dialog;
 

@@ -2,7 +2,7 @@
 using Cliente.Obj.Model;
 using Cliente.Services;
 using Cliente.Services.Model;
-using Cliente.src.Services.Model;
+using Cliente.Obj;
 using Cliente.View.Dialog;
 using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
@@ -101,7 +101,7 @@ public class MainVM : ViewModelBase, IBarNavegacion
 
         var dialog = new ChangePassDialog
         {
-            AceptedCommand = new AsyncRelayCommand<ChangePassDialog>((changePass) => EjecutarCambioPasswordAsync(changePass, usuario)),
+            AceptarCommand = new AsyncRelayCommand<ChangePassDialog>((changePass) => EjecutarCambioPasswordAsync(changePass, usuario)),
             OldPasswordRequired = Visibility.Visible,
             DialogOpenIdentifier = DialogService.DialogSub01,
             DialogNameIdentifier = DialogService.DialogSub02,

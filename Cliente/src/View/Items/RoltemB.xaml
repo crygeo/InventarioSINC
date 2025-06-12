@@ -24,7 +24,7 @@
 
             <MenuItem Command="{Binding PlacementTarget.EliminarItemCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
                       Header="_Eliminar"
-                      IsEnabled="{Binding PlacementTarget.Item.IsAdmin, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource InvertBool}}"
+                      IsEnabled="{Binding PlacementTarget.Entity.IsAdmin, RelativeSource={RelativeSource AncestorType=ContextMenu}, Converter={StaticResource InvertBool}}"
                       Icon="{md:PackIcon Kind=Delete}" />
         </ContextMenu>
     </UserControl.ContextMenu>

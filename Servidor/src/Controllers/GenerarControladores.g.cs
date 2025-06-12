@@ -46,12 +46,7 @@ public class ProductoController : BaseController<Producto> { }
 
 [ApiController]
 [Route("api/[controller]")]
-public class ProveedorEmpresaController : BaseController<ProveedorEmpresa> { }
-
-
-[ApiController]
-[Route("api/[controller]")]
-public class ProveedorPersonaController : BaseController<ProveedorPersona> { }
+public class ProveedorController : BaseController<Proveedor> { }
 
 
 [ApiController]

@@ -19,11 +19,6 @@ namespace Servidor.src.Services
 
         public static readonly string ADMIN_ID = "6650c6a2b5cf184a0a8a0f3a";
 
-
-        public override IRepository<Usuario> Repository { get; } = new RepositorioUsuario();
-        public override IHubService<Usuario> HubService { get; }
-
-
         public Task<Usuario> GetByUser(string user) => ((RepositorioUsuario)Repository).GetByUser(user);
 
         public async Task<bool> ActualizarPasswordAsync(string userId, string newPassword)

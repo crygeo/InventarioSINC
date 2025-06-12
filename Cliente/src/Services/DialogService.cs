@@ -1,10 +1,13 @@
-﻿using System.Net.Http;
+﻿using Cliente.Helpers;
 using Cliente.Services.Model;
 using Cliente.View.Dialog;
 using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
 using Shared.Interfaces.Model;
+using System.Net.Http;
+using Cliente.Obj.Model;
 using Utilidades.Interfaces;
+using Utilidades.Interfaces.Dialogs;
 
 namespace Cliente.Services;
 
@@ -51,7 +54,7 @@ public class DialogService : IDialogService
         MessageDialog dialog = new MessageDialog { Message = content, DialogOpenIdentifier = diID };
         await MostrarDialogo(dialog);
     }
-    public async Task MostrarDialogo(IDialog dialogTo)
+    public async Task MostrarDialogo(IDialogBase dialogTo)
     {
         if (await CerrarSiEstaAbiertoYEsperar(dialogTo.DialogOpenIdentifier))
         {
@@ -117,11 +120,22 @@ public class DialogService : IDialogService
     }
 
 
-    public static async Task<T?> MostrarFormularioDinamicoAsyncMain<T>(T instancia, string header, Func<T, Task> aceptar)
-        where T : class
+
+    public static async Task<TEntity?> BuscarYMostrarFormularioAsyncMain<TEntity>(TEntity instancia, string header, Func<TEntity, Task> aceptar)
+        where TEntity : class
     {
-        await MostrarFormularioDinamicoAsync(instancia, header, new AsyncRelayCommand<T>(aceptar),
-            DialogIdentifierMain, DialogSub01);
+        var tipoDialogo = ComponetesHelp.GetDialogoPersonalizado<TEntity>(instancia);
+
+        if (tipoDialogo is IDialog<TEntity> newDialog)
+        {
+            newDialog.Entity = instancia;
+            newDialog.AceptarCommand = new AsyncRelayCommand<TEntity>(aceptar);
+            newDialog.DialogOpenIdentifier = DialogIdentifierMain;
+            newDialog.DialogNameIdentifier = DialogSub01;
+            await Instance.MostrarDialogo(newDialog);
+        }
+        else
+            await MostrarFormularioDinamicoAsync(instancia, header, new AsyncRelayCommand<TEntity>(aceptar), DialogIdentifierMain, DialogSub01);
 
         return instancia;
     }
@@ -136,7 +150,10 @@ public class DialogService : IDialogService
     public static async Task<T?> MostrarFormularioDinamicoAsync<T>(T instancia, string header, IAsyncRelayCommand<T> aceptarCommand, string openId, string nameId)
         where T : class
     {
-        var form = new FormularioDinamico(instancia)
+        if (instancia is not IModelObj modelBase)
+            throw new ArgumentException("El tipo debe heredar de ModelBase<IModelObj>", nameof(instancia));
+
+        var form = new FormularioDinamico<T>(instancia)
         {
             TextHeader = header,
             AceptarCommand = aceptarCommand,
@@ -150,10 +167,11 @@ public class DialogService : IDialogService
 
 
 
-    public async Task<bool> CerrarSiEstaAbiertoYEsperar(IDialog dialogId)
+    public async Task<bool> CerrarSiEstaAbiertoYEsperar(IDialogBase dialogId)
     {
         return await CerrarSiEstaAbiertoYEsperar(dialogId.DialogOpenIdentifier);
     }
+
     public async Task<bool> CerrarSiEstaAbiertoYEsperar(string dialogId)
     {
         if (EstaAbierto(dialogId) || DialogHost.IsDialogOpen(dialogId))

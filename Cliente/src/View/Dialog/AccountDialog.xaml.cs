@@ -4,6 +4,7 @@ using Cliente.Extencions;
 using Cliente.Obj.Model;
 using CommunityToolkit.Mvvm.Input;
 using Utilidades.Interfaces;
+using Utilidades.Interfaces.Dialogs;
 
 namespace Cliente.View.Dialog;
 
@@ -13,7 +14,7 @@ namespace Cliente.View.Dialog;
 public partial class AccountDialog : UserControl, IDialog
 {
     public static readonly DependencyProperty UsuarioProperty = DependencyProperty.Register(nameof(Usuario), typeof(Usuario), typeof(AccountDialog));
-    public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptedCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog));
+    public static readonly DependencyProperty AceptarCommandProperty = DependencyProperty.Register(nameof(AceptarCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog));
     public static readonly DependencyProperty CloseSeccionCommandProperty = DependencyProperty.Register(nameof(CloseSeccionCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog));
     public static readonly DependencyProperty ChangedPasswordCommandProperty = DependencyProperty.Register(nameof(ChangedPasswordCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog));
     public static readonly DependencyProperty TextHeaderProperty = DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(AccountDialog));
@@ -28,10 +29,10 @@ public partial class AccountDialog : UserControl, IDialog
         get => (Usuario)GetValue(UsuarioProperty);
         set => SetValue(UsuarioProperty, value);
     }
-    public IAsyncRelayCommand AceptedCommand
+    public IAsyncRelayCommand AceptarCommand
     {
-        get => (IAsyncRelayCommand)GetValue(AceptedCommandProperty);
-        set => SetValue(AceptedCommandProperty, value);
+        get => (IAsyncRelayCommand)GetValue(AceptarCommandProperty);
+        set => SetValue(AceptarCommandProperty, value);
     }
     public IAsyncRelayCommand CloseSeccionCommand
     {

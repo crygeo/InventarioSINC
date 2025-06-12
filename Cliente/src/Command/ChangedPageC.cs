@@ -1,5 +1,5 @@
-﻿using Cliente.src.ViewModel.Model;
-using Cliente.ViewModel;
+﻿using Cliente.ViewModel;
+using Cliente.ViewModel.Model;
 using Utilidades.Command;
 using Utilidades.Mvvm;
 

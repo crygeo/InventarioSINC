@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cliente.ServicesHub;
-using Shared.Factory;
+﻿using Shared.Factory;
 using Shared.Interfaces.Model;
 
-namespace Cliente.src.ServicesHub
+namespace Cliente.ServicesHub
 {
     public static class HubServiceFactory
     {

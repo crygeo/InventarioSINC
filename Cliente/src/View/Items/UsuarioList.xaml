@@ -7,7 +7,7 @@
              xmlns:items="clr-namespace:Cliente.View.Items"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance Type=local:UsuarioList}">
+             d:DataContext="{d:DesignInstance Type=items:UsuarioList}">
 
     <Grid>
         <ListBox ItemsSource="{Binding ItemsSource, RelativeSource={RelativeSource AncestorType=UserControl}}"

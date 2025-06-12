@@ -1,5 +1,5 @@
 ﻿using Cliente.Helpers;
-using Cliente.Obj.Model;
+using Cliente.Obj;
 using MaterialDesignThemes.Wpf;
 using Utilidades.Mvvm;
 

@@ -30,7 +30,7 @@
             <TextBlock Text="{Binding TextHeader, RelativeSource={RelativeSource AncestorType=UserControl}}" FontSize="16" FontWeight="Bold"
                    Grid.Row="0" HorizontalAlignment="Center" Margin="10" Style="{StaticResource MaterialDesignBody1TextBlock}"/>
 
-            <TextBox Text="{Binding Item.Nombre, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" MaxLength="20" 
+            <TextBox Text="{Binding Entity.Nombre, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged, Mode=TwoWay}" MaxLength="20" 
                  md:HintAssist.Hint="Nombre de rol"
                  Grid.Row="1" MinWidth="150" Margin="10,10,10,20" Style="{StaticResource MaterialDesignFloatingHintTextBox}"/>
 

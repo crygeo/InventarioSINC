@@ -9,7 +9,6 @@ namespace Servidor.src.Model
 {
     public class Usuario : IUsuario
     {
-        private bool _verView;
 
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -27,7 +26,6 @@ namespace Servidor.src.Model
         public string Password { get; set; }
         [BsonRepresentation(BsonType.ObjectId)]
         public List<string> Roles { get; set; }
-        public bool VerView { get; set; }
         public void Update(IModelObj entity)
         {
             throw new NotImplementedException();
