@@ -26,11 +26,11 @@
                             <ContextMenu>
                                 <MenuItem Header="Editar"
                                           Command="{Binding Data.EditarItemCommand, Source={StaticResource Proxy}}"
-                                          CommandParameter="{Binding Data.Entity, Source={StaticResource Proxy}}"
+                                          CommandParameter="{Binding Data.Item, Source={StaticResource Proxy}}"
                                           Icon="{md:PackIcon Kind=Edit}" />
                                 <MenuItem Header="Eliminar"
                                           Command="{Binding Data.EliminarItemCommand, Source={StaticResource Proxy}}"
-                                          CommandParameter="{Binding Data.Entity, Source={StaticResource Proxy}}"
+                                          CommandParameter="{Binding Data.Item, Source={StaticResource Proxy}}"
                                           Icon="{md:PackIcon Kind=Delete}" />
                             </ContextMenu>
                         </Setter.Value>

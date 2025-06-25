@@ -5,15 +5,16 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:extencions="clr-namespace:Cliente.Extencions"
+             xmlns:converter="clr-namespace:Cliente.Converter"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
         <extencions:BindingProxy x:Key="Proxy" Data="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-
+        <converter:IdToSelectorJerarquicoConverter x:Key="IdToSelectorJerarquicoConverter"/>
     </UserControl.Resources>
     <ScrollViewer HorizontalScrollBarVisibility="Auto">
         <StackPanel Margin="10">
-            <ItemsControl ItemsSource="{Binding IdentificadoresOrigen, RelativeSource={RelativeSource AncestorType=UserControl}}">
+            <ItemsControl ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=Selectores}">
                 <ItemsControl.ItemsPanel>
                     <ItemsPanelTemplate>
                         <StackPanel Orientation="Horizontal"/>
@@ -24,48 +25,21 @@
                     <DataTemplate>
                         <StackPanel Margin="10">
                             <ComboBox ItemsSource="{Binding Valores}"
-                                      md:HintAssist.Hint="{Binding Name}"
+                                      md:HintAssist.Hint="{Binding Identificador.Name}"
                                       FontSize="15"
-                                      SelectedItem="{Binding ValorSeleccionado, Mode=TwoWay}"
+                                      SelectedItem="{Binding Seleccionado, Mode=TwoWay}"
                                       MinWidth="120" Margin="0,5"
-                                      DisplayMemberPath="{Binding Valor}">
-                                
-                                <ComboBox.ItemContainerStyle>
-                                    <Style TargetType="ComboBoxItem" BasedOn="{StaticResource MaterialDesignComboBoxItemStyle}">
-                                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                                        <Setter Property="VerticalContentAlignment" Value="Stretch" />
-                                        <Setter Property="ContextMenu">
-                                            <Setter.Value>
-                                                <ContextMenu>
-                                                    <MenuItem Header="Editar"
-                                                              Command="{Binding Data.EditarCommand, Source={StaticResource Proxy}}"
-                                                              CommandParameter="{Binding}">
-                                                        <MenuItem.Icon>
-                                                            <md:PackIcon Kind="Pencil" Width="18" Height="18" />
-                                                        </MenuItem.Icon>
-                                                    </MenuItem>
+                                      DisplayMemberPath="Valor">
 
-                                                    <MenuItem Header="Eliminar"
-                                                              Command="{Binding Data.EliminarCommand, Source={StaticResource Proxy}}"
-                                                              CommandParameter="{Binding}">
-                                                        <MenuItem.Icon>
-                                                            <md:PackIcon Kind="Delete" Width="18" Height="18" />
-                                                        </MenuItem.Icon>
-                                                    </MenuItem>
-                                                </ContextMenu>
-                                            </Setter.Value>
-                                        </Setter>
-                                    </Style>
-                                </ComboBox.ItemContainerStyle>
+
                             </ComboBox>
-                            <Button Content="+ Add"
-                                    Width="80"
-                                    Command="{Binding .AgregarCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                                    CommandParameter="{Binding}" />
+
                         </StackPanel>
                     </DataTemplate>
                 </ItemsControl.ItemTemplate>
             </ItemsControl>
+
+
         </StackPanel>
     </ScrollViewer>
 </UserControl>

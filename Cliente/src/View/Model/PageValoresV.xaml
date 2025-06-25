@@ -6,49 +6,51 @@
              xmlns:local="clr-namespace:Cliente.View.Model"
              xmlns:model="clr-namespace:Cliente.src.ViewModel.Model"
              xmlns:converter="clr-namespace:Cliente.src.Converter"
+             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800" d:DataContext="{d:DesignInstance model:PageValoresVM}">
-    <UserControl.Resources>
-        <converter:ValoresPorIdConverter x:Key="ValoresPorIdConverter"/>
-    </UserControl.Resources>
-    <Grid>
-        <ItemsControl ItemsSource="{Binding ListIdentificadors}"
-                      ScrollViewer.HorizontalScrollBarVisibility="Auto"
-                      ScrollViewer.VerticalScrollBarVisibility="Disabled"
-                      ScrollViewer.CanContentScroll="False">
-            <ItemsControl.ItemsPanel>
-                <ItemsPanelTemplate>
-                    <StackPanel Orientation="Horizontal" VerticalAlignment="Top"/>
-                </ItemsPanelTemplate>
-            </ItemsControl.ItemsPanel>
-            <ItemsControl.ItemTemplate>
-                <DataTemplate>
-                    <Border Margin="5" BorderThickness="1" BorderBrush="DarkGray" Width="150">
-                        <Grid Margin="5">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="50"/>
-                            </Grid.RowDefinitions>
 
-                            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" TextAlignment="Center" TextWrapping="NoWrap"/>
-                            <Separator Grid.Row="0" Margin="0,30,0,0"/>
-                            <ListBox Grid.Row="1" MinHeight="50" Margin="0,10,0,0">
-                                <ListBox.ItemsSource>
-                                    <MultiBinding Converter="{StaticResource ValoresPorIdConverter}">
-                                        <Binding Path="Id" />
-                                        <Binding Path="DataContext.ValoresPorIdentificador" RelativeSource="{RelativeSource AncestorType=UserControl}" />
-                                    </MultiBinding>
-                                </ListBox.ItemsSource>
-                            </ListBox>
-                            <Separator Grid.Row="2" Margin="0,-30,0,0"/>
-                            <Button Grid.Row="2" Margin="10,0,10,0" Content="+ Add" VerticalAlignment="Bottom" 
-                                    Command="{Binding  DataContext.AddValorCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" 
-                                    CommandParameter="{Binding}"/>
-                        </Grid>
-                    </Border>
-                </DataTemplate>
-            </ItemsControl.ItemTemplate>
-        </ItemsControl>
+    <Grid>
+
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header Section -->
+        <materialDesign:DrawerHost>
+            <materialDesign:DrawerHost.LeftDrawerContent>
+                <ListBox
+                    ItemsSource="{Binding Navigation}"
+                    SelectedItem="{Binding NavigationSelect}"
+                    BorderThickness="0"
+                    Background="Transparent">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <StackPanel Orientation="Horizontal">
+                                <materialDesign:PackIcon Kind="{Binding SelectedIcon}" Width="24" Height="24" />
+                                <TextBlock Text="{Binding Title}" Margin="10,0,0,0" />
+                            </StackPanel>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </materialDesign:DrawerHost.LeftDrawerContent>
+
+            <Grid>
+                <!-- BOTÓN HAMBURGUESA -->
+                <Button 
+                        HorizontalAlignment="Left"
+                        VerticalAlignment="Top"
+                        Margin="0,0"
+                        Padding="6"
+                        Command="{x:Static materialDesign:DrawerHost.OpenDrawerCommand}">
+                    <materialDesign:PackIcon Kind="Menu" Width="24" Height="24"/>
+                </Button>
+
+                <!-- VISTA PRINCIPAL -->
+                <ContentControl Margin="50,0,0,30" Content="{Binding NavigationSelect.Page}" ContentTemplateSelector="{StaticResource ViewModelTemplateSelector}"/>
+            </Grid>
+
+        </materialDesign:DrawerHost>
+
     </Grid>
 </UserControl>

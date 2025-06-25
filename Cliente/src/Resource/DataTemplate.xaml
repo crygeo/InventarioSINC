@@ -2,7 +2,9 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:vm="clr-namespace:Cliente.ViewModel"
                     xmlns:view="clr-namespace:Cliente.View"
-                    xmlns:model="clr-namespace:Cliente.View.Model">
+                    xmlns:model="clr-namespace:Cliente.View.Model"
+                    xmlns:subPage="clr-namespace:Cliente.src.View.Model.SubPage"
+                    xmlns:mvvm="clr-namespace:Utilidades.Mvvm;assembly=Utilidades">
     
     
     
@@ -20,6 +22,10 @@
 
     <DataTemplate x:Key="ViewTemplate_ElementoJerarquico">
         <model:PageValoresV/>
+    </DataTemplate>
+
+    <DataTemplate x:Key="IdentificadoresTemplate" DataType="{x:Type mvvm:SubViewModelBase}">
+        <subPage:PageIdentificadoresV />
     </DataTemplate>
 
 

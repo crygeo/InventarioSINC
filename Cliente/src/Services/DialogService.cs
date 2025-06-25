@@ -147,13 +147,13 @@ public class DialogService : IDialogService
 
         return instancia;
     }
-    public static async Task<T?> MostrarFormularioDinamicoAsync<T>(T instancia, string header, IAsyncRelayCommand<T> aceptarCommand, string openId, string nameId)
+    public static async Task<T?> MostrarFormularioDinamicoAsync<T>(T instancia, string header, IAsyncRelayCommand<T> aceptarCommand, string openId, string nameId, Dictionary<string, string> nombresCampos = null)
         where T : class
     {
         if (instancia is not IModelObj modelBase)
             throw new ArgumentException("El tipo debe heredar de ModelBase<IModelObj>", nameof(instancia));
 
-        var form = new FormularioDinamico<T>(instancia)
+        var form = new FormularioDinamico<T>(instancia, nombresCampos)
         {
             TextHeader = header,
             AceptarCommand = aceptarCommand,

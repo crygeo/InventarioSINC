@@ -20,9 +20,9 @@ namespace Cliente.Helpers;
 public static class ComponetesHelp
 {
 
-    private static readonly Dictionary<Type, Func<object, string, FrameworkElement>> _constructores = new();
+    private static readonly Dictionary<Type, Func<object, string, string?, FrameworkElement>> _constructores = new();
 
-    public static FrameworkElement CrearComponente(object objetoModelo, string nombrePropiedad)
+    public static FrameworkElement CrearComponente(object objetoModelo, string nombrePropiedad, string? hint = null)
     {
         var tipo = objetoModelo.GetType();
         var propInfo = tipo.GetProperty(nombrePropiedad)
@@ -31,7 +31,7 @@ public static class ComponetesHelp
         var solicitarAttr = propInfo.GetCustomAttribute<SolicitarAttribute>()
                             ?? throw new InvalidOperationException($"La propiedad '{nombrePropiedad}' no tiene el atributo [Solicitar].");
 
-        if (TryCreate(solicitarAttr.ItemType, objetoModelo, nombrePropiedad, out var componente))
+        if (TryCreate(solicitarAttr.ItemType, objetoModelo, nombrePropiedad, hint, out var componente))
             return componente;
 
         throw new Exception($"No se pudo crear el componente para '{nombrePropiedad}'.");
@@ -44,7 +44,7 @@ public static class ComponetesHelp
     }
 
 
-    public static AtributesAdd CrearAtributesAdd(object objetoModelo, string nombrePropiedad)
+    public static AtributesAdd CrearAtributesAdd(object objetoModelo, string nombrePropiedad, string? hint = null)
     {
         var atradd = new AtributesAdd
         {
@@ -64,28 +64,7 @@ public static class ComponetesHelp
 
         return atradd;
     }
-    //public static VariantesAdd CrearVariantesAdd(object objetoModelo, string nombrePropiedad, string hint)
-    //{
-    //    var atradd = new VariantesAdd()
-    //    {
-    //        DataContext = objetoModelo,
-    //        Margin = new Thickness(0, 0, 0, 10),
-    //        TypeItem = typeof(Variantes)
-
-    //    };
-
-    //    var binding = new Binding(nombrePropiedad)
-    //    {
-    //        Mode = BindingMode.TwoWay,
-    //        UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-    //        ValidatesOnNotifyDataErrors = true
-    //    };
-
-    //    atradd.SetBinding(VariantesAdd.ItemsSourceProperty, binding);
-
-    //    return atradd;
-    //}
-    public static TextBox CrearTextBoxConEstilo(object dataContext, string propiedad)
+    public static TextBox CrearTextBoxConEstilo(object dataContext, string propiedad, string? hint = null)
     {
         var tipo = dataContext.GetType();
         var propInfo = tipo.GetProperty(propiedad);
@@ -108,7 +87,7 @@ public static class ComponetesHelp
             MinWidth = 200
         };
 
-        HintAssist.SetHint(txt, attr.Nombre ?? propiedad);
+        HintAssist.SetHint(txt, hint ?? attr.Nombre ?? propiedad);
 
         var binding = new Binding(propiedad)
         {
@@ -123,7 +102,7 @@ public static class ComponetesHelp
 
         return txt;
     }
-    public static IdentificadoresSelect CrearIdentificadorSelect(object dataContext, string nombrePropiedad)
+    public static IdentificadoresSelect CrearIdentificadorSelect(object dataContext, string nombrePropiedad, string? hint = null)
     {
         var identificadorSelect = new IdentificadoresSelect
         {
@@ -132,9 +111,18 @@ public static class ComponetesHelp
             MinWidth = 200,
         };
 
+        var binding = new Binding(nombrePropiedad)
+        {
+            Mode = BindingMode.TwoWay,
+            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+            ValidatesOnNotifyDataErrors = true,
+        };
+
+        identificadorSelect.SetBinding(IdentificadoresSelect.IdValoresProperty, binding);
+
         return identificadorSelect;
     }
-    public static DatePicker CrearDatePickerConEstilo(object dataContext, string propiedad)
+    public static DatePicker CrearDatePickerConEstilo(object dataContext, string propiedad, string? hint = null)
     {
         var datePicker = new DatePicker
         {
@@ -162,7 +150,7 @@ public static class ComponetesHelp
 
         return datePicker;
     }
-    public static ProveedorSelect CrearProveedorSelect(object dataContext, string propiedad)
+    public static ProveedorSelect CrearProveedorSelect(object dataContext, string propiedad, string? hint = null)
     {
         var proveedorSelect = new ProveedorSelect
         {
@@ -189,15 +177,15 @@ public static class ComponetesHelp
         return proveedorSelect;
     }
 
-    public static void Register(Type itemType, Func<object, string, FrameworkElement> factory)
+    public static void Register(Type itemType, Func<object, string, string?, FrameworkElement> factory)
     {
         _constructores[itemType] = factory;
     }
-    public static bool TryCreate(Type? itemType, object modelo, string nombreProp, out FrameworkElement? control)
+    public static bool TryCreate(Type? itemType, object modelo, string nombreProp, string? hint, out FrameworkElement? control)
     {
         if (itemType != null && _constructores.TryGetValue(itemType, out var factory))
         {
-            control = factory(modelo, nombreProp);
+            control = factory(modelo, nombreProp, hint);
             control.Margin = new Thickness(5);
             return true;
         }

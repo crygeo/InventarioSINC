@@ -52,7 +52,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : class
 
 
     public IAsyncRelayCommand CargarEntityCommand { get; }
-    public IAsyncRelayCommand CrearEntityCommand { get; }
+    public IAsyncRelayCommand CrearEntityCommand { get; set; }
     public IAsyncRelayCommand EditarEntityCommand { get; }
     public IAsyncRelayCommand EliminarEntityCommand { get; }
 
@@ -152,7 +152,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : class
     }
 
 
-    private async Task ConfirmarCrearEntityAsync(TEntity? entity)
+    public virtual async Task ConfirmarCrearEntityAsync(TEntity? entity)
     {
         if (entity == null)
             return;

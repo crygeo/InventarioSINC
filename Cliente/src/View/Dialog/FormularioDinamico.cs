@@ -50,8 +50,11 @@ public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>
 
     public WrapPanel FormTop { get; private set; }
     public StackPanel FormBot { get; private set; }
-    public FormularioDinamico(TEntity entity)
+    private Dictionary<string, string> _nombreCampos;
+
+    public FormularioDinamico(TEntity entity, Dictionary<string, string> nombreCampos = null)
     {
+        this._nombreCampos = nombreCampos ?? new Dictionary<string, string>();
         this.Entity = entity;
 
         this.MaxWidth = 650;
@@ -143,8 +146,10 @@ public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>
         {
             var atributo = propiedad.GetCustomAttribute<SolicitarAttribute>();
             string label = atributo?.Nombre ?? propiedad.Name;
+            string? hint;
+            _nombreCampos.TryGetValue(propiedad.Name, out hint);
 
-            var componente = ComponetesHelp.CrearComponente(Entity, propiedad.Name);
+            var componente = ComponetesHelp.CrearComponente(Entity, propiedad.Name, hint);
 
             if (componente is TextBox)
             {

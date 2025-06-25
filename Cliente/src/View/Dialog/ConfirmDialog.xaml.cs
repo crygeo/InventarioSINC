@@ -1,5 +1,6 @@
-﻿using System.Windows;
+﻿    using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using Cliente.Extencions;
 using CommunityToolkit.Mvvm.Input;
 using Utilidades.Interfaces;
@@ -16,7 +17,6 @@ public partial class ConfirmDialog : UserControl, IDialog
     public static readonly DependencyProperty CancelarCommandProperty = DependencyProperty.Register(nameof(CancelarCommand), typeof(IAsyncRelayCommand), typeof(ConfirmDialog));
     public static readonly DependencyProperty TextHeaderProperty = DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(ConfirmDialog));
     public static readonly DependencyProperty MessageProperty = DependencyProperty.Register(nameof(Message), typeof(string), typeof(ConfirmDialog));
-
 
     public IAsyncRelayCommand CancelarCommand
     {
@@ -47,6 +47,16 @@ public partial class ConfirmDialog : UserControl, IDialog
     public ConfirmDialog()
     {
         InitializeComponent();
+        this.PreviewKeyDown += ConfirmDialog_PreviewKeyDown;
+    }
+
+    private async void ConfirmDialog_PreviewKeyDown(object sender, KeyEventArgs e)
+    {
+        if (e.Key == Key.Enter)
+        {
+            e.Handled = true;
+            await AceptarCommand.TryEjecutarYCerrarDialogoAsync(this);
+        }
     }
 
     private async void OnCancel(object sender, RoutedEventArgs e)

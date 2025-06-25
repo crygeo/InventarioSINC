@@ -14,6 +14,7 @@ namespace Servidor.src.Model
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public string Id { get; set; }
+        [BsonRepresentation(BsonType.ObjectId)]
         public IEnumerable<string> IdIdentificadores { get; set; }
         public string IdProveedor { get; set; }
         public DateTime FechaIngreso { get; set; }
@@ -23,7 +24,6 @@ namespace Servidor.src.Model
         public string Nota { get; set; }
         public bool Updatable { get; set; }
         public bool Deleteable { get; set; }
-        public bool VerView { get; set; }
         public void Update(IModelObj entity)
         {
             throw new NotImplementedException();

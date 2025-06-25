@@ -25,12 +25,5 @@ namespace Servidor.src.Model
             throw new System.NotImplementedException();
         }
 
-        public void AddOrRemove(string id)
-        {
-
-        }
-
-        public bool VerView { get; set; }
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using MongoDB.Bson;
+﻿using System;
+using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Shared.Interfaces.Model;
 using Shared.Interfaces.Model.Obj;
@@ -7,7 +8,6 @@ namespace Servidor.src.Model
 {
     public class ElementoJerarquico : IElementoJerarquico
     {
-        private bool _verView;
 
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
@@ -17,14 +17,13 @@ namespace Servidor.src.Model
         public string Nombre { get; set; }
         public string Valor { get; set; }
         public string Descripcion { get; set; }
+        public DateTime FechaCreacion { get; set; }
         public bool Updatable { get; set; }
         public bool Deleteable { get; set; }
         public void Update(IModelObj entity)
         {
             throw new System.NotImplementedException();
         }
-
-        public bool VerView { get; set; }
 
     }
 }
