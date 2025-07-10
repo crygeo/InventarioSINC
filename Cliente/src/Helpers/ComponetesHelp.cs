@@ -159,20 +159,20 @@ public static class ComponetesHelp
             MinWidth = 200,
         };
 
-        //var converter = new IdToProveedorConverter
-        //{
-        //    ListaProveedores = ServiceFactory.GetService<Proveedor>().Collection
-        //};
+        var converter = new IdToProveedorConverter
+        {
+            ListaProveedores = ServiceFactory.GetService<Proveedor>().Collection
+        };
 
-        //var binding = new Binding(propiedad)
-        //{
-        //    Mode = BindingMode.TwoWay,
-        //    UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
-        //    ValidatesOnNotifyDataErrors = true,
-        //    Converter = converter
+        var binding = new Binding(propiedad)
+        {
+            Mode = BindingMode.TwoWay,
+            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+            ValidatesOnNotifyDataErrors = true,
+            Converter = converter
 
-        //};
-        //proveedorSelect.SetBinding(ProveedorSelect.ProveedorProperty, binding);
+        };
+        proveedorSelect.SetBinding(ProveedorSelect.ProveedorProperty, binding);
 
         return proveedorSelect;
     }

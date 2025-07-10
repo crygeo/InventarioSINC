@@ -122,7 +122,7 @@ public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>
             Content = "Aceptar",
             Margin = new Thickness(10, 0, 10, 0)
         };
-        btnAceptar.Click +=  OnAcepted;
+        btnAceptar.Click += OnAcepted;
 
         botones.Children.Add(btnCerrar);
         botones.Children.Add(btnAceptar);
@@ -167,6 +167,8 @@ public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>
     }
     private async void OnAcepted(object sender, RoutedEventArgs e)
     {
+        if (Entity == null) return;
+
         var errores = Entity.ValidarCamposSolicitados();
 
         if (!errores.Any())
