@@ -9,6 +9,5 @@ namespace Shared.Interfaces
 {
     public interface IIdentificadoresEntity
     {
-        IEnumerable<IIdentificador> Identificadores { get; }
     }
 }

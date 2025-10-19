@@ -5,7 +5,7 @@ using System.Security.Claims;
 using System.Text;
 using Microsoft.AspNetCore.DataProtection.KeyManagement;
 using Microsoft.IdentityModel.Tokens;
-using Servidor.src.Objs;
+using Servidor.src.Model;
 
 namespace Servidor.src.Helper
 {

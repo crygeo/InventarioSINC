@@ -12,6 +12,7 @@ using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using Servidor.src.Model;
 
 namespace Servidor.src.Controllers
 {
@@ -19,14 +20,12 @@ namespace Servidor.src.Controllers
     [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
-        private readonly ServiceUsuario _service;
+        private ServiceUsuario? _usuarioService;
+
+        public ServiceUsuario UsuarioService => _usuarioService ??= (ServiceUsuario)ServiceFactory.GetService<Usuario>();
 
         public string NamePermiso = "Auth.Login";
 
-        public AuthController(ServiceUsuario service)
-        {
-            _service = service;
-        }
 
         [HttpGet("validate-token")]
         public async Task<IActionResult> ValidateToken()
@@ -52,11 +51,11 @@ namespace Servidor.src.Controllers
                 string id = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? string.Empty;
                 if (!string.IsNullOrEmpty(id))
                 {
-                    var user = await _service.GetByIdAsync(id);
+                    var user = await UsuarioService.GetByIdAsync(id);
                     if (user == null)
                         return Unauthorized(new ErrorResponse(401, "Usuario no encontrado"));
 
-                    if (!await _service.VerificarPermiso(user, NamePermiso))
+                    if (!await UsuarioService.VerificarPermiso(user, NamePermiso))
                         return Unauthorized(new ErrorResponse(401, "Usuario no permitido para iniciar sesión"));
                 }
 
@@ -99,14 +98,14 @@ namespace Servidor.src.Controllers
                     return BadRequest(new ErrorResponse(400, "Usuario y contraseña son requeridos"));
                 }
 
-                var usuario = await _service.GetByUser(login.User);
+                var usuario = await UsuarioService.GetByUser(login.User);
 
                 if (usuario == null || string.IsNullOrWhiteSpace(usuario.Password) || !BCrypt.Net.BCrypt.Verify(login.Password, usuario.Password))
                 {
                     return Unauthorized(new ErrorResponse(401, "Credenciales inválidas"));
                 }
 
-                if (!await _service.VerificarPermiso(usuario, NamePermiso))
+                if (!await UsuarioService.VerificarPermiso(usuario, NamePermiso))
                 {
                     return Unauthorized(new ErrorResponse(401, "Usuario no permitido para iniciar sesión"));
                 }

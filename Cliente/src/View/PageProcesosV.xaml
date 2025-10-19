@@ -1,56 +1,54 @@
-﻿<Page x:Class="Cliente.src.View.PageProcesosV"
-      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-      xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes" 
-      xmlns:vm="clr-namespace:Cliente.src.ViewModel" 
-      xmlns:Convert="clr-namespace:Utilidades.Converters;assembly=Utilidades" 
-      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-      xmlns:local="clr-namespace:Cliente.src.View"
-      xmlns:item="clr-namespace:Cliente.src.View.Items"
-      mc:Ignorable="d" 
-      d:DesignHeight="450" d:DesignWidth="800"
-      Title="PageRolesV" d:DataContext="{d:DesignInstance Type=vm:PageProcesosVM}">
-    <Page.Resources>
-        <!--<Convert:NodoHierarchyConverter x:Key="ArbolConvert"/>-->
-    </Page.Resources>
+﻿<UserControl x:Class="Cliente.View.PageProcesosV"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:Convert="clr-namespace:Utilidades.Converters;assembly=Utilidades" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModel="clr-namespace:Cliente.ViewModel"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type=viewModel:PageProcesosVM}">
+    <UserControl.Resources>
+    </UserControl.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
         <Grid Grid.Row="0"
-             Height="80"
              Background="{DynamicResource MaterialDesignCardBackground}">
-            <ListBox
-                Height="80"
-                ItemsSource="{Binding ListItemsNav}"
-                SelectedItem="{Binding SelectedItemNav}"
-                Style="{StaticResource MaterialDesign3.NavigationBarListBox}">
-                <ListBox.ItemContainerStyle>
-                    <Style
-                        TargetType="ListBoxItem"
-                        BasedOn="{StaticResource MaterialDesign3.NavigationBarListBoxItem}">
-                        <Setter
-                             Property="md:NavigationBarAssist.IsTextVisible"
-                             Value="True" />
-                        <Setter
-                             Property="md:NavigationBarAssist.SelectedIcon"
-                             Value="{Binding SelectedIcon}" />
-                        <Setter
-                             Property="md:NavigationBarAssist.UnselectedIcon"
-                             Value="{Binding UnselectedIcon}" />
-                    </Style>
-                </ListBox.ItemContainerStyle>
-                <ListBox.Resources>
+                <ListBox
+                    ItemsSource="{Binding ListItemsNav}"
+                    SelectedItem="{Binding SelectedItemNav}"
+                    Style="{StaticResource MaterialDesign3.NavigationBarListBox}"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                    ScrollViewer.CanContentScroll="False"
+                >
 
-                </ListBox.Resources>
-            </ListBox>
+                    <ListBox.ItemsPanel>
+                        <ItemsPanelTemplate>
+                            <StackPanel Orientation="Horizontal"/>
+                        </ItemsPanelTemplate>
+                    </ListBox.ItemsPanel>
+
+                    <ListBox.ItemContainerStyle>
+                        <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesign3.NavigationBarListBoxItem}">
+                            <Setter Property="md:NavigationBarAssist.IsTextVisible" Value="True" />
+                            <Setter Property="md:NavigationBarAssist.SelectedIcon" Value="{Binding SelectedIcon}" />
+                            <Setter Property="md:NavigationBarAssist.UnselectedIcon" Value="{Binding UnselectedIcon}" />
+                        </Style>
+                    </ListBox.ItemContainerStyle>
+                </ListBox>
+            
+
         </Grid>
         <Border Grid.Row="1" Margin="10" CornerRadius="10">
             <Grid>
-                <Frame Content="{Binding PageSelectViewModel}" d:Content="{d:DesignInstance Type=vm:PageProcesosVM}" NavigationUIVisibility="Hidden"/>
+                <ContentControl Content="{Binding PageSelectViewModel}"
+                                ContentTemplateSelector="{StaticResource ViewModelTemplateSelector}" />
             </Grid>
         </Border>
     </Grid>
-</Page>
+</UserControl>

@@ -1,5 +1,5 @@
 ﻿using MongoDB.Driver;
-using Shared.Interfaces.ModelsBase;
+using Shared.Interfaces.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;

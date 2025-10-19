@@ -1,18 +1,17 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Servidor.src.Hubs;
 using Shared.Interfaces;
-using Shared.Interfaces.ModelsBase;
 using System.Threading.Tasks;
+using Shared.Interfaces.Model;
 
 namespace Servidor.src.HubsService
 {
-    public abstract class HubServiceBase<T> : IHubService<T> where T : IModelObj
+    public class HubServiceBase<T> : IHubService<T> where T : class, IModelObj
     {
-        public IHubContext<Hub> HubContext { get; }
-        public HubServiceBase(IHubContext<Hub> hubContext)
-        {
-            HubContext = hubContext;
-        }
+
+        private IHubContext<Hub>? _hubContext;
+        public IHubContext<Hub> HubContext =>  _hubContext ??= (IHubContext<Hub>) HubFactory.GetHubContext<T>();
+
 
         public async Task NewItem(T obj)
         {
@@ -28,5 +27,6 @@ namespace Servidor.src.HubsService
         {
             await HubContext.Clients.All.SendAsync($"Delete{typeof(T).Name}", obj);
         }
+
     }
 }

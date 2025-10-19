@@ -5,15 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using Shared.Interfaces.ModelsBase;
+using Shared.Interfaces.Model;
 
 namespace Servidor.src.Repositorios
 {
-    public abstract class RepositorioBase<TObj> : IRepository<TObj> where TObj : IModelObj
+    public class RepositorioBase<TObj> : IRepository<TObj> where TObj : IModelObj
     {
         public IMongoCollection<TObj> Collection { get; }
 
-        public string NameCollection => $"Rep{typeof(TObj).Name}";
+        public virtual string NameCollection => $"Rep{typeof(TObj).Name}";
 
         /// <summary>
         /// Constructor base que inicializa la conexión a la colección MongoDB.
@@ -70,6 +70,7 @@ namespace Servidor.src.Repositorios
         {
             try
             {
+
                 await Collection.InsertOneAsync(entity);
                 return true;  // Inserción exitosa
             }

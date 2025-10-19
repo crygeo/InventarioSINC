@@ -1,33 +1,34 @@
-﻿<UserControl x:Class="Cliente.src.View.Items.UsuarioItemB"
+﻿<UserControl x:Class="Cliente.View.Items.UsuarioItemB"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Cliente.src.View.Items"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:conver="clr-namespace:Utilidades.Converters;assembly=Utilidades"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:ex="clr-namespace:Cliente.Extencions"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800"
              Background="Transparent">
     <UserControl.Resources>
+        <ex:BindingProxy x:Key="Proxy" Data="{Binding RelativeSource={RelativeSource AncestorType=UserControl}}"/>
         <conver:InverseBooleanConverter x:Key="InverseBooleanConverter"/>
     </UserControl.Resources>
     <UserControl.ContextMenu>
         <ContextMenu Style="{StaticResource MaterialDesignContextMenu}">
-            <MenuItem Command="{Binding PlacementTarget.EditarUsuarioCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+            <MenuItem Command="{Binding Data.EditarUsuarioCommand, Source={StaticResource Proxy}}"
                   Header="_Editar"
                   Icon="{md:PackIcon Kind=AccountEdit}" />
 
-            <MenuItem Command="{Binding PlacementTarget.EliminarUsuarioCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+            <MenuItem Command="{Binding Data.EliminarUsuarioCommand, Source={StaticResource Proxy}}"
                   Header="_Eliminar"
                   Icon="{md:PackIcon Kind=Delete}" />
             <Separator/>
-            <MenuItem Command="{Binding PlacementTarget.CambiarPasswordCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+            <MenuItem Command="{Binding Data.CambiarPasswordCommand, Source={StaticResource Proxy}}"
                   Header="_Cambiar Contraseña"
                   Icon="{md:PackIcon Kind=FormTextboxPassword}" />
             <Separator/>
             <MenuItem Header="_Roles"
-                      ItemsSource="{Binding PlacementTarget.ListRoles, RelativeSource={RelativeSource AncestorType=ContextMenu}}"
+                      ItemsSource="{Binding Data.ListRoles, Source={StaticResource Proxy}}"
                   Icon="{md:PackIcon Kind=ShieldAccount}" >
                 <MenuItem.ItemContainerStyle>
                     <Style TargetType="MenuItem">
@@ -37,7 +38,6 @@
                         <Setter Property="IsChecked" Value="{Binding IsSelect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                         <Setter Property="StaysOpenOnClick" Value="True" />
                         <EventSetter Event="Click" Handler="MenuItem_Click" />
-
                     </Style>
                 </MenuItem.ItemContainerStyle>
             </MenuItem>

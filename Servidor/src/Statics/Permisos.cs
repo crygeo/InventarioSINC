@@ -1,11 +1,12 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
 namespace Servidor.src.Statics
 {
-    public class Permisos
+    public static class Permisos
     {
         private static List<string>? _list = null;
         public static List<string> List
@@ -40,5 +41,9 @@ namespace Servidor.src.Statics
             }
             return list;
         }
+
+        
     }
+
+
 }

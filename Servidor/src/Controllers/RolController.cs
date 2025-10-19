@@ -1,22 +1,20 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using System.Collections.Generic;
 using System.Threading.Tasks;
-using MongoDB.Driver;
-using Servidor.src.Repositorios;
-using Servidor.src.Objs;
 using Servidor.src.Services;
-using Microsoft.AspNetCore.Authorization;
+using Servidor.src.Model;
 
-namespace Servidor.src.Controllers
+namespace Servidor.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class RolController(ServiceRol servicioRol) : BaseController<Rol>(servicioRol)
+    public class RolController() : BaseController<Rol>()
     {
+        private ServiceRol ServiceRol => (ServiceRol)Service;
+
         [HttpGet("Perms")]
         public async Task<ActionResult> GetPermss()
         {
-            var perm = await servicioRol.GetAllPermisos();
+            var perm = await ServiceRol.GetAllPermisos();
             return Ok(perm);
         }
     }

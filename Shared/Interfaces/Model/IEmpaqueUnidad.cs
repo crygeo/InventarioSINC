@@ -1,0 +1,21 @@
+﻿using Shared.Interfaces.Model.Obj;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace Shared.Interfaces.ModelsBase
+{
+    public interface IEmpaqueUnidad
+    {
+        IRecepcionCarga RecepcionCarga { get; }
+        string IdValorVariante { get; set; }
+        float PesoUnidad { get; set; }
+        float PesoBruto { get => PesoUnidad * Unidades; }
+        int Unidades { get; set; }
+
+        void AgregarUnidades(int cantidad);
+        void QuitarUnidades(int cantidad);
+    }
+}

@@ -1,6 +1,10 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System;
+using System.Linq;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SignalR;
+using Servidor.src.Hubs;
+using System.Reflection;
 
 namespace Servidor.src.Extensiones
 {
@@ -12,6 +16,31 @@ namespace Servidor.src.Extensiones
             if (name.StartsWith("Hub"))
                 name = name.Substring(3);
             app.MapHub<THub>($"/hub{name}");
+        }
+
+        public static void MapAllGenericHubs<TInterface>(this IEndpointRouteBuilder app)
+        {
+            // Buscar todos los tipos que implementen IModelObj y no sean abstractos
+            var modelos = Assembly.GetExecutingAssembly()
+                .GetTypes()
+                .Where(t => typeof(TInterface).IsAssignableFrom(t) && t is { IsClass: true, IsAbstract: false });
+
+            foreach (var modelo in modelos)
+            {
+                var hubType = typeof(HubBase<>).MakeGenericType(modelo);
+
+                var mapHubMethod = typeof(HubEndpointRouteBuilderExtensions)
+                    .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                    .First(m => m.Name == "MapHub" && m.IsGenericMethod && m.GetParameters().Length == 2);
+
+                var genericMap = mapHubMethod.MakeGenericMethod(hubType);
+
+                string name = modelo.Name;
+                var path = $"/hub{name}";
+
+                // Ejecuta: app.MapHub<HubBase<T>>("/hub{T}")
+                genericMap.Invoke(null, new object[] { app, path });
+            }
         }
     }
 }

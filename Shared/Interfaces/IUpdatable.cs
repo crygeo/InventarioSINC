@@ -4,7 +4,7 @@ using System.Linq;
 using System.Security.Principal;
 using System.Text;
 using System.Threading.Tasks;
-using Shared.Interfaces.ModelsBase;
+using Shared.Interfaces.Model;
 
 namespace Shared.Interfaces
 {

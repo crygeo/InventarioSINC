@@ -1,47 +1,32 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:vm="clr-namespace:Cliente.src.ViewModel"
-                    xmlns:view="clr-namespace:Cliente.src.View"
-                    xmlns:uCon="clr-namespace:Cliente.src.View.Items">
+                    xmlns:vm="clr-namespace:Cliente.ViewModel"
+                    xmlns:view="clr-namespace:Cliente.View"
+                    xmlns:model="clr-namespace:Cliente.View.Model"
+                    xmlns:subPage="clr-namespace:Cliente.src.View.Model.SubPage"
+                    xmlns:mvvm="clr-namespace:Utilidades.Mvvm;assembly=Utilidades">
     
     
-    
-    <DataTemplate DataType="{x:Type vm:PageRolesVM}">
-        <view:PageRolesV/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type vm:PageUsuarioVM}">
-        <view:PageUsuariosV/>
-    </DataTemplate>
     
     <DataTemplate DataType="{x:Type vm:PageProcesosVM}">
         <view:PageProcesosV/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:PageProductoVM}">
-        <view:PageGeneralV/>
+    <DataTemplate x:Key="ViewTemplate_Rol">
+        <model:PageRolesV/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:PageIdentificadorVM}">
-        <view:PageGeneralV/>
+    <DataTemplate x:Key="ViewTemplate_Usuario">
+        <model:PageUsuariosV/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:PageClasificacionVM}">
-        <view:PageGeneralV/>
+    <DataTemplate x:Key="ViewTemplate_ElementoJerarquico">
+        <model:PageValoresV/>
     </DataTemplate>
 
-    <DataTemplate DataType="{x:Type vm:PageRecepcionCarga}">
-        <view:PageGeneralV/>
+    <DataTemplate x:Key="IdentificadoresTemplate" DataType="{x:Type mvvm:SubViewModelBase}">
+        <subPage:PageIdentificadoresV />
     </DataTemplate>
-
-    <DataTemplate DataType="{x:Type vm:PageProveedorEmpresa}">
-        <view:PageGeneralV/>
-    </DataTemplate>
-
-    <DataTemplate DataType="{x:Type vm:PageProveedorPersona}">
-        <view:PageGeneralV/>
-    </DataTemplate>
-
 
 
 </ResourceDictionary>

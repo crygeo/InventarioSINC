@@ -1,17 +1,23 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Servidor.src.Objs;
+using Servidor.src.HubsService;
+using Servidor.src.Model;
 using Servidor.src.Repositorios;
 using Shared.Interfaces;
-using Shared.Interfaces.ModelsBase;
+using Shared.Interfaces.Model;
 
-namespace Servidor.src.Services;
+namespace Servidor.Services;
 
-public abstract class ServiceBase<TObj> : IService<TObj> where TObj : IModelObj
+public class ServiceBase<TObj> : IService<TObj> where TObj :class, IModelObj
 {
-    public abstract IRepository<TObj> Repository { get; }
-    public abstract IHubService<TObj> HubService { get; }
+    private RepositorioBase<TObj>? _repository;
+    private HubServiceBase<TObj>? _hubService;
+
+    public virtual IRepository<TObj> Repository => _repository ??= RepositorioFactory.GetRepositorio<TObj>(); 
+    public virtual IHubService<TObj> HubService => _hubService ??= HubServiceFactory.GetHubService<TObj>();
 
     public virtual Task InitServiceAsync()
     {
@@ -62,7 +68,7 @@ public abstract class ServiceBase<TObj> : IService<TObj> where TObj : IModelObj
     public async Task<bool> VerificarPermiso(string idUser, string NamePermiso)
     {
         var database = MongoDBConnection._database;
-        if(database == null) return false;
+        if (database == null) throw new Exception("Base de datos null");
 
         var repUser = database.GetCollection<Usuario>("RepUsuario");
 
