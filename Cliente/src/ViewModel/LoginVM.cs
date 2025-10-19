@@ -3,6 +3,7 @@ using Cliente.Services;
 using Cliente.View;
 using Cliente.View.Dialog;
 using Cliente.WindowStrategy;
+using Utilidades.Dialogs;
 using Utilidades.Interfaces;
 using Utilidades.Mvvm;
 using Utilidades.Services;

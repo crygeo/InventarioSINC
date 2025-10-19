@@ -6,7 +6,7 @@ using CommunityToolkit.Mvvm.Input;
 using Utilidades.Extencions;
 using Utilidades.Factory;
 using Utilidades.Interfaces;
-using Utilidades.Interfaces.Dialogs;
+using Utilidades.Dialogs;
 
 namespace Cliente.View.Dialog;
 

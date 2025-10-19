@@ -7,7 +7,7 @@ using CommunityToolkit.Mvvm.Input;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Utilidades.Interfaces.Dialogs;
+using Utilidades.Dialogs;
 using BooleanToVisibilityConverter = Utilidades.Converters.BooleanToVisibilityConverter;
 
 namespace Cliente.View.Dialog;

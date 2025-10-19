@@ -10,8 +10,8 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using Utilidades.Controls;
 using Utilidades.Converters;
+using Utilidades.Dialogs;
 using Utilidades.Interfaces;
-using Utilidades.Interfaces.Dialogs;
 using static System.Net.Mime.MediaTypeNames;
 using Application = System.Windows.Application;
 

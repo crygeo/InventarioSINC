@@ -1,5 +1,5 @@
 ﻿using System.Windows;
-using Cliente.Services;
+using Utilidades.Dialogs;
 
 namespace Cliente.View;
 

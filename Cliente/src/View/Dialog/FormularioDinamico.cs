@@ -11,7 +11,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
-using Utilidades.Interfaces.Dialogs;
+using Utilidades.Dialogs;
 
 namespace Cliente.View.Dialog;
 

@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using Utilidades.Interfaces;
-using Utilidades.Interfaces.Dialogs;
+using Utilidades.Dialogs;
 
 namespace Cliente.View.Dialog;
 

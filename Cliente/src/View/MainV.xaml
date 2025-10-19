@@ -7,7 +7,7 @@
         Title="MainV" Height="600" Width="800"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:viewModel="clr-namespace:Cliente.ViewModel"
-        xmlns:sv="clr-namespace:Cliente.Services"
+        xmlns:sv="clr-namespace:Cliente.Default"
         xmlns:model="clr-namespace:Cliente.Obj.Model"
         xmlns:obj="clr-namespace:Cliente.Obj"
         xmlns:model1="clr-namespace:Cliente.ViewModel.Model"
@@ -17,8 +17,8 @@
         <viewModel:MainVM x:Key="viewModel"/>
     </Window.Resources>
 
-    <md:DialogHost Identifier="{x:Static sv:DialogService.DialogIdentifierProgress}">
-        <md:DialogHost Identifier="{x:Static sv:DialogService.DialogIdentifierMain}">
+    <md:DialogHost Identifier="{x:Static sv:DialogDefaults.Progress}">
+        <md:DialogHost Identifier="{x:Static sv:DialogDefaults.Main}">
 
             <Grid DataContext="{Binding Source={StaticResource viewModel}}">
                 <Grid.ColumnDefinitions>

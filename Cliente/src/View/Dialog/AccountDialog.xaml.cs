@@ -3,8 +3,8 @@ using System.Windows.Controls;
 using Cliente.Extencions;
 using Cliente.Obj.Model;
 using CommunityToolkit.Mvvm.Input;
+using Utilidades.Dialogs;
 using Utilidades.Interfaces;
-using Utilidades.Interfaces.Dialogs;
 
 namespace Cliente.View.Dialog;
 
@@ -51,7 +51,7 @@ public partial class AccountDialog : UserControl, IDialog
         set => SetValue(TextHeaderProperty, value);
     }
 
-    public string DialogNameIdentifier { get; set; }
+    public required string DialogNameIdentifier { get; set; }
     public required string DialogOpenIdentifier { get; set; }
 
 

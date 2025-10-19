@@ -1,4 +1,5 @@
-﻿using System.Collections.ObjectModel;
+﻿using Cliente.Default;
+using Cliente.Extencions;
 using Cliente.Helpers;
 using Cliente.Services;
 using Cliente.Services.Model;
@@ -6,6 +7,8 @@ using Cliente.View.Dialog;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Extensions;
 using Shared.Interfaces.Model;
+using System.Collections.ObjectModel;
+using Utilidades.Dialogs;
 using Utilidades.Interfaces;
 using Utilidades.Mvvm;
 
@@ -110,12 +113,10 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : class
         await progressTask;
 
     }
-
-
     public async virtual Task CrearEntityAsync()
     {
 
-        await DialogService.BuscarYMostrarFormularioAsyncMain(
+        await DialogServiceI.BuscarMostrarDialogAsync(
             new TEntity(),
             $"Crear {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
             ConfirmarCrearEntityAsync
@@ -127,7 +128,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : class
             return;
 
 
-        await DialogService.BuscarYMostrarFormularioAsyncMain(
+        await DialogServiceI.BuscarMostrarDialogAsync(
             EntitySelect.Clone(),
             $"Editar {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
             ConfirmarEditarEntityAsync
@@ -144,8 +145,8 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : class
             TextHeader = $"Eliminar {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
             Message = $"¿Estás seguro de que quieres eliminar el {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)} seleccionado?",
             AceptarCommand = new AsyncRelayCommand(ConfirmarEliminarEntityAsync),
-            DialogNameIdentifier = DialogService.DialogSub01,
-            DialogOpenIdentifier = DialogService.DialogIdentifierMain
+            DialogNameIdentifier = DialogDefaults.Sub01,
+            DialogOpenIdentifier = DialogDefaults.Main
         };
 
         await DialogServiceI.MostrarDialogo(confirmDialog);
@@ -163,7 +164,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : class
             result.ObjInteration = typeof(TEntity);
             await DialogServiceI.ValidarRespuesta(result);
             return result;
-        });
+        }, DialogDefaults.Progress);
     }
     private async Task ConfirmarEditarEntityAsync(TEntity? entity)
     {
@@ -175,7 +176,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : class
             result.ObjInteration = typeof(TEntity);
             await DialogServiceI.ValidarRespuesta(result);
             return result;
-        });
+        }, DialogDefaults.Progress);
     }
     private async Task ConfirmarEliminarEntityAsync()
     {
@@ -188,7 +189,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase where TEntity : class
             result.ObjInteration = typeof(TEntity);
             await DialogServiceI.ValidarRespuesta(result);
             return result;
-        });
+        }, DialogDefaults.Progress);
     }
 
 

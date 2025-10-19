@@ -1,7 +1,7 @@
 ﻿using System.Windows.Controls;
 using CommunityToolkit.Mvvm.Input;
 using Utilidades.Interfaces;
-using Utilidades.Interfaces.Dialogs;
+using Utilidades.Dialogs;
 
 namespace Cliente.View.Dialog;
 /// <summary>

@@ -1,6 +1,4 @@
 ﻿using MaterialDesignThemes.Wpf;
-using Utilidades.Interfaces;
-using Utilidades.Interfaces.Dialogs;
 
 namespace Cliente.Attributes;
 

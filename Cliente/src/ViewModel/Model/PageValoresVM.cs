@@ -14,6 +14,9 @@ using System.Threading.Tasks;
 using Cliente.Obj;
 using MaterialDesignThemes.Wpf;
 using Utilidades.Mvvm;
+using Utilidades.Dialogs;
+using Cliente.Extencions;
+using Cliente.Default;
 
 namespace Cliente.src.ViewModel.Model
 {
@@ -90,10 +93,10 @@ namespace Cliente.src.ViewModel.Model
                 { nameof(newValor.Valor), identificador.Descripcion }
             };
 
-            await DialogService.MostrarFormularioDinamicoAsync(newValor,
+            await DialogService.Instance.MostrarFormularioDinamicoAsync(newValor,
                     $"Agregar nuevo \"{identificador.Name}\"",
-                    new AsyncRelayCommand<ElementoJerarquico>(ConfirmarCrearEntityAsync),
-                    DialogService.DialogIdentifierMain, DialogService.DialogSub01,
+                    ConfirmarCrearEntityAsync,
+                    DialogDefaults.Main, DialogDefaults.Sub01,
                     nombresCampos);
         }
 

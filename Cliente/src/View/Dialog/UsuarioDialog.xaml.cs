@@ -4,7 +4,7 @@ using Cliente.Extencions;
 using Cliente.Obj.Model;
 using CommunityToolkit.Mvvm.Input;
 using Utilidades.Interfaces;
-using Utilidades.Interfaces.Dialogs;
+using Utilidades.Dialogs;
 
 namespace Cliente.View.Dialog;
 

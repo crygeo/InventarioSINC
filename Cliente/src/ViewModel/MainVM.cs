@@ -8,6 +8,8 @@ using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
 using Utilidades.Interfaces;
 using Utilidades.Mvvm;
+using Utilidades.Dialogs;
+using Cliente.Default;
 
 namespace Cliente.ViewModel;
 
@@ -66,8 +68,8 @@ public class MainVM : ViewModelBase, IBarNavegacion
             Usuario = result.EntityGet,
             CloseSeccionCommand = new AsyncRelayCommand(CerrarSesionAsync),
             ChangedPasswordCommand = new AsyncRelayCommand<Usuario>(CambiarPasswordAsync),
-            DialogOpenIdentifier = DialogService.DialogIdentifierMain,
-            DialogNameIdentifier = DialogService.DialogSub01,
+            DialogOpenIdentifier = DialogDefaults.Main,
+            DialogNameIdentifier = DialogDefaults.Sub01,
         };
 
         await DialogService.MostrarDialogo(dialog);
@@ -80,8 +82,8 @@ public class MainVM : ViewModelBase, IBarNavegacion
             TextHeader = "Cerrar Sesión",
             Message = "¿Estás seguro de que quieres cerrar sesión?",
             AceptarCommand = new AsyncRelayCommand(EjecutarCierreSesionAsync),
-            DialogOpenIdentifier = DialogService.DialogSub01,
-            DialogNameIdentifier = DialogService.DialogSub02,
+            DialogOpenIdentifier = DialogDefaults.Sub01,
+            DialogNameIdentifier = DialogDefaults.Sub02,
         };
 
         await DialogService.MostrarDialogo(confirmDialog);
@@ -103,8 +105,8 @@ public class MainVM : ViewModelBase, IBarNavegacion
         {
             AceptarCommand = new AsyncRelayCommand<ChangePassDialog>((changePass) => EjecutarCambioPasswordAsync(changePass, usuario)),
             OldPasswordRequired = Visibility.Visible,
-            DialogOpenIdentifier = DialogService.DialogSub01,
-            DialogNameIdentifier = DialogService.DialogSub02,
+            DialogOpenIdentifier = DialogDefaults.Sub01,
+            DialogNameIdentifier = DialogDefaults.Sub02,
         };
 
         await DialogService.MostrarDialogo(dialog);
@@ -120,7 +122,7 @@ public class MainVM : ViewModelBase, IBarNavegacion
             var result = await ServicioServiceUsuario.ChangePasswordAsync(usuario.Id, changePass.OldPassword, changePass.NewPassword);
             await DialogService.ValidarRespuesta(result);
             return result;
-        }, DialogService.DialogSub02);
+        }, DialogDefaults.Sub02);
     }
 
     protected override void UpdateChanged()
