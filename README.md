@@ -1,35 +1,59 @@
-# Reestructuración del Modelo de Datos
 
-Esta rama contiene una **reestructuración profunda** del modelo de datos del sistema, con el objetivo de mejorar la escalabilidad, eficiencia y reutilización de componentes tanto en el servidor como en el cliente.
+# 🧾 Reestructuración del Modelo de Datos — InventarioSINC
 
----
-
-## 🔄 Objetivos de la reestructuración
-
-- Eliminar redundancia en las interfaces (`IAtributo`, `IValor`, etc.)
-- Usar un modelo **jerárquico genérico** (`IElementoJerarquico`) para representar atributos, valores y relaciones dinámicas
-- Optimizar las entidades que contienen grandes colecciones (`Identificador`, `RecepcionCarga`, etc.)
-- Separar responsabilidades entre entidades de configuración y datos operativos
-- Reducir la sobrecarga en el tráfico de red (especialmente en SignalR)
+**📅 Fecha:** Octubre 2025  
+**🚀 Versión:** v2.0.0 — Reestructuración completa del modelo de datos y arquitectura modular
 
 ---
 
-## 🧩 Cambios principales
+## 📘 Resumen
 
-### ✅ `IElementoJerarquico`
+**InventarioSINC** es un sistema modular de gestión de inventario basado en una arquitectura **cliente-servidor desacoplada**.  
+El cliente está desarrollado en **WPF (MVVM)** y el servidor en **ASP.NET Core** con **MongoDB**.  
+Esta versión incluye una **reestructuración profunda del modelo de datos** para mejorar la **escalabilidad**, **eficiencia** y **reutilización de componentes**, tanto en el servidor como en el cliente.
 
-Modelo genérico para representar identificadores, atributos y valores relacionados entre sí.
+---
+
+## 🎯 Objetivos
+
+- Eliminar redundancia en las interfaces (`IAtributo`, `IValor`, etc.).  
+- Implementar un modelo **jerárquico genérico** (`IElementoJerarquico`) para representar atributos, valores y relaciones dinámicas.  
+- Optimizar entidades que contienen grandes colecciones (`Identificador`, `RecepcionCarga`, etc.).  
+- Separar responsabilidades entre entidades de configuración y datos operativos.  
+- Reducir la sobrecarga en el tráfico de red (especialmente en SignalR).  
+
+---
+
+## 🧱 Arquitectura (Resumen)
+
+| Capa | Descripción | Tecnologías |
+|------|--------------|--------------|
+| **Cliente** | UI desacoplada basada en WPF (MVVM) y CommunityToolkit.Mvvm. Formularios generados dinámicamente a partir de metadatos. | WPF, C# |
+| **Servidor** | API REST genérica con repositorios y servicios abstractos. | ASP.NET Core, MongoDB |
+| **Compartido** | Define contratos, modelos base e interfaces reutilizables. | .NET Standard |
+
+---
+
+## ⚙️ Cambios principales y motivos
+
+### 🧩 Modelo jerárquico genérico (`IElementoJerarquico`)
+**Motivo:** Unificar la representación de elementos que antes se modelaban como distintas entidades (atributos, valores, identificadores, etc.), evitando duplicación.  
+**Beneficio:** Simplifica la creación y extensión de relaciones dinámicas entre entidades.
 
 ```csharp
 public interface IElementoJerarquico : IModelObj
 {
     string IdPerteneciente { get; set; }
-    string Name { get; set; }
+    string Nombre { get; set; }
     string? Descripcion { get; set; }
 }
 ```
-## ✅ RecepcionCarga
-Simplificación de referencias y almacenamiento de datos de forma desacoplada.
+
+---
+
+### 📦 Reestructuración de `RecepcionCarga`
+**Motivo:** Reducir el tamaño y complejidad de entidades con grandes colecciones y referencias.  
+**Enfoque:** Usar referencias a `IElementoJerarquico` para identificadores y valores, separando datos pesados como `byte[]` (guías) en entidades independientes.
 
 ```csharp
 public interface IRecepcionCarga : IModelObj
@@ -43,86 +67,111 @@ public interface IRecepcionCarga : IModelObj
     string Nota { get; set; }
 }
 ```
-## ✅ Separación de valores (Valor)
-Los valores ya no están embebidos en las entidades (Identificador, Atributo, etc.), sino que se gestionan en una colección aparte para mejorar la eficiencia.
----
-## 🧠 Consideraciones
-Este diseño es compatible con MongoDB y aprovecha su naturaleza no relacional.
-
-El cliente necesitará realizar consultas adicionales para obtener los valores relacionados (lazy-load).
-
-Las notificaciones por SignalR deben optimizarse para enviar solo lo necesario (no el objeto completo).
----
-## 🛠️ Próximos pasos
-Completar migración de modelos concretos (class)
-
-Implementar servicios REST separados para ElementoJerarquico y Valor
-
-Ajustar vistas en el cliente para usar la nueva jerarquía dinámica
-
-Documentar relaciones y estructura final del esquema
----
-## 📂 Rama actual
-Esta es una rama de trabajo: los cambios aún no están en producción.
-Una vez finalizada y testeada, será fusionada con main o develop.
-
-## 📅 Fecha de inicio
-Junio 2025
-
-----
-## Actualización
-Junio 2025-06-06
-
-# 🧬 Generador Automático de Controladores `.tt`
-
-Este archivo `.tt` genera automáticamente controladores para todos los modelos definidos en la carpeta `/Model`, **ignorando aquellos que ya tienen un controlador manual**.
-
-## ⚙️ ¿Cómo funciona?
-
-- Busca todos los archivos `.cs` dentro de la carpeta `Model/`.
-- Compara con los archivos existentes en la carpeta `Controllers/`.
-- Genera un archivo `.g.cs` con controladores base (`BaseController<T>`) **solo para aquellos modelos que aún no tienen controlador personalizado**.
-
-## 📁 Estructura esperada
-```mathematica
-Servidor/
-├── Controllers/
-│ ├── GenerarControladores.tt ← Este archivo
-│ ├── ProductoController.cs ← Personalizado
-│ └── ... ← Otros controladores
-├── Model/
-│ ├── Producto.cs
-│ ├── Clasificacion.cs
-│ └── ...
-|
-```
-
-
-## 📄 Ejemplo generado
-
-```csharp
-[ApiController]
-[Route("api/[controller]")]
-public class ClasificacionController : BaseController<Clasificacion> { }
-```
-
-## ✅ Requisitos
-El archivo .tt debe estar ubicado dentro de la carpeta Controllers/.
-
-Los modelos deben estar dentro de la carpeta Model/ (hermanos de Controllers/).
-
-Proyecto compilado al menos una vez para evitar errores de dependencias.
-
-## 🚫 Limitaciones
-No analiza directamente los ensamblados (.dll), trabaja solo con nombres de archivo.
-
-No recomendado para producción. Usar solo como ayuda en desarrollo para reducir boilerplate.
-
-## 🛠️ Créditos
-Plantilla generada por [ChatGPT + CryGeo], con ❤️ al código limpio y DRY.
 
 ---
 
-## 🧑‍💻 Autor
+### 🔄 Separación de valores (`Valor`)
+**Motivo:** Los valores ya no están embebidos dentro de las entidades (por ejemplo, `Identificador` o `Atributo`).  
+**Beneficio:** Reduce duplicación y tamaño de documentos, mejora consultas y velocidad de serialización.
 
-Desarrollado por un programador fullstack .NET, apasionado por las buenas prácticas, arquitectura limpia y sistemas mantenibles.
+---
+
+### ⚡ Optimización de notificaciones (SignalR)
+**Motivo:** Evitar enviar objetos completos en actualizaciones en tiempo real.  
+**Enfoque:** Enviar únicamente los identificadores y los cambios mínimos requeridos; el cliente realiza *lazy loading* cuando es necesario.
+
+---
+
+## 🌐 API y Servicios
+
+- Nuevos endpoints REST para `ElementoJerarquico` y `Valor`.  
+- Repositorios y servicios genéricos reutilizables (`RepositorioBase<T>`, `ServiceBase<T>`).  
+- Controladores desacoplados mediante inyección de dependencias.  
+- Autenticación basada en JWT con validación de roles y permisos.  
+
+---
+
+## 💻 Impacto en Cliente y Servidor
+
+### 🧩 Cliente (WPF)
+- Formularios y vistas adaptados al nuevo modelo jerárquico (`IElementoJerarquico`).  
+- Implementación de carga diferida (*lazy loading*) para valores relacionados.  
+- Actualización de controles dinámicos (`AtributesAdd`, `FormularioDinamico`) para usar las nuevas APIs.  
+- Mantiene compatibilidad con `ModelBase<T>`, `INotifyPropertyChanged` y validaciones en tiempo real.
+
+### 🛠️ Servidor (ASP.NET Core + MongoDB)
+- Nuevos modelos/colecciones (`ElementoJerarquico`, `Valor`).  
+- CRUD desacoplado y persistencia eficiente con `IMongoCollection<T>`.  
+- Notificaciones SignalR más ligeras y orientadas a eventos.  
+- Separación entre datos operativos y de configuración.
+
+---
+
+## 🔁 Migración y pasos recomendados
+
+1. Definir y documentar el nuevo esquema para:
+   - `IElementoJerarquico`
+   - `IRecepcionCarga`
+   - `Valor`
+2. Crear servicios y repositorios REST para las nuevas colecciones.  
+3. Migrar datos embebidos a colecciones separadas (`Valor`).  
+4. Actualizar las vistas del cliente para usar carga diferida.  
+5. Validar SignalR con mensajes reducidos y selectivos.  
+6. Ejecutar pruebas unitarias, de integración y de rendimiento.  
+7. Fusionar con `main` o `develop` tras validación completa.
+
+---
+
+## 🧠 Consideraciones de diseño
+
+- **Compatibilidad con MongoDB:** se aprovecha su naturaleza no relacional; las referencias son preferibles en colecciones grandes.  
+- **Rendimiento:** separar valores reduce E/S y peso de transferencia, aunque incrementa lecturas diferidas.  
+- **Consistencia:** si se requiere atomicidad, considerar operaciones compensatorias o transacciones.  
+- **Auditoría:** mantener el patrón `Clone()` para ediciones locales seguras antes de confirmar cambios.
+
+---
+
+## 🧪 Pruebas y consumo de API
+
+- Se recomienda usar **Postman** para probar autenticación y endpoints CRUD.  
+- Implementar pruebas automatizadas (unitarias e integración).  
+- Verificar rendimiento en operaciones de escritura y consultas masivas.
+
+---
+
+## 🧰 Próximos pasos
+
+- Completar migración de modelos concretos.  
+- Ajustar vistas para jerarquía dinámica.  
+- Documentar relaciones entre entidades.  
+- Implementar endpoints REST para `ElementoJerarquico` y `Valor`.  
+- Optimizar notificaciones y pruebas de carga.  
+
+---
+
+## 📂 Estado de la rama
+
+- **Tipo:** Rama de trabajo (no en producción).  
+- **Fecha de inicio:** Junio 2025.  
+- Una vez validada la migración, se fusionará con `main` o `develop`.
+
+---
+
+## 🤝 Contribuciones
+
+- Crea una rama por cada conjunto de cambios.  
+- Describe el impacto en PRs y actualiza documentación de interfaces compartidas.  
+- Mantén consistencia con las políticas de licencia del proyecto.  
+
+---
+
+## ⚠️ Breaking Changes
+
+- Se modificaron **namespaces**, **contratos** y **rutas**.  
+- Los proyectos dependientes deben actualizar referencias y bindings.  
+
+---
+
+## 📜 Licencia y notas finales
+
+Esta reestructuración prioriza la **escalabilidad**, la **limpieza de contratos** y la **eficiencia en las comunicaciones** para soportar el crecimiento del sistema.
