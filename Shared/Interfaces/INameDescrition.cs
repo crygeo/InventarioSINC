@@ -1,14 +1,8 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Shared.Interfaces.ModelsBase;
+﻿using Shared.Interfaces.ModelsBase;
 
-namespace Shared.Interfaces
+namespace Shared.Interfaces;
+
+public interface INameDescrition : INickName
 {
-    public interface INameDescrition : INickName
-    {
-        string Descripcion { get; set; }
-    }
+    string Descripcion { get; set; }
 }

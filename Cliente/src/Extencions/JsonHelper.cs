@@ -14,7 +14,6 @@ public static class JsonHelper
             var obj = JsonConvert.DeserializeObject<T>(json);
 
             if (obj == null)
-            {
                 return new ResultResponse<T>
                 {
                     Success = false,
@@ -22,7 +21,6 @@ public static class JsonHelper
                     Message = "No se pudo deserializar el objeto.",
                     Error = "El contenido fue nulo o incompatible con el tipo esperado."
                 };
-            }
 
             return new ResultResponse<T>
             {
@@ -44,7 +42,8 @@ public static class JsonHelper
         }
     }
 
-    public static async Task<IResultResponse<T>> TryDeserializeAsync<T>(HttpResponseMessage response, string successMessage = "Deserialización exitosa")
+    public static async Task<IResultResponse<T>> TryDeserializeAsync<T>(HttpResponseMessage response,
+        string successMessage = "Deserialización exitosa")
     {
         try
         {
@@ -54,22 +53,20 @@ public static class JsonHelper
             var obj = JsonConvert.DeserializeObject<T>(json);
 
             if (obj == null)
-            {
                 return new ResultResponse<T>
                 {
                     Success = false,
                     EntityGet = default!,
                     Message = "No se pudo deserializar el objeto.",
-                    Error = "El contenido fue nulo o incompatible con el tipo esperado.",
+                    Error = "El contenido fue nulo o incompatible con el tipo esperado."
                 };
-            }
 
             return new ResultResponse<T>
             {
                 Success = true,
                 EntityGet = obj,
                 Message = successMessage,
-                Error = "",
+                Error = ""
             };
         }
         catch (Exception ex)
@@ -79,12 +76,8 @@ public static class JsonHelper
                 Success = false,
                 EntityGet = default!,
                 Message = "Error al procesar la respuesta.",
-                Error = $"Excepción durante la deserialización: {ex.Message}",
-
+                Error = $"Excepción durante la deserialización: {ex.Message}"
             };
         }
     }
-
-
-
 }

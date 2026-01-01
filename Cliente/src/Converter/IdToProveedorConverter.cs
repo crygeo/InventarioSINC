@@ -1,6 +1,6 @@
-﻿using Shared.Interfaces.Model.Obj;
-using System.Globalization;
+﻿using System.Globalization;
 using System.Windows.Data;
+using Shared.Interfaces.Model.Obj;
 
 namespace Cliente.Converter;
 
@@ -10,10 +10,8 @@ public class IdToProveedorConverter : IValueConverter
 
     public object? Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        if (value is string id && ListaProveedores != null)
-        {
-            return ListaProveedores.FirstOrDefault(p => p.Id == id);
-        }
+        if (value is string id && ListaProveedores != null) return ListaProveedores.FirstOrDefault(p => p.Id == id);
+
         return null;
     }
 

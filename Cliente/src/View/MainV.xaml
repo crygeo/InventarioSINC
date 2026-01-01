@@ -7,57 +7,60 @@
         Title="MainV" Height="600" Width="800"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:viewModel="clr-namespace:Cliente.ViewModel"
-        xmlns:sv="clr-namespace:Cliente.Default"
-        xmlns:model="clr-namespace:Cliente.Obj.Model"
+        xmlns:def="clr-namespace:Cliente.Default"
         xmlns:obj="clr-namespace:Cliente.Obj"
         xmlns:model1="clr-namespace:Cliente.ViewModel.Model"
         Style="{StaticResource MaterialDesignWindow}"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
-        <viewModel:MainVM x:Key="viewModel"/>
+        <viewModel:MainVM x:Key="viewModel" />
     </Window.Resources>
 
-    <md:DialogHost Identifier="{x:Static sv:DialogDefaults.Progress}">
-        <md:DialogHost Identifier="{x:Static sv:DialogDefaults.Main}">
+    <md:DialogHost Identifier="{x:Static def:DialogDefaults.Progress}">
+        <md:DialogHost Identifier="{x:Static def:DialogDefaults.Main}">
 
             <Grid DataContext="{Binding Source={StaticResource viewModel}}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="80" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
-                <Grid Grid.Column="0" >
+                <Grid Grid.Column="0">
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="*"/>
-                        <RowDefinition Height="70"/>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="70" />
                     </Grid.RowDefinitions>
                     <Viewbox VerticalAlignment="Top"
-                         Margin="0,20"
-                         Stretch="Uniform">
+                             Margin="0,20"
+                             Stretch="Uniform">
                         <ListBox VerticalAlignment="Top"
-                         ItemsSource="{Binding ListItemsNav}"
-                         SelectedItem="{Binding SelectedItemNav, Mode=TwoWay}"
-                         SelectedIndex="0">
+                                 ItemsSource="{Binding ListItemsNav}"
+                                 SelectedItem="{Binding SelectedItemNav, Mode=TwoWay}"
+                                 SelectedIndex="0">
                             <ListBox.ItemContainerStyle>
-                                <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesign3.NavigationRailListBoxItem}">
+                                <Style TargetType="ListBoxItem"
+                                       BasedOn="{StaticResource MaterialDesign3.NavigationRailListBoxItem}">
                                     <Setter Property="md:BadgedAssist.Badge" Value="{Binding Notification}" />
                                     <Setter Property="md:NavigationRailAssist.IsTextVisible" Value="True" />
-                                    <Setter Property="md:NavigationRailAssist.SelectedIcon" Value="{Binding SelectedIcon}" />
-                                    <Setter Property="md:NavigationRailAssist.UnselectedIcon" Value="{Binding UnselectedIcon}" />
+                                    <Setter Property="md:NavigationRailAssist.SelectedIcon"
+                                            Value="{Binding SelectedIcon}" />
+                                    <Setter Property="md:NavigationRailAssist.UnselectedIcon"
+                                            Value="{Binding UnselectedIcon}" />
                                 </Style>
                             </ListBox.ItemContainerStyle>
                             <ListBox.Resources>
                                 <DataTemplate DataType="{x:Type obj:ItemNavigationM}">
-                                    <TextBlock Text="{Binding Title}"/>
+                                    <TextBlock Text="{Binding Title}" />
                                 </DataTemplate>
                             </ListBox.Resources>
                         </ListBox>
 
                     </Viewbox>
-                    <Button Grid.Row="1" Style="{StaticResource MaterialDesignIconButton}" Background="#404242" Command="{Binding AccountView}">
-                        <md:PackIcon Kind="AccountCircle" Width="30" Height="30"/>
+                    <Button Grid.Row="1" Style="{StaticResource MaterialDesignIconButton}" Background="#404242"
+                            Command="{Binding AccountView}">
+                        <md:PackIcon Kind="AccountCircle" Width="30" Height="30" />
                     </Button>
                 </Grid>
 
@@ -66,9 +69,10 @@
                 <RadioButton Style="{DynamicResource RadioButtonStyle1}" Command="{Binding ChangePageCommand}" CommandParameter="Roles" Content="Roles"/>
             </StackPanel>-->
                 <Grid Grid.Column="1">
-                    <ContentControl Content="{Binding PageSelectViewModel}" d:Content="{d:DesignInstance Type=model1:PageUsuarioVM}"/>
+                    <ContentControl Content="{Binding PageSelectViewModel}"
+                                    d:Content="{d:DesignInstance Type=model1:PageUsuarioVM}" />
                 </Grid>
-                <md:Snackbar Grid.Column="1" HorizontalAlignment="Stretch" x:Name="SnackbarThree"  />
+                <md:Snackbar Grid.Column="1" HorizontalAlignment="Stretch" x:Name="SnackbarThree" />
 
             </Grid>
         </md:DialogHost>

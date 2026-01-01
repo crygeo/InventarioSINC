@@ -1,14 +1,17 @@
 ﻿using System;
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
-using Shared.Interfaces.Model.Obj;
+using Shared.Attributes;
 using Shared.Interfaces.Model;
+using Shared.Interfaces.Model.Obj;
 
-namespace Servidor.src.Model;
+namespace Servidor.Model;
 
-
+[AutoController]
 public class Proveedor : IProveedor
 {
+    public bool VerView { get; set; } = true;
+
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; } = string.Empty;
@@ -33,7 +36,11 @@ public class Proveedor : IProveedor
 
     public bool Deleteable { get; set; } = true;
     public bool Updatable { get; set; } = true;
-    public bool VerView { get; set; } = true;
+
+    public string NombreCompleto =>
+        $"{PrimerNombre} {SegundoNombre} {PrimerApellido} {SegundoApellido}"
+            .Replace("  ", " ")
+            .Trim();
 
     public void Update(IModelObj entity)
     {

@@ -1,50 +1,29 @@
 ﻿using System.Collections;
-using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
-using Cliente.Helpers;
-using Cliente.Services;
-using Cliente.View.Dialog;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Cliente.View.Items;
 
 /// <summary>
-/// Lógica de interacción para AtributesAdd.xaml
+///     Lógica de interacción para AtributesAdd.xaml
 /// </summary>
 public partial class AtributesAdd : UserControl
 {
-    public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(AtributesAdd));
-    public static readonly DependencyProperty EditarAtributoCommandProperty = DependencyProperty.Register(nameof(EditarAtributoCommand), typeof(IAsyncRelayCommand), typeof(AtributesAdd));
-    public static readonly DependencyProperty EliminarAtributoCommandProperty = DependencyProperty.Register(nameof(EliminarAtributoCommand), typeof(IAsyncRelayCommand), typeof(AtributesAdd));
-    public static readonly DependencyProperty EditarValorCommandProperty = DependencyProperty.Register(nameof(EditarValorCommand), typeof(IAsyncRelayCommand), typeof(AtributesAdd));
-    public static readonly DependencyProperty EliminarValorCommandProperty = DependencyProperty.Register(nameof(EliminarValorCommand), typeof(IAsyncRelayCommand), typeof(AtributesAdd));
+    public static readonly DependencyProperty ItemsSourceProperty =
+        DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(AtributesAdd));
 
-    public IEnumerable ItemsSource
-    {
-        get => (IEnumerable)GetValue(ItemsSourceProperty);
-        set => SetValue(ItemsSourceProperty, value);
-    }
-    public IAsyncRelayCommand EditarAtributoCommand
-    {
-        get => (IAsyncRelayCommand)GetValue(EditarAtributoCommandProperty);
-        set => SetValue(EditarAtributoCommandProperty, value);
-    }
-    public IAsyncRelayCommand EliminarAtributoCommand
-    {
-        get => (IAsyncRelayCommand)GetValue(EliminarAtributoCommandProperty);
-        set => SetValue(EliminarAtributoCommandProperty, value);
-    }
-    public IAsyncRelayCommand EditarValorCommand
-    {
-        get => (IAsyncRelayCommand)GetValue(EditarValorCommandProperty);
-        set => SetValue(EditarValorCommandProperty, value);
-    }
-    public IAsyncRelayCommand EliminarValorCommand
-    {
-        get => (IAsyncRelayCommand)GetValue(EliminarValorCommandProperty);
-        set => SetValue(EliminarValorCommandProperty, value);
-    }
+    public static readonly DependencyProperty EditarAtributoCommandProperty =
+        DependencyProperty.Register(nameof(EditarAtributoCommand), typeof(IAsyncRelayCommand), typeof(AtributesAdd));
+
+    public static readonly DependencyProperty EliminarAtributoCommandProperty =
+        DependencyProperty.Register(nameof(EliminarAtributoCommand), typeof(IAsyncRelayCommand), typeof(AtributesAdd));
+
+    public static readonly DependencyProperty EditarValorCommandProperty =
+        DependencyProperty.Register(nameof(EditarValorCommand), typeof(IAsyncRelayCommand), typeof(AtributesAdd));
+
+    public static readonly DependencyProperty EliminarValorCommandProperty =
+        DependencyProperty.Register(nameof(EliminarValorCommand), typeof(IAsyncRelayCommand), typeof(AtributesAdd));
 
     public AtributesAdd()
     {
@@ -52,9 +31,38 @@ public partial class AtributesAdd : UserControl
         //RegistrarComandos();
     }
 
+    public IEnumerable ItemsSource
+    {
+        get => (IEnumerable)GetValue(ItemsSourceProperty);
+        set => SetValue(ItemsSourceProperty, value);
+    }
+
+    public IAsyncRelayCommand EditarAtributoCommand
+    {
+        get => (IAsyncRelayCommand)GetValue(EditarAtributoCommandProperty);
+        set => SetValue(EditarAtributoCommandProperty, value);
+    }
+
+    public IAsyncRelayCommand EliminarAtributoCommand
+    {
+        get => (IAsyncRelayCommand)GetValue(EliminarAtributoCommandProperty);
+        set => SetValue(EliminarAtributoCommandProperty, value);
+    }
+
+    public IAsyncRelayCommand EditarValorCommand
+    {
+        get => (IAsyncRelayCommand)GetValue(EditarValorCommandProperty);
+        set => SetValue(EditarValorCommandProperty, value);
+    }
+
+    public IAsyncRelayCommand EliminarValorCommand
+    {
+        get => (IAsyncRelayCommand)GetValue(EliminarValorCommandProperty);
+        set => SetValue(EliminarValorCommandProperty, value);
+    }
+
     private async void AddAtributoEntity(object sender, RoutedEventArgs e)
     {
-
         //var Dialog = new FormularioDinamico(new AtributosEntity())
         //{
         //    AceptarCommand = new AsyncRelayCommand<AtributosEntity>(AgregarAtributo),
@@ -65,6 +73,7 @@ public partial class AtributesAdd : UserControl
 
         //await DialogService.Instance.MostrarDialogo(Dialog);
     }
+
     private async void AddValueAtributo(object sender, RoutedEventArgs e)
     {
         //if (sender is not Button bt)
@@ -153,10 +162,4 @@ public partial class AtributesAdd : UserControl
 
     //    return Task.CompletedTask;
     //}
-
-
-
-
-
-
 }

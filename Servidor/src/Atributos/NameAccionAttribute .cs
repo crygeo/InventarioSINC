@@ -1,17 +1,14 @@
 ﻿using System;
 
-namespace Servidor.src.Atributos
+namespace Servidor.src.Atributos;
+
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Method)]
+public class NameAccionAttribute : Attribute
 {
-
-    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, Inherited = true, AllowMultiple = false)]
-    public class NameAccionAttribute : Attribute
+    public NameAccionAttribute(string accion)
     {
-        public string Accion { get; }
-
-        public NameAccionAttribute(string accion)
-        {
-            Accion = accion;
-        }
+        Accion = accion;
     }
 
+    public string Accion { get; }
 }

@@ -1,46 +1,44 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
+using System.Reflection;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.AspNetCore.SignalR;
-using Servidor.src.Hubs;
-using System.Reflection;
+using Servidor.Hubs;
 
-namespace Servidor.src.Extensiones
+namespace Servidor.Extensiones;
+
+public static class HubRouteExtensions
 {
-    public static class HubRouteExtensions
+    public static void MapHubByConvention<THub>(this IEndpointRouteBuilder app) where THub : Hub
     {
-        public static void MapHubByConvention<THub>(this IEndpointRouteBuilder app) where THub : Hub
+        var name = typeof(THub).Name;
+        if (name.StartsWith("Hub"))
+            name = name.Substring(3);
+        app.MapHub<THub>($"/hub{name}");
+    }
+
+    public static void MapAllGenericHubs<TInterface>(this IEndpointRouteBuilder app)
+    {
+        // Buscar todos los tipos que implementen IModelObj y no sean abstractos
+        var modelos = Assembly.GetExecutingAssembly()
+            .GetTypes()
+            .Where(t => typeof(TInterface).IsAssignableFrom(t) && t is { IsClass: true, IsAbstract: false });
+
+        foreach (var modelo in modelos)
         {
-            string name = typeof(THub).Name;
-            if (name.StartsWith("Hub"))
-                name = name.Substring(3);
-            app.MapHub<THub>($"/hub{name}");
-        }
+            var hubType = typeof(HubBase<>).MakeGenericType(modelo);
 
-        public static void MapAllGenericHubs<TInterface>(this IEndpointRouteBuilder app)
-        {
-            // Buscar todos los tipos que implementen IModelObj y no sean abstractos
-            var modelos = Assembly.GetExecutingAssembly()
-                .GetTypes()
-                .Where(t => typeof(TInterface).IsAssignableFrom(t) && t is { IsClass: true, IsAbstract: false });
+            var mapHubMethod = typeof(HubEndpointRouteBuilderExtensions)
+                .GetMethods(BindingFlags.Public | BindingFlags.Static)
+                .First(m => m.Name == "MapHub" && m.IsGenericMethod && m.GetParameters().Length == 2);
 
-            foreach (var modelo in modelos)
-            {
-                var hubType = typeof(HubBase<>).MakeGenericType(modelo);
+            var genericMap = mapHubMethod.MakeGenericMethod(hubType);
 
-                var mapHubMethod = typeof(HubEndpointRouteBuilderExtensions)
-                    .GetMethods(BindingFlags.Public | BindingFlags.Static)
-                    .First(m => m.Name == "MapHub" && m.IsGenericMethod && m.GetParameters().Length == 2);
+            var name = modelo.Name;
+            var path = $"/hub{name}";
 
-                var genericMap = mapHubMethod.MakeGenericMethod(hubType);
-
-                string name = modelo.Name;
-                var path = $"/hub{name}";
-
-                // Ejecuta: app.MapHub<HubBase<T>>("/hub{T}")
-                genericMap.Invoke(null, new object[] { app, path });
-            }
+            // Ejecuta: app.MapHub<HubBase<T>>("/hub{T}")
+            genericMap.Invoke(null, new object[] { app, path });
         }
     }
 }

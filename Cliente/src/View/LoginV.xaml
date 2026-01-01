@@ -3,31 +3,31 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-        xmlns:utils="clr-namespace:Utilidades.Controls;assembly=Utilidades"
+        xmlns:def="clr-namespace:Cliente.Default"
         xmlns:conver="clr-namespace:Utilidades.Converters;assembly=Utilidades"
         xmlns:viewModel="clr-namespace:Cliente.ViewModel"
         x:Class="Cliente.View.LoginV"
         mc:Ignorable="d"
-        Title="Login" 
-        Height="450" 
-        Width="800" 
+        Title="Login"
+        Height="450"
+        Width="800"
         d:DataContext="{d:DesignInstance Type=viewModel:LoginVM}"
         WindowStartupLocation="CenterScreen"
+
         Style="{StaticResource MaterialDesignWindow}"
-        ResizeMode="NoResize"
-        >
+        ResizeMode="NoResize">
 
     <Window.DataContext>
-        <viewModel:LoginVM/>
+        <viewModel:LoginVM />
     </Window.DataContext>
     <Window.Resources>
-        <conver:InputBoxConverter x:Key="InputBoxConverter"/>
+        <conver:InputBoxConverter x:Key="InputBoxConverter" />
     </Window.Resources>
-    <md:DialogHost Identifier="RootDialog">
+    <md:DialogHost Identifier="{x:Static def:DialogDefaults.Login}">
         <Grid>
 
             <Grid.Background>
-                <ImageBrush ImageSource="../Img/prismatic-globe-database-xnom187ixkelq5gn.jpg"/>
+                <ImageBrush ImageSource="../Img/prismatic-globe-database-xnom187ixkelq5gn.jpg" />
             </Grid.Background>
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="3*" />
@@ -36,92 +36,88 @@
 
             <!-- Logo Section -->
             <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
-                <TextBlock Text="• SINClient" 
-                       FontSize="36" 
-                       FontWeight="Bold"
-                       Style="{StaticResource MaterialDesignBodyLargeTextBlock}"
-                       VerticalAlignment="Center" />
+                <TextBlock Text="• SINClient"
+                           FontSize="36"
+                           FontWeight="Bold"
+                           Style="{StaticResource MaterialDesignBodyLargeTextBlock}"
+                           VerticalAlignment="Center" />
             </StackPanel>
 
             <!-- Form Section -->
             <md:Card Grid.Column="1" Margin="30" UniformCornerRadius="30" Background="#99323232">
 
-                <Grid  VerticalAlignment="Center"
-                   HorizontalAlignment="Center"
-                   Margin="30">
+                <Grid VerticalAlignment="Center"
+                      HorizontalAlignment="Center"
+                      Margin="30">
 
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
                     </Grid.RowDefinitions>
 
                     <StackPanel Grid.Row="0"
-                        Margin="0,10"
-                        Orientation="Horizontal">
+                                Margin="0,10"
+                                Orientation="Horizontal">
 
-                        <md:PackIcon Kind="Account" 
-                             Width="25" 
-                             Height="25"
-                             VerticalAlignment="Center"/>
+                        <md:PackIcon Kind="Account"
+                                     Width="25"
+                                     Height="25"
+                                     VerticalAlignment="Center" />
 
-                        <TextBox Text="{Binding Usuario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InputBoxConverter}, ConverterParameter='NickName'}"
-                             MinWidth="200"
-                             Margin="10,0,0,0"
-                             Grid.Row="0"
-                             Grid.Column="1"
-                             md:HintAssist.Hint="Account"
-                             Style="{StaticResource MaterialDesignOutlinedTextBox}">
-                        </TextBox>
+                        <TextBox
+                            Text="{Binding Usuario, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged, Converter={StaticResource InputBoxConverter}, ConverterParameter='NickName'}"
+                            MinWidth="200"
+                            Margin="10,0,0,0"
+                            md:HintAssist.Hint="Account"
+                            Style="{StaticResource MaterialDesignOutlinedTextBox}" />
 
                     </StackPanel>
 
                     <StackPanel Orientation="Horizontal"
-                        Margin="0,10"
-                        Grid.Row="1">
+                                Margin="0,10"
+                                Grid.Row="1">
 
-                        <md:PackIcon Kind="Key" 
-                             Width="25" 
-                             Height="25"
-                             VerticalAlignment="Center"/>
+                        <md:PackIcon Kind="Key"
+                                     Width="25"
+                                     Height="25"
+                                     VerticalAlignment="Center" />
 
                         <PasswordBox x:Name="PasswordBox"
-                                 Margin="10,0,0,0"
-                                 MinWidth="200"
-                                 md:HintAssist.Hint="Password"
-                                 md:PasswordBoxAssist.Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
-                                 md:PasswordBoxAssist.IsPasswordRevealed="False"
-                                 md:PasswordBoxAssist.IsRevealButtonTabStop="False"
-                                 md:HintAssist.HintPaddingBrush="#323232"
-                                 Style="{StaticResource MaterialDesignOutlinedRevealPasswordBox}">
-
-                        </PasswordBox>
+                                     Margin="10,0,0,0"
+                                     MinWidth="200"
+                                     md:HintAssist.Hint="Password"
+                                     md:PasswordBoxAssist.Password="{Binding Password, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                     md:PasswordBoxAssist.IsPasswordRevealed="False"
+                                     md:PasswordBoxAssist.IsRevealButtonTabStop="False"
+                                     md:HintAssist.HintPaddingBrush="#323232"
+                                     Style="{StaticResource MaterialDesignOutlinedRevealPasswordBox}" />
                     </StackPanel>
 
                     <CheckBox Grid.Row="2"
-                          Margin="0,30,0,30"
-                          x:Name="CheckRemember" 
-                          Content="Remember" 
-                          IsChecked="{Binding RememberMe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
-                          Foreground="White" 
-                          HorizontalAlignment="Center" 
-                          Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}"
-                          FocusVisualStyle="{StaticResource CustomFocusStyle}"/>
+                              Margin="0,30,0,30"
+                              x:Name="CheckRemember"
+                              Content="Remember"
+                              IsChecked="{Binding RememberMe, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                              Foreground="White"
+                              HorizontalAlignment="Center"
+                              Style="{StaticResource MaterialDesignFilterChipPrimaryOutlineCheckBox}"
+                              FocusVisualStyle="{StaticResource CustomFocusStyle}" />
 
                     <Button Grid.Row="3"
-                        Height="40"
-                        Width="150"
-                        Grid.ColumnSpan="2"
-                        Command="{Binding LoginCommand}"
-                        PreviewKeyDown="Button_PreviewKeyDown"
-                        md:ButtonAssist.CornerRadius="20"
-                        Style="{StaticResource MaterialDesignRaisedButton}"
-                        FocusVisualStyle="{StaticResource CustomFocusStyle}">
+                            Height="40"
+                            Width="150"
+                            Grid.ColumnSpan="2"
+                            Command="{Binding LoginCommand}"
+                            PreviewKeyDown="Button_PreviewKeyDown"
+                            md:ButtonAssist.CornerRadius="20"
+                            Style="{StaticResource MaterialDesignRaisedButton}"
+                            FocusVisualStyle="{StaticResource CustomFocusStyle}">
 
                         <TextBlock Text="Iniciar sesion" />
                     </Button>

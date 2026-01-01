@@ -1,21 +1,18 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using Servidor.src.Services;
-using Servidor.src.Model;
+﻿using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Servidor.Model;
+using Servidor.Services;
 
-namespace Servidor.Controllers
+namespace Servidor.Controllers;
+
+public partial class RolController : BaseController<Rol>
 {
-    [ApiController]
-    [Route("api/[controller]")]
-    public class RolController() : BaseController<Rol>()
-    {
-        private ServiceRol ServiceRol => (ServiceRol)Service;
+    private ServiceRol ServiceRol => (ServiceRol)Service;
 
-        [HttpGet("Perms")]
-        public async Task<ActionResult> GetPermss()
-        {
-            var perm = await ServiceRol.GetAllPermisos();
-            return Ok(perm);
-        }
+    [HttpGet("Perms")]
+    public async Task<ActionResult> GetPermss()
+    {
+        var perm = await ServiceRol.GetAllPermisos();
+        return Ok(perm);
     }
 }

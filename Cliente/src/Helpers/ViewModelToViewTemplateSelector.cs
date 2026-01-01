@@ -1,11 +1,9 @@
-﻿using Cliente.src.ViewModel.Model;
-using Cliente.View;
-using Cliente.View.Model;
-using Cliente.ViewModel.Model;
-using System.Diagnostics;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Cliente.View.Model;
+using Cliente.ViewModel.Model;
 using Utilidades.Mvvm;
 
 namespace Cliente.Helpers;
@@ -14,17 +12,12 @@ public class ViewModelToViewTemplateSelector : DataTemplateSelector
 {
     public override DataTemplate? SelectTemplate(object item, DependencyObject container)
     {
-            if (item is not ViewModelBase vm)
+        if (item is not ViewModelBase vm)
             return base.SelectTemplate(item, container);
 
         // SubViewModelBase con lógica de vista padre
-        if (vm is SubViewModelBase subVM)
-        {
-            return TryFindTemplate($"{subVM.ID}Template");
-
-            // Agrega más condiciones aquí si lo necesitas
-        }
-
+        if (vm is SubViewModelBase subVM) return TryFindTemplate($"{subVM.ID}Template");
+        // Agrega más condiciones aquí si lo necesitas
         // ViewModelServiceBase<T> con inferencia por tipo
         var entityType = GetEntityTypeFromViewModel(vm);
 

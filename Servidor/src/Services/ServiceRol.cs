@@ -1,53 +1,46 @@
-﻿using Servidor.src.Hubs;
-using Servidor.src.HubsService;
-using Servidor.src.Repositorios;
-using Servidor.src.Statics;
-using Shared.Interfaces;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Servidor.Services;
-using Servidor.src.Model;
+using Servidor.Model;
+using Servidor.Statics;
 
-namespace Servidor.src.Services
+namespace Servidor.Services;
+
+public class ServiceRol : ServiceBase<Rol>
 {
-    public class ServiceRol : ServiceBase<Rol>
+    public const string GENERAL_ROLE_ID = "6650c6a2b5cf184a0a8a0f3b";
+
+    public Task<List<string>> GetAllPermisos()
     {
-        public const string GENERAL_ROLE_ID = "6650c6a2b5cf184a0a8a0f3b";
+        return Task.FromResult(Permisos.List);
+    }
 
-        public Task<List<string>> GetAllPermisos()
+    private async Task ActualizarRolGeneral()
+    {
+        var roles = await Repository.GetByIdAsync(GENERAL_ROLE_ID);
+        if (roles != null)
         {
-            return Task.FromResult(Permisos.List);
+            roles.Permisos = Permisos.List;
+            await Repository.UpdateAsync(roles.Id, roles);
+            return;
         }
 
-        private async Task ActualizarRolGeneral()
+        // Crear un rol general por defecto si no existe
+
+        var rolGeneral = new Rol
         {
-            var roles = await Repository.GetByIdAsync(GENERAL_ROLE_ID);
-            if (roles != null)
-            {
-                roles.Permisos = Permisos.List;
-                await Repository.UpdateAsync(roles.Id, roles);
-                return;
-            }
+            Id = GENERAL_ROLE_ID,
+            Nombre = "General",
+            Permisos = Permisos.List,
+            IsAdmin = true,
+            Deleteable = false,
+            Updatable = false
+        };
 
-            // Crear un rol general por defecto si no existe
+        await Repository.CreateAsync(rolGeneral);
+    }
 
-            var rolGeneral = new Rol
-            {
-                Id = GENERAL_ROLE_ID,
-                Nombre = "General",
-                Permisos = Permisos.List,
-                IsAdmin = true,
-                Deleteable = false,
-                Updatable = false,
-            };
-
-            await Repository.CreateAsync(rolGeneral);
-        }
-
-        public override async Task InitServiceAsync()
-        {
-            await ActualizarRolGeneral();
-        }
-
+    public override async Task InitServiceAsync()
+    {
+        await ActualizarRolGeneral();
     }
 }

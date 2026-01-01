@@ -1,13 +1,12 @@
 ﻿using Shared.Factory;
 using Shared.Interfaces.Model;
 
-namespace Cliente.ServicesHub
+namespace Cliente.ServicesHub;
+
+public static class HubServiceFactory
 {
-    public static class HubServiceFactory
+    public static HubServiceBase<TEntity> GetHubService<TEntity>() where TEntity : class, IModelObj, new()
     {
-        public static HubServiceBase<TEntity> GetHubService<TEntity>() where TEntity : class, IModelObj, new()
-        {
-            return FactoryResolver.Resolve<HubServiceBase<TEntity>>();
-        }
+        return FactoryResolver.Resolve<HubServiceBase<TEntity>>();
     }
 }

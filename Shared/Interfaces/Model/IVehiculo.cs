@@ -1,15 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Shared.Interfaces.ModelsBase;
 
-namespace Shared.Interfaces.ModelsBase
+public interface IVehiculo
 {
-    public interface IVehiculo
-    {
-        string Placa { get; set; }
-        string Modelo { get; set; }
-        
-    }
+    string Placa { get; set; }
+    string Modelo { get; set; }
 }

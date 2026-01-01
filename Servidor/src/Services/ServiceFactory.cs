@@ -1,14 +1,12 @@
-﻿using Servidor.Services;
-using Shared.Factory;
+﻿using Shared.Factory;
 using Shared.Interfaces.Model;
 
-namespace Servidor.src.Services
+namespace Servidor.Services;
+
+public static class ServiceFactory
 {
-    public static class ServiceFactory
+    public static ServiceBase<T> GetService<T>() where T : class, IModelObj
     {
-        public static ServiceBase<T> GetService<T>() where T : class, IModelObj
-        {
-            return FactoryResolver.Resolve<ServiceBase<T>>();
-        }
+        return FactoryResolver.Resolve<ServiceBase<T>>();
     }
 }

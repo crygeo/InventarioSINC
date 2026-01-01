@@ -1,64 +1,77 @@
-﻿using Cliente.Attributes;
-using Cliente.Extencions;
-using Cliente.Helpers;
-using Cliente.Obj.Model;
-using Cliente.Services;
-using CommunityToolkit.Mvvm.Input;
-using MaterialDesignThemes.Wpf;
-using Shared.Interfaces.Model;
-using System.Reflection;
+﻿using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Media;
+using Cliente.Converter;
+using Cliente.Extencions;
+using Cliente.Helpers;
+using Cliente.Obj.Model;
+using CommunityToolkit.Mvvm.Input;
+using MaterialDesignThemes.Wpf;
+using Shared.Interfaces.Model;
+using Utilidades.Attributes;
 using Utilidades.Dialogs;
 
 namespace Cliente.View.Dialog;
 
 public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>
 {
+    public static readonly DependencyProperty TextHeaderProperty = DependencyProperty.Register(nameof(TextHeader),
+        typeof(string), typeof(FormularioDinamico<TEntity>), new PropertyMetadata(string.Empty));
 
-    public static readonly DependencyProperty TextHeaderProperty = DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(FormularioDinamico<TEntity>), new PropertyMetadata(string.Empty));
-    public static readonly DependencyProperty CancelarCommandProperty = DependencyProperty.Register(nameof(CancelarCommand), typeof(IAsyncRelayCommand<ModelBase<IModelObj>>), typeof(FormularioDinamico<TEntity>), new PropertyMetadata(null));
-    public static readonly DependencyProperty AceptarCommandProperty = DependencyProperty.Register(nameof(AceptarCommand), typeof(IAsyncRelayCommand), typeof(FormularioDinamico<TEntity>), new PropertyMetadata(null));
-    public static readonly DependencyProperty DialogNameIdentifierProperty = DependencyProperty.Register(nameof(DialogNameIdentifier), typeof(string), typeof(FormularioDinamico<TEntity>), new PropertyMetadata(null));
+    public static readonly DependencyProperty CancelarCommandProperty =
+        DependencyProperty.Register(nameof(CancelarCommand), typeof(IAsyncRelayCommand<ModelBase<IModelObj>>),
+            typeof(FormularioDinamico<TEntity>), new PropertyMetadata(null));
 
+    public static readonly DependencyProperty AceptarCommandProperty =
+        DependencyProperty.Register(nameof(AceptarCommand), typeof(IAsyncRelayCommand),
+            typeof(FormularioDinamico<TEntity>), new PropertyMetadata(null));
+
+    public static readonly DependencyProperty DialogNameIdentifierProperty =
+        DependencyProperty.Register(nameof(DialogNameIdentifier), typeof(string), typeof(FormularioDinamico<TEntity>),
+            new PropertyMetadata(null));
+
+    private readonly Dictionary<string, string> _nombreCampos;
+    public WrapPanel FormTop { get; }
+    public StackPanel FormBot { get; }
 
 
     public TEntity Entity { get; set; }
+
     public string TextHeader
     {
         get => (string)GetValue(TextHeaderProperty);
         set => SetValue(TextHeaderProperty, value);
     }
+
     public IAsyncRelayCommand<TEntity> AceptarCommand
     {
         get => (IAsyncRelayCommand<TEntity>)GetValue(AceptarCommandProperty);
         set => SetValue(AceptarCommandProperty, value);
     }
+
     public IAsyncRelayCommand CancelarCommand
     {
         get => (IAsyncRelayCommand)GetValue(CancelarCommandProperty);
         set => SetValue(CancelarCommandProperty, value);
     }
+
     public string DialogNameIdentifier
     {
         get => (string)GetValue(DialogNameIdentifierProperty);
         set => SetValue(DialogNameIdentifierProperty, value);
     }
-    public required string DialogOpenIdentifier { get; set; }
 
-    public WrapPanel FormTop { get; private set; }
-    public StackPanel FormBot { get; private set; }
-    private Dictionary<string, string> _nombreCampos;
+    public required string DialogOpenIdentifier { get; set; }
 
     public FormularioDinamico(TEntity entity, Dictionary<string, string> nombreCampos = null)
     {
-        this._nombreCampos = nombreCampos ?? new Dictionary<string, string>();
-        this.Entity = entity;
+        _nombreCampos = nombreCampos ?? new Dictionary<string, string>();
+        Entity = entity;
 
-        this.MaxWidth = 650;
-        this.MaxHeight = 700;
+        MaxWidth = 650;
+        MaxHeight = 700;
 
         // Root DialogHost
         var dialogHost = new DialogHost
@@ -86,7 +99,7 @@ public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>
         titulo.SetBinding(TextBlock.TextProperty, new Binding(nameof(TextHeader))
         {
             Source = this,
-            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
+            UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged
         });
 
         Grid.SetRow(titulo, 0);
@@ -130,7 +143,7 @@ public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>
         grid.Children.Add(botones);
 
         dialogHost.Content = grid;
-        this.Content = dialogHost;
+        Content = dialogHost;
 
         GenerarCampos();
     }
@@ -145,26 +158,37 @@ public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>
         foreach (var propiedad in propiedades)
         {
             var atributo = propiedad.GetCustomAttribute<SolicitarAttribute>();
-            string label = atributo?.Nombre ?? propiedad.Name;
+            var label = atributo?.Nombre ?? propiedad.Name;
             string? hint;
             _nombreCampos.TryGetValue(propiedad.Name, out hint);
 
             var componente = ComponetesHelp.CrearComponente(Entity, propiedad.Name, hint);
+            var attr = propiedad.GetCustomAttribute<SolicitarAttribute>();
 
+            if (!string.IsNullOrEmpty(attr?.VisibleWhen))
+            {
+                var visibilityBinding = new Binding(attr.VisibleWhen)
+                {
+                    Source = Entity,
+                    Converter = new EqualityToVisibilityConverter(),
+                    ConverterParameter = attr.VisibleWhenValue
+                };
+
+                componente.SetBinding(UIElement.VisibilityProperty, visibilityBinding);
+            }
+            
             if (componente is TextBox)
-            {
                 FormTop.Children.Add(componente);
-            }
             else
-            {
                 FormBot.Children.Add(componente);
-            }
         }
     }
+
     private async void OnClose(object sender, RoutedEventArgs e)
     {
         await CancelarCommand.TryEjecutarYCerrarDialogoAsync(this);
     }
+
     private async void OnAcepted(object sender, RoutedEventArgs e)
     {
         if (Entity == null) return;
@@ -175,9 +199,7 @@ public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>
             await AceptarCommand.TryEjecutarYCerrarDialogoAsync(this, Entity);
         else
             foreach (var error in errores)
-            {
                 DialogService.Instance.MensajeQueue.Enqueue(error);
-            }
 
         //await DialogServiceI.Instance.MostrarDialogo(string.Join("\n", errores));
     }

@@ -1,23 +1,32 @@
-﻿using Shared.Factory;
-using Shared.Interfaces.Model;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Cliente.Obj.Model;
+using Shared.Interfaces.Model;
 using Utilidades.Interfaces;
-using Utilidades.Mvvm;
 
-namespace Cliente.ViewModel.Model
+namespace Cliente.ViewModel.Model;
+
+/// <summary>
+/// Fábrica central de ViewModels.
+/// La tabla de resolución (_map) es generada automáticamente
+/// por el Source Generator.
+/// </summary>
+public static partial class ViewModelFactory
 {
-    public static class ViewModelFactory
+    /// <summary>
+    /// Obtiene una instancia del ViewModel asociado a la entidad TEntity.
+    /// </summary>
+    /// <typeparam name="TEntity">
+    /// Tipo de entidad de dominio.
+    /// </typeparam>
+    /// <exception cref="InvalidOperationException">
+    /// Se lanza si no existe un ViewModel registrado para la entidad.
+    /// </exception>
+    public static ViewModelServiceBase<TEntity> GetViewModel<TEntity>()
+        where TEntity : class, IModelObj, ISelectable, new()
     {
+        if (_map.TryGetValue(typeof(TEntity), out var factory))
+            return (ViewModelServiceBase<TEntity>)factory();
 
-        public static ViewModelServiceBase<TEntity> GetViewModel<TEntity>() where TEntity : class, IModelObj, ISelectable, new()
-        {
-            return FactoryResolver.Resolve<ViewModelServiceBase<TEntity>>();
-        }
-
+        throw new InvalidOperationException(
+            $"No hay ViewModel registrado para {typeof(TEntity).Name}");
     }
 }

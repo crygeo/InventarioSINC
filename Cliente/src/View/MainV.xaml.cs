@@ -4,7 +4,7 @@ using Utilidades.Dialogs;
 namespace Cliente.View;
 
 /// <summary>
-/// Lógica de interacción para MainV.xaml
+///     Lógica de interacción para MainV.xaml
 /// </summary>
 public partial class MainV : Window
 {

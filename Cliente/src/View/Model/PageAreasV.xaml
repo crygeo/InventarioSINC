@@ -1,0 +1,109 @@
+<UserControl x:Class="Cliente.View.Model.PageAreasV"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:viewM="clr-namespace:Cliente.ViewModel.Model"
+             xmlns:obj="clr-namespace:Cliente.Obj"
+             xmlns:convert="clr-namespace:Cliente.Converter"
+             xmlns:convertUtil="clr-namespace:Utilidades.Converters;assembly=Utilidades"
+             xmlns:ex="clr-namespace:Cliente.Extencions"
+             xmlns:bg="clr-namespace:Cliente.Attributes"
+             d:DataContext="{d:DesignInstance viewM:PageAreaVM}"
+             mc:Ignorable="d">
+    <UserControl.Resources>
+        <convertUtil:BooleanToVisibilityConverter x:Key="BooleanToVisibility" />
+        <ex:BindingProxy x:Key="Proxy" Data="{Binding }" />
+    </UserControl.Resources>
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <StackPanel Grid.Column="0">
+            <TextBlock Text="Areas" />
+            <Button Style="{StaticResource MaterialDesignOutlinedSecondaryDarkButton}"
+                    Command="{Binding CrearEntityCommand}">
+                <md:PackIcon
+                    Kind="Add" />
+            </Button>
+            <TreeView ItemsSource="{Binding TreeNode}"
+                      bg:TreeViewSelectedItemBehavior.Enable="True"
+                      bg:TreeViewSelectedItemBehavior.SelectedItem="{Binding SelectedTreeNode, Mode=TwoWay}">
+
+                <TreeView.Resources>
+
+                    <!-- ÁREA -->
+                    <HierarchicalDataTemplate DataType="{x:Type obj:AreaNode}"
+                                              ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Nombre}" />
+                    </HierarchicalDataTemplate>
+
+
+                    <!-- TURNO -->
+                    <HierarchicalDataTemplate DataType="{x:Type obj:TurnoNode}"
+                                              ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Nombre}" />
+                    </HierarchicalDataTemplate>
+
+
+                    <!-- SECCIÓN -->
+                    <HierarchicalDataTemplate DataType="{x:Type obj:SeccionNode}"
+                                              ItemsSource="{Binding Children}">
+                        <TextBlock Text="{Binding Nombre}" />
+                    </HierarchicalDataTemplate>
+
+
+                    <!-- GRUPO -->
+                    <DataTemplate DataType="{x:Type obj:GrupoNode}">
+                        <TextBlock Text="{Binding Nombre}" />
+                    </DataTemplate>
+
+                </TreeView.Resources>
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem"
+                           BasedOn="{StaticResource MaterialDesignTreeViewItem}">
+
+                        <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu>
+                                    <MenuItem Header="Agregar"
+                                              Command="{Binding AddCommand}"
+                                              IsEnabled="{Binding AddCommand}" />
+                                    <Separator />
+                                    <MenuItem Header="Editar"
+                                              Command="{Binding EditCommand}"
+                                              IsEnabled="{Binding EditCommand}" />
+
+                                    <MenuItem Header="Eliminar"
+                                              Command="{Binding DeleteCommand}"
+                                              IsEnabled="{Binding DeleteCommand}" />
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
+
+                    </Style>
+                </TreeView.ItemContainerStyle>
+
+            </TreeView>
+        </StackPanel>
+
+
+        <Grid Grid.Column="1">
+            <!--Aquí va un DataGrid de los empleados asignados a las secciones.-->
+            <DataGrid ItemsSource="{Binding Empleados}"
+                      AutoGenerateColumns="False"
+                      CanUserAddRows="False"
+                      IsReadOnly="True"
+                      x:Name="DataGridSolicitados">
+
+            </DataGrid>
+
+
+        </Grid>
+
+    </Grid>
+
+</UserControl>

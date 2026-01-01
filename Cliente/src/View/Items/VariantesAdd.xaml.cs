@@ -1,52 +1,30 @@
 ﻿using System.Collections;
-using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
-using Cliente.Helpers;
-using Cliente.Services;
-using Cliente.View.Dialog;
 using CommunityToolkit.Mvvm.Input;
 
 namespace Cliente.View.Items;
 
 /// <summary>
-/// Lógica de interacción para VariantesAdd.xaml
+///     Lógica de interacción para VariantesAdd.xaml
 /// </summary>
 public partial class VariantesAdd : UserControl
 {
-    public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(VariantesAdd));
-    public static readonly DependencyProperty ItemSelectProperty = DependencyProperty.Register(nameof(ItemSelect), typeof(object), typeof(VariantesAdd));
-    public static readonly DependencyProperty EditarVarianteCommandProperty = DependencyProperty.Register(nameof(EditarVarianteCommand), typeof(IAsyncRelayCommand), typeof(VariantesAdd));
-    public static readonly DependencyProperty EliminarVarianteCommandProperty = DependencyProperty.Register(nameof(EliminarVarianteCommand), typeof(IAsyncRelayCommand), typeof(VariantesAdd));
-    public static readonly DependencyProperty TypeItemProperty = DependencyProperty.Register(nameof(TypeItem), typeof(Type), typeof(VariantesAdd));
+    public static readonly DependencyProperty ItemsSourceProperty =
+        DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(VariantesAdd));
 
-    public required Type TypeItem
-    {
-        get => (Type)GetValue(TypeItemProperty);
-        set => SetValue(TypeItemProperty, value);
-    }
-    public IEnumerable ItemsSource
-    {
-        get => (IEnumerable)GetValue(ItemsSourceProperty);
-        set => SetValue(ItemsSourceProperty, value);
-    }
-    public object ItemSelect
-    {
-        get => GetValue(ItemSelectProperty);
-        set => SetValue(ItemSelectProperty, value);
-    }
-      
-    public IAsyncRelayCommand EditarVarianteCommand
-    {
-        get => (IAsyncRelayCommand)GetValue(EditarVarianteCommandProperty);
-        set => SetValue(EditarVarianteCommandProperty, value);
-    }
-    public IAsyncRelayCommand EliminarVarianteCommand
-    {
-        get => (IAsyncRelayCommand)GetValue(EliminarVarianteCommandProperty);
-        set => SetValue(EliminarVarianteCommandProperty, value);
-    }
-        
+    public static readonly DependencyProperty ItemSelectProperty =
+        DependencyProperty.Register(nameof(ItemSelect), typeof(object), typeof(VariantesAdd));
+
+    public static readonly DependencyProperty EditarVarianteCommandProperty =
+        DependencyProperty.Register(nameof(EditarVarianteCommand), typeof(IAsyncRelayCommand), typeof(VariantesAdd));
+
+    public static readonly DependencyProperty EliminarVarianteCommandProperty =
+        DependencyProperty.Register(nameof(EliminarVarianteCommand), typeof(IAsyncRelayCommand), typeof(VariantesAdd));
+
+    public static readonly DependencyProperty TypeItemProperty =
+        DependencyProperty.Register(nameof(TypeItem), typeof(Type), typeof(VariantesAdd));
+
 
     public VariantesAdd()
     {
@@ -54,9 +32,38 @@ public partial class VariantesAdd : UserControl
         RegistrarComandos();
     }
 
+    public required Type TypeItem
+    {
+        get => (Type)GetValue(TypeItemProperty);
+        set => SetValue(TypeItemProperty, value);
+    }
+
+    public IEnumerable ItemsSource
+    {
+        get => (IEnumerable)GetValue(ItemsSourceProperty);
+        set => SetValue(ItemsSourceProperty, value);
+    }
+
+    public object ItemSelect
+    {
+        get => GetValue(ItemSelectProperty);
+        set => SetValue(ItemSelectProperty, value);
+    }
+
+    public IAsyncRelayCommand EditarVarianteCommand
+    {
+        get => (IAsyncRelayCommand)GetValue(EditarVarianteCommandProperty);
+        set => SetValue(EditarVarianteCommandProperty, value);
+    }
+
+    public IAsyncRelayCommand EliminarVarianteCommand
+    {
+        get => (IAsyncRelayCommand)GetValue(EliminarVarianteCommandProperty);
+        set => SetValue(EliminarVarianteCommandProperty, value);
+    }
+
     private async void AddVariante(object sender, RoutedEventArgs e)
     {
-
         //var Dialog = new FormularioDinamico(new Variantes())
         //{
         //    AceptarCommand = new AsyncRelayCommand<Variantes>(AgregarVariente),
@@ -103,8 +110,4 @@ public partial class VariantesAdd : UserControl
 
     //    return Task.CompletedTask;
     //}
-       
-
-
-
 }

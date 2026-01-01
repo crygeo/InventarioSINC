@@ -1,12 +1,11 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace Shared.Interfaces
+namespace Shared.Interfaces;
+
+public interface IIdentifiable
 {
-    public interface IIdentifiable
-    {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        string Id { get; set; }
-    }
+    [BsonId]
+    [BsonRepresentation(BsonType.ObjectId)]
+    string Id { get; set; }
 }

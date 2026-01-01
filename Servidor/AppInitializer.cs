@@ -1,20 +1,14 @@
-﻿using DnsClient.Protocol;
+﻿using System.Threading.Tasks;
+using Servidor.Model;
 using Servidor.Services;
-using Servidor.src.Model;
-using Servidor.src.Services;
-using System;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
 
-namespace Servidor
+namespace Servidor;
+
+public class AppInitializer
 {
-    public class AppInitializer
+    public async Task InitAsync()
     {
-        public async Task InitAsync()
-        {
-            await ServiceFactory.GetService<Usuario>().InitServiceAsync();
-            await ServiceFactory.GetService<Usuario>().InitServiceAsync();
-        }
+        await ServiceFactory.GetService<Usuario>().InitServiceAsync();
+        await ServiceFactory.GetService<Rol>().InitServiceAsync();
     }
 }

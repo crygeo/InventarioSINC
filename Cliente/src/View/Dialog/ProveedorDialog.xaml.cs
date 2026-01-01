@@ -1,27 +1,45 @@
-﻿using Cliente.Attributes;
+﻿using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
 using Cliente.Extencions;
 using Cliente.Helpers;
 using Cliente.Obj.Model;
-using Cliente.Services;
 using CommunityToolkit.Mvvm.Input;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Data;
 using Utilidades.Dialogs;
 using BooleanToVisibilityConverter = Utilidades.Converters.BooleanToVisibilityConverter;
 
 namespace Cliente.View.Dialog;
 
-
 public partial class ProveedorDialog : UserControl, IDialog<Proveedor>
 
 {
     //Dependency properties for dialog identifiers
-    public static DependencyProperty DialogNameIdentifierProperty = DependencyProperty.Register(nameof(DialogNameIdentifier), typeof(string), typeof(ProveedorDialog), new PropertyMetadata(string.Empty));
-    public static DependencyProperty DialogOpenIdentifierProperty = DependencyProperty.Register(nameof(DialogOpenIdentifier), typeof(string), typeof(ProveedorDialog), new PropertyMetadata(string.Empty));
-    public static DependencyProperty AceptarCommandProperty = DependencyProperty.Register(nameof(AceptarCommand), typeof(IAsyncRelayCommand<Proveedor>), typeof(ProveedorDialog), new PropertyMetadata(null));
-    public static DependencyProperty EntityProperty = DependencyProperty.Register(nameof(Entity), typeof(Proveedor), typeof(ProveedorDialog), new PropertyMetadata(null));
-    public static DependencyProperty TextHeaderProperty = DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(ProveedorDialog), new PropertyMetadata(null));
+    public static DependencyProperty DialogNameIdentifierProperty = DependencyProperty.Register(
+        nameof(DialogNameIdentifier), typeof(string), typeof(ProveedorDialog), new PropertyMetadata(string.Empty));
+
+    public static DependencyProperty DialogOpenIdentifierProperty = DependencyProperty.Register(
+        nameof(DialogOpenIdentifier), typeof(string), typeof(ProveedorDialog), new PropertyMetadata(string.Empty));
+
+    public static DependencyProperty AceptarCommandProperty = DependencyProperty.Register(nameof(AceptarCommand),
+        typeof(IAsyncRelayCommand<Proveedor>), typeof(ProveedorDialog), new PropertyMetadata(null));
+
+    public static DependencyProperty CancelarCommandProperty = DependencyProperty.Register(nameof(CancelarCommand),
+        typeof(IAsyncRelayCommand), typeof(ProveedorDialog), new PropertyMetadata(null));
+
+    public static DependencyProperty EntityProperty = DependencyProperty.Register(nameof(Entity), typeof(Proveedor),
+        typeof(ProveedorDialog), new PropertyMetadata(null));
+
+    public static DependencyProperty TextHeaderProperty = DependencyProperty.Register(nameof(TextHeader),
+        typeof(string), typeof(ProveedorDialog), new PropertyMetadata(null));
+
+    public ProveedorDialog(Proveedor entity)
+    {
+        Entity = entity;
+
+        InitializeComponent();
+
+        GenerarCampos();
+    }
 
 
     public string TextHeader
@@ -53,20 +71,18 @@ public partial class ProveedorDialog : UserControl, IDialog<Proveedor>
         get => (Proveedor)GetValue(EntityProperty);
         set => SetValue(EntityProperty, value);
     }
-    public ProveedorDialog(Proveedor entity)
+
+    public IAsyncRelayCommand CancelarCommand
     {
-        this.Entity = entity;
-
-        InitializeComponent();
-
-        GenerarCampos();
+        get => (IAsyncRelayCommand)GetValue(CancelarCommandProperty);
+        set => SetValue(CancelarCommandProperty, value);
     }
 
     private void GenerarCampos()
     {
         // PanelEmpresa
         var panelEmpresa = new StackPanel();
-        panelEmpresa.SetBinding(StackPanel.VisibilityProperty, new Binding("Entity.EsEmpresa")
+        panelEmpresa.SetBinding(VisibilityProperty, new Binding("Entity.EsEmpresa")
         {
             RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(UserControl), 1),
             Converter = new BooleanToVisibilityConverter()
@@ -77,10 +93,10 @@ public partial class ProveedorDialog : UserControl, IDialog<Proveedor>
 
         // PanelPersona
         var panelPersona = new StackPanel();
-        panelPersona.SetBinding(StackPanel.VisibilityProperty, new Binding("Entity.EsEmpresa")
+        panelPersona.SetBinding(VisibilityProperty, new Binding("Entity.EsEmpresa")
         {
             RelativeSource = new RelativeSource(RelativeSourceMode.FindAncestor, typeof(UserControl), 1),
-            Converter = new  BooleanToVisibilityConverter(),
+            Converter = new BooleanToVisibilityConverter(),
             ConverterParameter = "Invert"
         });
 
@@ -113,8 +129,6 @@ public partial class ProveedorDialog : UserControl, IDialog<Proveedor>
             await AceptarCommand.TryEjecutarYCerrarDialogoAsync(this, Entity);
         else
             foreach (var error in errores)
-            {
                 DialogService.Instance.MensajeQueue.Enqueue(error);
-            }
     }
 }

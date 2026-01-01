@@ -3,23 +3,39 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using Cliente.Attributes;
+using Cliente.Converter;
 using CommunityToolkit.Mvvm.Input;
+using Utilidades.Attributes;
 
 namespace Cliente.View.Items;
 
 /// <summary>
-/// Lógica de interacción para ObjectIList.xaml
+///     Lógica de interacción para ObjectIList.xaml
 /// </summary>
 public partial class ObjectIList : UserControl
 {
-    public static readonly DependencyProperty ItemsSourceProperty = DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(ObjectIList));
-    public static readonly DependencyProperty ItemProperty = DependencyProperty.Register(nameof(Item), typeof(object), typeof(ObjectIList));
-    public static readonly DependencyProperty TypeItemProperty = DependencyProperty.Register(nameof(TypeItem), typeof(Type), typeof(ObjectIList));
+    public static readonly DependencyProperty ItemsSourceProperty =
+        DependencyProperty.Register(nameof(ItemsSource), typeof(IEnumerable), typeof(ObjectIList));
 
-    public static readonly DependencyProperty EditarItemCommandProperty = DependencyProperty.Register(nameof(EditarItemCommand), typeof(IAsyncRelayCommand), typeof(ObjectIList));
-    public static readonly DependencyProperty EliminarItemCommandProperty =DependencyProperty.Register(nameof(EliminarItemCommand), typeof(IAsyncRelayCommand), typeof(ObjectIList));
+    public static readonly DependencyProperty ItemProperty =
+        DependencyProperty.Register(nameof(Item), typeof(object), typeof(ObjectIList));
 
+    public static readonly DependencyProperty TypeItemProperty =
+        DependencyProperty.Register(nameof(TypeItem), typeof(Type), typeof(ObjectIList));
+
+    public static readonly DependencyProperty EditarItemCommandProperty =
+        DependencyProperty.Register(nameof(EditarItemCommand), typeof(IAsyncRelayCommand), typeof(ObjectIList));
+
+    public static readonly DependencyProperty EliminarItemCommandProperty =
+        DependencyProperty.Register(nameof(EliminarItemCommand), typeof(IAsyncRelayCommand), typeof(ObjectIList));
+
+    public ObjectIList()
+    {
+        InitializeComponent();
+        //DataContext = this;
+
+        Loaded += ObjectIList_Loaded;
+    }
 
 
     public IAsyncRelayCommand EditarItemCommand
@@ -27,11 +43,13 @@ public partial class ObjectIList : UserControl
         get => (IAsyncRelayCommand)GetValue(EditarItemCommandProperty);
         set => SetValue(EditarItemCommandProperty, value);
     }
+
     public IAsyncRelayCommand EliminarItemCommand
     {
         get => (IAsyncRelayCommand)GetValue(EliminarItemCommandProperty);
         set => SetValue(EliminarItemCommandProperty, value);
     }
+
     public IEnumerable ItemsSource
     {
         get => (IEnumerable)GetValue(ItemsSourceProperty);
@@ -43,19 +61,11 @@ public partial class ObjectIList : UserControl
         get => (object)GetValue(ItemProperty);
         set => SetValue(ItemProperty, value);
     }
+
     public Type TypeItem
     {
         get => (Type)GetValue(TypeItemProperty);
         set => SetValue(TypeItemProperty, value);
-    }
-
-    public ObjectIList()
-    {
-        InitializeComponent();
-        //DataContext = this;
-
-        this.Loaded += ObjectIList_Loaded;
-
     }
 
     private void ObjectIList_Loaded(object sender, RoutedEventArgs e)
@@ -68,36 +78,55 @@ public partial class ObjectIList : UserControl
         TrySetItemType();
 
         if (TypeItem == null)
-            throw new Exception($"TypeItem is null");
+            throw new Exception("TypeItem is null");
 
         var properties = TypeItem.GetProperties()
-            .Where(p => Attribute.IsDefined(p, typeof(SolicitarAttribute)));
+            .Select(p => new
+            {
+                Prop = p,
+                Vista = p.GetCustomAttribute<VistaAttribute>(),
+                Solicitar = p.GetCustomAttribute<SolicitarAttribute>()
+            })
+            .Where(x => x.Vista != null && x.Vista.Visible)
+            .OrderBy(x => x.Vista.Orden)
+            .ToList();
 
         DataGridSolicitados.Columns.Clear();
 
-        foreach (var prop in properties)
+        foreach (var item in properties)
         {
-            var attr = prop.GetCustomAttribute<SolicitarAttribute>();
-            var displayName = attr?.Nombre ?? prop.Name;
+            var prop = item.Prop;
+            var vista = item.Vista;
+            var solicitar = item.Solicitar;
 
-            var isEnumerable = typeof(System.Collections.IEnumerable).IsAssignableFrom(prop.PropertyType)
-                               && prop.PropertyType != typeof(string);
+            var displayName =
+                vista?.Nombre ??
+                solicitar?.Nombre ??
+                prop.Name;
 
-            Binding binding;
-            if (isEnumerable)
-            {
-                binding = new Binding($"{prop.Name}.Count");
-            }
+            var isEnumerable =
+                typeof(IEnumerable).IsAssignableFrom(prop.PropertyType)
+                && prop.PropertyType != typeof(string);
+
+            var binding = isEnumerable
+                ? new Binding($"{prop.Name}.Count")
+                : new Binding(prop.Name);
+
+            if (vista?.LookupType != null)
+                DataGridSolicitados.Columns.Add(new DataGridTextColumn
+                {
+                    Header = displayName,
+                    Binding = new Binding(prop.Name)
+                    {
+                        Converter = new LookupValueConverter(vista.LookupType)
+                    }
+                });
             else
-            {
-                binding = new Binding(prop.Name);
-            }
-
-            DataGridSolicitados.Columns.Add(new DataGridTextColumn
-            {
-                Header = displayName,
-                Binding = binding
-            });
+                DataGridSolicitados.Columns.Add(new DataGridTextColumn
+                {
+                    Header = displayName,
+                    Binding = binding
+                });
         }
     }
 
@@ -111,5 +140,4 @@ public partial class ObjectIList : UserControl
         if (item != null)
             TypeItem = item.GetType();
     }
-
 }

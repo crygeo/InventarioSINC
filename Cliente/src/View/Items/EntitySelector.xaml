@@ -1,0 +1,39 @@
+<UserControl x:Class="Cliente.View.Items.EntitySelector"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- 🔍 Buscador -->
+        <TextBox Grid.Row="0"
+                 Margin="0 0 0 5"
+                 Text="{Binding FiltroTexto,
+                                RelativeSource={RelativeSource AncestorType=UserControl},
+                                UpdateSourceTrigger=PropertyChanged}" />
+
+        <!-- 👤 Selector -->
+        <ComboBox Grid.Row="1"
+                  IsEditable="False"
+                  IsTextSearchEnabled="False"
+                  ItemsSource="{Binding View,
+                                RelativeSource={RelativeSource AncestorType=UserControl}}"
+                  SelectedItem="{Binding SelectedEmpleado,
+                                RelativeSource={RelativeSource AncestorType=UserControl},
+                                Mode=TwoWay}">
+            <ComboBox.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <TextBlock Text="{Binding NombreCompleto}" FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding Cedula}" FontSize="11" Foreground="Gray"/>
+                    </StackPanel>
+                </DataTemplate>
+            </ComboBox.ItemTemplate>
+        </ComboBox>
+
+    </Grid>
+</UserControl>

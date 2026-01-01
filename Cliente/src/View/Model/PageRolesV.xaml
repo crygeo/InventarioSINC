@@ -1,58 +1,56 @@
 ﻿<UserControl x:Class="Cliente.View.Model.PageRolesV"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:Convert="clr-namespace:Utilidades.Converters;assembly=Utilidades" 
+             xmlns:Convert="clr-namespace:Utilidades.Converters;assembly=Utilidades"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:items="clr-namespace:Cliente.View.Items"
-             xmlns:viewModel="clr-namespace:Cliente.ViewModel"
-             mc:Ignorable="d" 
-             d:DesignHeight="450" d:DesignWidth="800"
-             d:DataContext="{d:DesignInstance Type=viewModel:PageRolesVM}">
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
     <UserControl.Resources>
-        <Convert:NodoHierarchyConverter x:Key="ArbolConvert"/>
+        <Convert:NodoHierarchyConverter x:Key="ArbolConvert" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4*"/>
-            <ColumnDefinition Width="7*"/>
+            <ColumnDefinition Width="4*" />
+            <ColumnDefinition Width="7*" />
         </Grid.ColumnDefinitions>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="*"/>
-                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <items:RolList ItemsSource="{Binding DataContext.Entitys, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                          Item="{Binding DataContext.EntitySelect, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
-                          EditarItemCommand="{Binding DataContext.EditarEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                          EliminarItemCommand="{Binding DataContext.EliminarEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+            <items:RolList
+                ItemsSource="{Binding DataContext.Entitys, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                Item="{Binding DataContext.EntitySelect, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
+                EditarItemCommand="{Binding DataContext.EditarEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                EliminarItemCommand="{Binding DataContext.EliminarEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
             <StackPanel Grid.Row="1" Background="Transparent" Orientation="Horizontal" HorizontalAlignment="Right">
 
                 <Button Style="{StaticResource MaterialDesignFloatingActionDarkButton}"
                         Margin="0,10,10,10"
                         md:ButtonProgressAssist.IsIndicatorVisible="{Binding ProgressVisible}"
                         md:ButtonProgressAssist.Value="{Binding ProgressValue}"
-                        VerticalAlignment="Center" 
+                        VerticalAlignment="Center"
                         HorizontalAlignment="Right"
                         Command="{Binding DataContext.CargarEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         ToolTip="MaterialDesignFloatingActionDarkButton">
-                        <md:PackIcon Width="24"
-                                     Height="24"
-                                     Kind="Reload"/>
+                    <md:PackIcon Width="24"
+                                 Height="24"
+                                 Kind="Reload" />
 
                 </Button>
                 <Button Style="{StaticResource MaterialDesignFloatingActionDarkButton}"
-                    VerticalAlignment="Center"
-                    Margin="0,10,10,10"
-                    HorizontalAlignment="Right"
-                    Command="{Binding DataContext.CrearEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    ToolTip="MaterialDesignFloatingActionDarkButton"
-                    >
+                        VerticalAlignment="Center"
+                        Margin="0,10,10,10"
+                        HorizontalAlignment="Right"
+                        Command="{Binding DataContext.CrearEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        ToolTip="MaterialDesignFloatingActionDarkButton">
                     <md:PackIcon Width="30"
                                  Height="30"
-                                 Kind="AccountMultiplePlus"/>
+                                 Kind="AccountMultiplePlus" />
                 </Button>
             </StackPanel>
 
