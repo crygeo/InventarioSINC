@@ -1,16 +1,9 @@
 ﻿using Microsoft.AspNetCore.SignalR;
 using Shared.Interfaces.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace Shared.Interfaces
+namespace Shared.Interfaces;
+
+public interface IHubService<T> : IHubNotification<T> where T : IModelObj
 {
-    public interface IHubService<T> : IHubNotification<T> where T : IModelObj
-    {
-        IHubContext<Hub> HubContext { get; }
-    }
-
+    IHubContext<Hub> HubContext { get; }
 }

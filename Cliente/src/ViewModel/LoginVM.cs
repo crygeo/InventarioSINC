@@ -1,10 +1,11 @@
 ﻿using System.Windows.Input;
+using Cliente.Default;
+using Cliente.Obj.Model;
 using Cliente.Services;
+using Cliente.ServicesHub;
 using Cliente.View;
-using Cliente.View.Dialog;
 using Cliente.WindowStrategy;
 using Utilidades.Dialogs;
-using Utilidades.Interfaces;
 using Utilidades.Mvvm;
 using Utilidades.Services;
 using Utilidades.WindowStrategies;
@@ -14,29 +15,11 @@ namespace Cliente.ViewModel;
 
 public class LoginVM : ViewModelBase
 {
-    private AuthService _authService;
-    private string _usuario;
+    private readonly AuthService _authService;
+    private readonly IWindowStrategy MainWindow = new MainWS();
     private string _password;
     private bool _rememberMe;
-
-    public string Usuario
-    {
-        get => _usuario;
-        set => SetProperty(ref _usuario, value, nameof(Usuario));
-    }
-    public string Password
-    {
-        get => _password;
-        set => SetProperty(ref _password, value, nameof(Password));
-    }
-    public bool RememberMe
-    {
-        get => _rememberMe;
-        set => SetProperty(ref _rememberMe, value, nameof(RememberMe));
-    }
-
-    public ICommand LoginCommand { get; set; }
-    private readonly IWindowStrategy MainWindow = new MainWS();
+    private string _usuario;
 
     public LoginVM()
     {
@@ -49,21 +32,41 @@ public class LoginVM : ViewModelBase
         CargarDatos();
     }
 
+    public string Usuario
+    {
+        get => _usuario;
+        set => SetProperty(ref _usuario, value);
+    }
+
+    public string Password
+    {
+        get => _password;
+        set => SetProperty(ref _password, value);
+    }
+
+    public bool RememberMe
+    {
+        get => _rememberMe;
+        set => SetProperty(ref _rememberMe, value);
+    }
+
+    public ICommand LoginCommand { get; set; }
+
     private async void Login(object obj)
     {
-        IResultResponse<TokenResponse> res = await DialogService.Instance.MostrarDialogoProgreso(async () =>
+        var res = await DialogService.Instance.MostrarDialogoProgreso(async () =>
         {
             var result = await _authService.LoginAsync(Usuario, Password);
-            await DialogService.Instance.ValidarRespuesta(result, "RootDialog");
+            await DialogService.Instance.ValidarRespuesta(result, DialogDefaults.Login);
             return result;
-        }, "RootDialog");
+        }, DialogDefaults.Login);
 
         if (res.Success)
         {
             if (RememberMe)
-                await AuthService.GuardarCredenciales(Usuario, Password, RememberMe);
+                await GuardarCredenciales(Usuario, Password, RememberMe);
             else
-                await AuthService.BorrarCredenciales();
+                await BorrarCredenciales();
             await MostDialog(res.Message);
         }
     }
@@ -80,13 +83,20 @@ public class LoginVM : ViewModelBase
 
         await DialogService.Instance.MostrarDialogo(successDialog);
 
+        // 🔥 Inicializar TODOS los Hubs ANTES de abrir la ventana principal
+        await HubInitializer.InitializeAsync();
+
+        // 🔥 Ahora sí abrir la ventana principal
         MainWindow.OpenWindow();
+
+        // Cerrar login
         NavigationService.CloseWindow<LoginV>();
     }
 
+
     private async void CargarDatos()
     {
-        var dat = await AuthService.CargarCredenciales();
+        var dat = await CargarCredenciales();
         if (dat.Item3)
         {
             Usuario = dat.Item1;
@@ -94,7 +104,7 @@ public class LoginVM : ViewModelBase
             RememberMe = dat.Item3;
         }
     }
-
+    
     protected override void UpdateChanged()
     {
     }

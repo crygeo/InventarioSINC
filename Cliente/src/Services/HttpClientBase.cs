@@ -24,7 +24,6 @@ public abstract class HttpClientBase
     {
         try
         {
-
             if (!string.IsNullOrEmpty(Token))
                 return Token;
 
@@ -36,16 +35,17 @@ public abstract class HttpClientBase
                 Token = await reader.ReadToEndAsync();
             }
         }
-        catch { }
+        catch
+        {
+        }
 
         return Token;
-
     }
+
     public static async Task<bool> SetToken(string token)
     {
         try
         {
-
             using var storage = IsolatedStorageFile.GetUserStoreForApplication();
             // Abrir el archivo de forma asíncrona
             using var stream = new IsolatedStorageFileStream("auth_token.txt", FileMode.Create, storage);
@@ -55,15 +55,17 @@ public abstract class HttpClientBase
             await writer.WriteAsync(token);
             return true;
         }
-        catch { return false; }
+        catch
+        {
+            return false;
+        }
     }
+
     public static void DeleteToken()
     {
         using var storage = IsolatedStorageFile.GetUserStoreForApplication();
-        if (storage.FileExists("auth_token.txt"))
-        {
-            storage.DeleteFile("auth_token.txt");
-        }
+        if (storage.FileExists("auth_token.txt")) storage.DeleteFile("auth_token.txt");
+
         Token = string.Empty;
     }
 
@@ -77,10 +79,10 @@ public abstract class HttpClientBase
         return reques;
     }
 
-    protected async Task<HttpRequesMessage<T>> GetRequest<T>(string Uri)
+    protected async Task<HttpRequesMessage<T>> GetRequest<T>(string uri)
     {
         var reques = await GetRequest<T>();
-        reques.RequestUri = new Uri(Uri);
+        reques.RequestUri = new Uri(uri);
         return reques;
     }
 
@@ -100,8 +102,10 @@ public abstract class HttpClientBase
         return reques;
     }
 
-    protected async Task<IResultResponse<T>> HandleResponseAsync<T, TE>(HttpRequesMessage<TE> request, string successMessage, bool isVoid = false)
+    protected async Task<IResultResponse<T>> HandleResponseAsync<T, TE>(HttpRequesMessage<TE> request,
+        string successMessage, bool isVoid = false)
     {
+        
         var client = GetClient();
         var response = await client.SendAsync(request /*.ConfigureAwait(false) */);
         if (!response.IsSuccessStatusCode)
@@ -112,7 +116,7 @@ public abstract class HttpClientBase
             result = ResultSuccess<T>(default!, successMessage);
         else
             result = await JsonHelper.TryDeserializeAsync<T>(response, successMessage);
-            
+
         result.Method = request.Method;
         result.ObjInteration = typeof(TE);
         return result;
@@ -120,16 +124,13 @@ public abstract class HttpClientBase
 
     protected async Task<ResultResponse<T>> HandleError<T>(HttpResponseMessage response)
     {
-        string content = await response.Content.ReadAsStringAsync();
+        var content = await response.Content.ReadAsStringAsync();
 
         try
         {
             // 1. Intentar deserializar a tu ErrorResponse personalizado
             var error = JsonConvert.DeserializeObject<ErrorResponse>(content);
-            if (!string.IsNullOrWhiteSpace(error?.Message))
-            {
-                return ResultError<T>(error.Message, error.Error);
-            }
+            if (!string.IsNullOrWhiteSpace(error?.Message)) return ResultError<T>(error.Message, error.Error);
 
             // 2. Intentar deserializar como error de validación de ASP.NET Core
             var validationError = JsonConvert.DeserializeObject<ValidationProblemDetails>(content);
@@ -152,25 +153,30 @@ public abstract class HttpClientBase
     }
 
 
-    protected ResultResponse<T> ResultSuccess<T>(T entity, string message) =>
-        new() { Success = true, EntityGet = entity, Message = message};
+    protected ResultResponse<T> ResultSuccess<T>(T entity, string message)
+    {
+        return new ResultResponse<T> { Success = true, EntityGet = entity, Message = message };
+    }
 
-    protected ResultResponse<T> ResultError<T>(string message, string error = "") =>
-        new() { Success = false, EntityGet = default!, Message = message, Error = error };
+    protected ResultResponse<T> ResultError<T>(string message, string error = "")
+    {
+        return new ResultResponse<T> { Success = false, EntityGet = default!, Message = message, Error = error };
+    }
 }
-
 
 public class TokenException : Exception
 {
-    public TokenExceptions Exception { get; set; }
     public TokenException(TokenExceptions tokenExceptions)
     {
         Exception = tokenExceptions;
     }
+
+    public TokenExceptions Exception { get; set; }
 }
+
 public enum TokenExceptions
 {
-    IsNull,
+    IsNull
 }
 
 public class ValidationProblemDetails

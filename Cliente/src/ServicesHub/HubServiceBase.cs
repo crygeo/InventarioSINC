@@ -1,71 +1,71 @@
-﻿using System.Collections.ObjectModel;
-using System.Windows;
-using Cliente.Services;
+﻿using Cliente.Services;
 using Microsoft.AspNetCore.SignalR.Client;
 using Shared.Interfaces.Model;
+using Utilidades.Interfaces;
 
 namespace Cliente.ServicesHub;
 
-public class HubServiceBase<TEntity> : Utilidades.Interfaces.IHubService<TEntity> where TEntity : IModelObj
+public class HubServiceBase<TEntity> : IHubService<TEntity>
+    where TEntity : IModelObj
 {
-    protected readonly HubConnection _hubConnection;
+    private readonly HubConnection _hubConnection;
     private readonly string _hubUrl;
-    public virtual ObservableCollection<TEntity> Collection { get; } = []; 
+    private readonly List<IDisposable> _subscriptions = new();
+
+
+    //Events
+    public event Action<TEntity>? OnCreated;
+    public event Action<TEntity>? OnUpdated;
+    public event Action<string>? OnDeleted;
+
+    
 
     public HubServiceBase()
     {
         _hubUrl = $"{Config.Url}/hub{typeof(TEntity).Name}";
 
         _hubConnection = new HubConnectionBuilder()
-            .WithUrl(_hubUrl) // URL del Hub en el servidor
-            .WithAutomaticReconnect() // Permite la reconexión automática
+            .WithUrl(_hubUrl)
+            .WithAutomaticReconnect()
             .Build();
 
-        SubscribeToEvent<TEntity>($"New{typeof(TEntity).Name}", (entity) =>
-        {
-            Application.Current.Dispatcher.Invoke(() => Collection.Add(entity));
-        });
-
-        SubscribeToEvent<TEntity>($"Update{typeof(TEntity).Name}", (entity) =>
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                var existingUser = Collection.FirstOrDefault(u => u.Id == entity.Id);
-                if (existingUser != null)
-                {
-                    existingUser.Update(entity);
-                }
-            });
-        });
-
-        SubscribeToEvent<TEntity>($"Delete{typeof(TEntity).Name}", (entity) =>
-        {
-            Application.Current.Dispatcher.Invoke(() =>
-            {
-                var usuario = Collection.FirstOrDefault(u => u.Id == entity.Id);
-                if (usuario != null)
-                {
-                    Collection.Remove(usuario); // Eliminar usuario de la lista
-                }
-            });
-        });
+        SubscribeEvents();
     }
 
-    /// <summary>
-    /// Método para suscribirse a eventos de SignalR de forma flexible
-    /// </summary>
-    protected void SubscribeToEvent<U>(string methodName, Action<U> action)
+    #region SignalR Subscriptions
+
+    private void SubscribeEvents()
     {
-        _hubConnection.On(methodName, action);
-    }
+        // ➕ NEW
+        SubscribeToEvent<TEntity>($"New{typeof(TEntity).Name}", entity =>
+        {
+            OnCreated?.Invoke(entity);
+        });
 
-    /// <summary>
-    /// Inicia la conexión con el servidor SignalR.
-    /// </summary>
+        // 🔄 UPDATE
+        SubscribeToEvent<TEntity>($"Update{typeof(TEntity).Name}", entity =>
+        {
+            OnUpdated?.Invoke(entity);
+        });
+
+        // ❌ DELETE
+        SubscribeToEvent<TEntity>($"Delete{typeof(TEntity).Name}", entity =>
+        {
+            OnDeleted?.Invoke(entity.Id);
+        });
+        }
+
+    #endregion
+
+    #region Connection control
+
     public async Task StartConnectionAsync()
     {
         try
         {
+            if (_hubConnection.State == HubConnectionState.Connected)
+                return;
+
             await _hubConnection.StartAsync();
             Console.WriteLine($"Conectado a {_hubUrl}");
         }
@@ -75,11 +75,29 @@ public class HubServiceBase<TEntity> : Utilidades.Interfaces.IHubService<TEntity
         }
     }
 
-    /// <summary>
-    /// Detiene la conexión con el servidor SignalR.
-    /// </summary>
     public async Task StopConnectionAsync()
     {
-        await _hubConnection.StopAsync();
+        foreach (var sub in _subscriptions)
+            sub.Dispose();
+
+        _subscriptions.Clear();
+
+        if (_hubConnection.State != HubConnectionState.Disconnected)
+            await _hubConnection.StopAsync();
     }
+
+
+
+    #endregion
+
+    #region Helpers
+
+    protected void SubscribeToEvent<T>(string methodName, Action<T> action)
+    {
+        var subscription = _hubConnection.On(methodName, action);
+        _subscriptions.Add(subscription);
+    }
+
+
+    #endregion
 }

@@ -1,42 +1,57 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-	<PropertyGroup>
-		<OutputType>Exe</OutputType>
-		<TargetFramework>net9.0-windows</TargetFramework>
-		<Nullable>enable</Nullable>
-		<ImplicitUsings>enable</ImplicitUsings>
-		<UseWPF>true</UseWPF>
-	</PropertyGroup>
+    <PropertyGroup>
+        <OutputType>WinExe</OutputType>
+        <TargetFramework>net9.0-windows</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <UseWPF>true</UseWPF>
+        <LangVersion>14</LangVersion>
+    </PropertyGroup>
 
-	<ItemGroup>
-	  <None Remove="src\Img\loading-process.png" />
-	  <None Remove="src\Img\prismatic-globe-database-xnom187ixkelq5gn.jpg" />
-	</ItemGroup>
+    <ItemGroup>
+        <None Remove="src\Img\loading-process.png"/>
+        <None Remove="src\Img\prismatic-globe-database-xnom187ixkelq5gn.jpg"/>
+    </ItemGroup>
 
-	<ItemGroup>
-		<PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-		<PackageReference Include="MaterialDesignColors" Version="5.2.2-ci991" />
-		<PackageReference Include="MaterialDesignThemes" Version="5.2.2-ci991" />
-		<PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.2" />
-		<PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="9.0.5" />
-		<PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
-	</ItemGroup>
-	<ItemGroup>
-		<ProjectReference Include="..\..\Utilidades\Utilidades.csproj" />
-		<ProjectReference Include="..\Shared\Shared.csproj" />
-	</ItemGroup>
-	<ItemGroup>
-	  <Resource Include="src\Img\loading-process.png">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Resource>
-	  <Resource Include="src\Img\prismatic-globe-database-xnom187ixkelq5gn.jpg">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </Resource>
-	</ItemGroup>
-	<ItemGroup>
-	  <None Update="App.config">
-	    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-	  </None>
-	</ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3"/>
+        <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0"/>
+        <PackageReference Include="MaterialDesignColors" Version="5.2.2-ci991"/>
+        <PackageReference Include="MaterialDesignThemes" Version="5.2.2-ci991"/>
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.0.2"/>
+        <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.NewtonsoftJson" Version="9.0.5"/>
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3"/>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\..\Utilidades\Utilidades.csproj"/>
+        <ProjectReference Include="..\Shared\Shared.csproj"/>
+        <ProjectReference
+                Include="..\CodeGen.SourceGenerators\CodeGen.SourceGenerators.csproj"
+                OutputItemType="Analyzer"
+                ReferenceOutputAssembly="false"/>
+    </ItemGroup>
+    <ItemGroup>
+        <Resource Include="src\Img\loading-process.png">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Resource>
+        <Resource Include="src\Img\prismatic-globe-database-xnom187ixkelq5gn.jpg">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </Resource>
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="App.config">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+    <ItemGroup>
+        <Page Update="src\View\PageGestionEmployerV.xaml">
+            <Generator>MSBuild:Compile</Generator>
+            <XamlRuntime>Wpf</XamlRuntime>
+            <SubType>Designer</SubType>
+        </Page>
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="src\Converter\Model\" />
+    </ItemGroup>
 </Project>

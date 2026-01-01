@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="Cliente.View.PageGestionEmployerV"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <UserControl.Resources>
+    </UserControl.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0"
+              Background="{DynamicResource MaterialDesignCardBackground}">
+            <ListBox
+                ItemsSource="{Binding ListItemsNav}"
+                SelectedItem="{Binding SelectedItemNav}"
+                Style="{StaticResource MaterialDesign3.NavigationBarListBox}"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                ScrollViewer.CanContentScroll="False">
+
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <StackPanel Orientation="Horizontal" />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesign3.NavigationBarListBoxItem}">
+                        <Setter Property="md:NavigationBarAssist.IsTextVisible" Value="True" />
+                        <Setter Property="md:NavigationBarAssist.SelectedIcon" Value="{Binding SelectedIcon}" />
+                        <Setter Property="md:NavigationBarAssist.UnselectedIcon" Value="{Binding UnselectedIcon}" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+            </ListBox>
+
+
+        </Grid>
+        <Border Grid.Row="1" Margin="10" CornerRadius="10">
+            <Grid>
+                <ContentControl Content="{Binding PageSelectViewModel}"
+                                ContentTemplateSelector="{StaticResource ViewModelTemplateSelector}" />
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

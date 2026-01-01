@@ -1,64 +1,58 @@
-﻿using Cliente.Obj.Model;
-using Cliente.View.Items;
-using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.Globalization;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Data;
+using Cliente.Obj.Model;
+using Cliente.View.Items;
 
-namespace Cliente.Converter
+namespace Cliente.Converter;
+
+public class IdToSelectorJerarquicoConverter : IMultiValueConverter
 {
-    public class IdToSelectorJerarquicoConverter : IMultiValueConverter
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+        var ids = values[0] as ObservableCollection<string>;
+        var identificadores = values[1] as ObservableCollection<Identificador>;
+        var elementos = values[2] as ObservableCollection<ElementoJerarquico>;
+        var result = values[3] as ObservableCollection<SelectorJerarquico>;
+
+        if (identificadores == null || elementos == null)
+            return null;
+
+        if (result == null)
+            result = new ObservableCollection<SelectorJerarquico>();
+
+
+        foreach (var identificador in identificadores)
         {
-            var ids = values[0] as ObservableCollection<string>;
-            var identificadores = values[1] as ObservableCollection<Identificador>;
-            var elementos = values[2] as ObservableCollection<ElementoJerarquico>;
-            var result = values[3] as ObservableCollection<SelectorJerarquico>;
+            var valores = elementos
+                .Where(e => e.IdPerteneciente == identificador.Id)
+                .OrderByDescending(e => e.FechaCreacion)
+                .ToList();
 
-            if (identificadores == null || elementos == null)
-                return null;
+            var selector = new SelectorJerarquico(identificador, valores);
 
-            if(result == null)
-                result = new ObservableCollection<SelectorJerarquico>();
+            // solo preselecciona si hay valores
+            if (ids != null)
+                selector.Seleccionado = valores.FirstOrDefault(e => ids.Contains(e.Id));
 
-
-            foreach (var identificador in identificadores)
-            {
-                var valores = elementos
-                    .Where(e => e.IdPerteneciente == identificador.Id)
-                    .OrderByDescending(e => e.FechaCreacion)
-                    .ToList();
-
-                var selector = new SelectorJerarquico(identificador, valores);
-
-                // solo preselecciona si hay valores
-                if (ids != null)
-                    selector.Seleccionado = valores.FirstOrDefault(e => ids.Contains(e.Id));
-
-                result.Add(selector);
-            }
-                
-            return result;
+            result.Add(selector);
         }
 
-        public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
-        {
-            var selectores = value as ObservableCollection<SelectorJerarquico>;
-            if (selectores == null)
-                return new object[] { null };
+        return result;
+    }
 
-            var ids = new ObservableCollection<string>(
-                selectores
-                    .Where(s => s.Seleccionado != null)
-                    .Select(s => s.Seleccionado!.Id)
-            );
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        var selectores = value as ObservableCollection<SelectorJerarquico>;
+        if (selectores == null)
+            return new object[] { null };
 
-            return new object[] { ids };
-        }
+        var ids = new ObservableCollection<string>(
+            selectores
+                .Where(s => s.Seleccionado != null)
+                .Select(s => s.Seleccionado!.Id)
+        );
+
+        return new object[] { ids };
     }
 }

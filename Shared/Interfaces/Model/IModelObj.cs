@@ -1,12 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Shared.Interfaces.Model;
 
-namespace Shared.Interfaces.Model
+public interface IModelObj : IIdentifiable, IDeleteable, IUpdatable
 {
-    public interface IModelObj : IIdentifiable, IDeleteable, IUpdatable
-    {
-    }
 }

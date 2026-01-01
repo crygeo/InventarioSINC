@@ -6,15 +6,28 @@ using Cliente.Obj.Model;
 namespace Cliente.View.Items;
 
 /// <summary>
-/// Lógica de interacción para ItemItemB.xaml
+///     Lógica de interacción para ItemItemB.xaml
 /// </summary>
 public partial class RoltemB : UserControl
 {
     // Propiedad de Dependencia para el Entity
-    public static readonly DependencyProperty ItemProperty = DependencyProperty.Register(nameof(Item), typeof(Rol), typeof(RoltemB));
-    public static readonly DependencyProperty IsSelectProperty = DependencyProperty.Register(nameof(IsSelect), typeof(bool), typeof(RoltemB), new PropertyMetadata(false));
-    public static readonly DependencyProperty EditarItemCommandProperty = DependencyProperty.Register(nameof(EditarItemCommand), typeof(ICommand), typeof(RoltemB));
-    public static readonly DependencyProperty EliminarItemCommandProperty = DependencyProperty.Register(nameof(EliminarItemCommand), typeof(ICommand), typeof(RoltemB));
+    public static readonly DependencyProperty ItemProperty =
+        DependencyProperty.Register(nameof(Item), typeof(Rol), typeof(RoltemB));
+
+    public static readonly DependencyProperty IsSelectProperty =
+        DependencyProperty.Register(nameof(IsSelect), typeof(bool), typeof(RoltemB), new PropertyMetadata(false));
+
+    public static readonly DependencyProperty EditarItemCommandProperty =
+        DependencyProperty.Register(nameof(EditarItemCommand), typeof(ICommand), typeof(RoltemB));
+
+    public static readonly DependencyProperty EliminarItemCommandProperty =
+        DependencyProperty.Register(nameof(EliminarItemCommand), typeof(ICommand), typeof(RoltemB));
+
+    public RoltemB()
+    {
+        InitializeComponent();
+    }
+
     public Rol Item
     {
         get => (Rol)GetValue(ItemProperty);
@@ -39,15 +52,10 @@ public partial class RoltemB : UserControl
         get => (ICommand)GetValue(EditarItemCommandProperty);
         set => SetValue(EditarItemCommandProperty, value);
     }
+
     public ICommand EliminarItemCommand
     {
         get => (ICommand)GetValue(EliminarItemCommandProperty);
         set => SetValue(EliminarItemCommandProperty, value);
-    }
-
-    public RoltemB()
-    {
-        InitializeComponent();
-
     }
 }

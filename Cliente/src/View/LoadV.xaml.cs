@@ -6,7 +6,7 @@ using Cliente.ViewModel;
 namespace Cliente.View;
 
 /// <summary>
-/// Lógica de interacción para LoadView.xaml
+///     Lógica de interacción para LoadView.xaml
 /// </summary>
 public partial class LoadV : Window
 {
@@ -16,17 +16,14 @@ public partial class LoadV : Window
         Loaded += (s, e) =>
         {
             LoadV_Loaded();
-            if (DataContext is LoadVM vm)
-            {
-                vm.StartCommand.Execute(null);
-            }
+            if (DataContext is LoadVM vm) vm.StartCommand.Execute(null);
         };
-
     }
+
     private void LoadV_Loaded()
     {
         // Crear la animación de rotación
-        DoubleAnimation rotationAnimation = new DoubleAnimation
+        var rotationAnimation = new DoubleAnimation
         {
             From = 0,
             To = 360,
@@ -35,9 +32,8 @@ public partial class LoadV : Window
         };
 
         // Aplicar la animación a la transformación de la imagen
-        RotateTransform rotateTransform = new RotateTransform();
+        var rotateTransform = new RotateTransform();
         ImageRotateTransform.Angle = 0;
         ImageRotateTransform.BeginAnimation(RotateTransform.AngleProperty, rotationAnimation);
     }
-
 }

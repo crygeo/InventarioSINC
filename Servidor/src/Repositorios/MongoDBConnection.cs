@@ -1,21 +1,20 @@
 ﻿using MongoDB.Driver;
 
-namespace Servidor.src.Repositorios
+namespace Servidor.Repositorios;
+
+public class MongoDBConnection
 {
-    public class MongoDBConnection
+    public static IMongoDatabase? _database;
+
+    public MongoDBConnection()
     {
-        public static IMongoDatabase? _database;
-
-        public MongoDBConnection()
+        if (_database == null)
         {
-            if (_database == null)
-            {
-                string connectionString = "mongodb://localhost:27017"; // Cambia esto a tu cadena de conexión
-                string databaseName = "inventasinc";
+            var connectionString = "mongodb://localhost:27017"; // Cambia esto a tu cadena de conexión
+            var databaseName = "inventasinc";
 
-                var client = new MongoClient(connectionString);
-                _database = client.GetDatabase(databaseName);
-            }
+            var client = new MongoClient(connectionString);
+            _database = client.GetDatabase(databaseName);
         }
     }
 }

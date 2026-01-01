@@ -5,23 +5,29 @@
                     xmlns:model="clr-namespace:Cliente.View.Model"
                     xmlns:subPage="clr-namespace:Cliente.src.View.Model.SubPage"
                     xmlns:mvvm="clr-namespace:Utilidades.Mvvm;assembly=Utilidades">
-    
-    
-    
+
+
     <DataTemplate DataType="{x:Type vm:PageProcesosVM}">
-        <view:PageProcesosV/>
+        <view:PageProcesosV />
+    </DataTemplate>
+
+    <DataTemplate DataType="{x:Type vm:PageGestionEmployerVM}">
+        <view:PageGestionEmployerV />
     </DataTemplate>
 
     <DataTemplate x:Key="ViewTemplate_Rol">
-        <model:PageRolesV/>
+        <model:PageRolesV />
     </DataTemplate>
 
     <DataTemplate x:Key="ViewTemplate_Usuario">
-        <model:PageUsuariosV/>
+        <model:PageUsuariosV />
     </DataTemplate>
 
     <DataTemplate x:Key="ViewTemplate_ElementoJerarquico">
-        <model:PageValoresV/>
+        <model:PageValoresV />
+    </DataTemplate>
+    <DataTemplate x:Key="ViewTemplate_Area">
+        <model:PageAreasV />
     </DataTemplate>
 
     <DataTemplate x:Key="IdentificadoresTemplate" DataType="{x:Type mvvm:SubViewModelBase}">

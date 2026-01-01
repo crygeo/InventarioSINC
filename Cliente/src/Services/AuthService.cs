@@ -17,11 +17,12 @@ public class AuthService : HttpClientBase
         var loginData = new { User = username, Password = password };
 
         var reques = await GetRequest<AuthService>(HttpMethod.Post, $"{BaseUrl}/login", loginData);
-        var resut = await HandleResponseAsync<TokenResponse, AuthService>(reques, "Seccion Iniciado Exitosamente.", false);
+        var resut = await HandleResponseAsync<TokenResponse, AuthService>(reques, "Seccion Iniciado Exitosamente.");
         if (resut.Success && !string.IsNullOrEmpty(resut.EntityGet.Token))
             await SetToken(resut.EntityGet.Token);
         return resut;
     }
+
     public async Task<TimeSpan> VerificarLogin()
     {
         try
@@ -34,8 +35,9 @@ public class AuthService : HttpClientBase
             if (!response.IsSuccessStatusCode)
                 return TimeSpan.Zero; // Token inválido o sesión expirada
 
-            string jsonResponse = await response.Content.ReadAsStringAsync();
-            var tokenData = JsonConvert.DeserializeObject<TokenValidationResponse>(jsonResponse) ?? new TokenValidationResponse();
+            var jsonResponse = await response.Content.ReadAsStringAsync();
+            var tokenData = JsonConvert.DeserializeObject<TokenValidationResponse>(jsonResponse) ??
+                            new TokenValidationResponse();
 
             if (tokenData.TimeRemaining <= 0)
                 return TimeSpan.Zero; // Expirado
@@ -45,10 +47,10 @@ public class AuthService : HttpClientBase
         }
         catch (TokenException)
         {
-            return TimeSpan.Zero;  // No hay sesión activa
+            return TimeSpan.Zero; // No hay sesión activa
         }
-
     }
+
     public async Task<bool> VerificarServidorAsync()
     {
         try
@@ -85,6 +87,7 @@ public class AuthService : HttpClientBase
         await writer.WriteLineAsync(password);
         await writer.WriteLineAsync(remember.ToString());
     }
+
     public static async Task BorrarCredenciales()
     {
         await Task.Run(() =>
@@ -94,6 +97,7 @@ public class AuthService : HttpClientBase
                 storage.DeleteFile("credentials.txt");
         });
     }
+
     public static async Task<(string, string, bool)> CargarCredenciales()
     {
         using (var storage = IsolatedStorageFile.GetUserStoreForApplication())
@@ -103,12 +107,12 @@ public class AuthService : HttpClientBase
                 using var stream = new IsolatedStorageFileStream("credentials.txt", FileMode.Open, storage);
                 using var reader = new StreamReader(stream);
 
-                string username = await reader.ReadLineAsync() ?? string.Empty;
-                string password = await reader.ReadLineAsync() ?? string.Empty;
-                string rememberString = await reader.ReadLineAsync() ?? string.Empty;
+                var username = await reader.ReadLineAsync() ?? string.Empty;
+                var password = await reader.ReadLineAsync() ?? string.Empty;
+                var rememberString = await reader.ReadLineAsync() ?? string.Empty;
 
                 // Convertir el valor "remember" a bool, si no es válido asignamos "false"
-                bool remember = bool.TryParse(rememberString, out bool result) && result;
+                var remember = bool.TryParse(rememberString, out var result) && result;
 
                 return (username, password, remember);
             }
@@ -121,6 +125,4 @@ public class AuthService : HttpClientBase
     {
         public string Token { get; set; } = string.Empty;
     }
-
-
 }

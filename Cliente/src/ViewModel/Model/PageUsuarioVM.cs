@@ -1,28 +1,26 @@
 ﻿using System.Windows;
+using Cliente.Default;
 using Cliente.Obj.Model;
-using Cliente.Services;
 using Cliente.Services.Model;
-using Cliente.ViewModel.Model;
 using Cliente.View.Dialog;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Extensions;
 using Utilidades.Dialogs;
-using Cliente.Default;
 
 namespace Cliente.ViewModel.Model;
 
-public class PageUsuarioVM : ViewModelServiceBase<Usuario>
+public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
 {
-    public IAsyncRelayCommand CambiarPasswordCommand { get; }
-    public IAsyncRelayCommand<Rol> AsignarRolCommand { get; }
-
-    public ServiceUsuario ServicioServiceUsuario => (ServiceUsuario)ServiceFactory.GetService<Usuario>();
-
     public PageUsuarioVM()
     {
         CambiarPasswordCommand = new AsyncRelayCommand(CambiarPasswordAsync);
         AsignarRolCommand = new AsyncRelayCommand<Rol>(AsignarRolAsync);
     }
+
+    public IAsyncRelayCommand CambiarPasswordCommand { get; }
+    public IAsyncRelayCommand<Rol> AsignarRolCommand { get; }
+
+    public ServiceUsuario ServicioServiceUsuario => (ServiceUsuario)ServiceFactory.GetService<Usuario>();
 
     private async Task CambiarPasswordAsync()
     {
@@ -33,26 +31,28 @@ public class PageUsuarioVM : ViewModelServiceBase<Usuario>
         {
             AceptarCommand = new AsyncRelayCommand<object?>(ConfirmarCambioPasswordAsync),
             OldPasswordRequired = Visibility.Collapsed,
-            DialogOpenIdentifier = DialogDefaults.Main,
+            DialogOpenIdentifier = DialogDefaults.Main
         };
 
         await DialogServiceI.MostrarDialogo(dialog);
     }
+
     private async Task ConfirmarCambioPasswordAsync(object? a)
     {
         if (a is not ChangePassDialog changePass)
             return;
 
-        if(EntitySelect == null) return;
+        if (EntitySelect == null) return;
 
         await DialogServiceI.MostrarDialogoProgreso(async () =>
         {
-            var result = await ServicioServiceUsuario.ChangePasswordAsync(EntitySelect.Id, changePass.OldPassword, changePass.NewPassword);
+            var result = await ServicioServiceUsuario.ChangePasswordAsync(EntitySelect.Id, changePass.OldPassword,
+                changePass.NewPassword);
             await DialogServiceI.ValidarRespuesta(result);
             return result;
         }, DialogDefaults.Progress);
-            
     }
+
     private async Task AsignarRolAsync(Rol? rol)
     {
         if (EntitySelect == null || rol == null)
@@ -65,7 +65,7 @@ public class PageUsuarioVM : ViewModelServiceBase<Usuario>
             rol.IsSelect = !rol.IsSelect;
     }
 
-    public override async Task CrearEntityAsync()
+    public override async Task CreateAsync()
     {
         var usuarioDialog = new UsuarioDialog
         {
@@ -77,7 +77,8 @@ public class PageUsuarioVM : ViewModelServiceBase<Usuario>
 
         await DialogServiceI.MostrarDialogo(usuarioDialog);
     }
-    public override async Task EditarEntityAsync()
+
+    public override async Task UpdateAsync()
     {
         if (EntitySelect == null)
             return;
@@ -92,7 +93,8 @@ public class PageUsuarioVM : ViewModelServiceBase<Usuario>
 
         await DialogServiceI.MostrarDialogo(usuarioDialog);
     }
-    public override async Task DeleteEntityAsync()
+
+    public override async Task DeleteAsync()
     {
         if (EntitySelect == null)
             return;
@@ -121,6 +123,7 @@ public class PageUsuarioVM : ViewModelServiceBase<Usuario>
             return result;
         }, DialogDefaults.Progress);
     }
+
     private async Task ConfirmarEditarUsuarioAsync(object? a)
     {
         if (a is not Usuario user)
@@ -133,9 +136,9 @@ public class PageUsuarioVM : ViewModelServiceBase<Usuario>
             return result;
         }, DialogDefaults.Progress);
     }
+
     private async Task ConfirmarEliminarUsuarioAsync()
     {
-
         if (EntitySelect == null) return;
 
         await DialogServiceI.MostrarDialogoProgreso(async () =>

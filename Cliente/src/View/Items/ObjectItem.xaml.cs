@@ -5,15 +5,28 @@ using System.Windows.Input;
 namespace Cliente.View.Items;
 
 /// <summary>
-/// Lógica de interacción para ItemItemB.xaml
+///     Lógica de interacción para ItemItemB.xaml
 /// </summary>
 public partial class ObjectItem : UserControl
 {
     // Propiedad de Dependencia para el Entity
-    public static readonly DependencyProperty ItemProperty = DependencyProperty.Register(nameof(Item), typeof(object), typeof(ObjectItem));
-    public static readonly DependencyProperty IsSelectProperty = DependencyProperty.Register(nameof(IsSelect), typeof(bool), typeof(ObjectItem), new PropertyMetadata(false));
-    public static readonly DependencyProperty EditarItemCommandProperty = DependencyProperty.Register(nameof(EditarItemCommand), typeof(ICommand), typeof(ObjectItem));
-    public static readonly DependencyProperty EliminarItemCommandProperty = DependencyProperty.Register(nameof(EliminarItemCommand), typeof(ICommand), typeof(ObjectItem));
+    public static readonly DependencyProperty ItemProperty =
+        DependencyProperty.Register(nameof(Item), typeof(object), typeof(ObjectItem));
+
+    public static readonly DependencyProperty IsSelectProperty =
+        DependencyProperty.Register(nameof(IsSelect), typeof(bool), typeof(ObjectItem), new PropertyMetadata(false));
+
+    public static readonly DependencyProperty EditarItemCommandProperty =
+        DependencyProperty.Register(nameof(EditarItemCommand), typeof(ICommand), typeof(ObjectItem));
+
+    public static readonly DependencyProperty EliminarItemCommandProperty =
+        DependencyProperty.Register(nameof(EliminarItemCommand), typeof(ICommand), typeof(ObjectItem));
+
+    public ObjectItem()
+    {
+        InitializeComponent();
+    }
+
     public object Item
     {
         get => (object)GetValue(ItemProperty);
@@ -38,15 +51,10 @@ public partial class ObjectItem : UserControl
         get => (ICommand)GetValue(EditarItemCommandProperty);
         set => SetValue(EditarItemCommandProperty, value);
     }
+
     public ICommand EliminarItemCommand
     {
         get => (ICommand)GetValue(EliminarItemCommandProperty);
         set => SetValue(EliminarItemCommandProperty, value);
-    }
-
-    public ObjectItem()
-    {
-        InitializeComponent();
-
     }
 }

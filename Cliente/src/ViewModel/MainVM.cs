@@ -1,59 +1,67 @@
 ﻿using System.Windows;
+using Cliente.Default;
+using Cliente.Obj;
 using Cliente.Obj.Model;
 using Cliente.Services;
 using Cliente.Services.Model;
-using Cliente.Obj;
 using Cliente.View.Dialog;
 using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
+using Utilidades.Dialogs;
 using Utilidades.Interfaces;
 using Utilidades.Mvvm;
-using Utilidades.Dialogs;
-using Cliente.Default;
 
 namespace Cliente.ViewModel;
 
 public class MainVM : ViewModelBase, IBarNavegacion
 {
-    private DialogService DialogService => DialogService.Instance;
-    public ServiceUsuario ServicioServiceUsuario => (ServiceUsuario)ServiceFactory.GetService<Usuario>();
-
     private ViewModelBase _pageSelectViewModel = null!;
-    public ViewModelBase PageSelectViewModel
-    {
-        get => _pageSelectViewModel;
-        set => SetProperty(ref _pageSelectViewModel, value);
-    }
 
     private IItemNav _selectedItemNav = null!;
-    public IItemNav SelectedItemNav
-    {
-        get => _selectedItemNav;
-        set
-        {
-            if (SetProperty(ref _selectedItemNav, value))
-            {
-                PageSelectViewModel = value.Page;
-            }
-        }
-    }
-
-    public IAsyncRelayCommand AccountView { get; }
-
-    public List<IItemNav> ListItemsNav { get; } = [
-        new ItemNavigationM {
-            Title = "Configuracion Sistema",
-            SelectedIcon = PackIconKind.TablePlus,
-            UnselectedIcon = PackIconKind.TablePlus,
-            Page = new PageProcesosVM()
-        }
-    ];
 
     public MainVM()
     {
         SelectedItemNav = ListItemsNav.First();
         AccountView = new AsyncRelayCommand(VerPerfilUsuarioAsync);
     }
+
+    private DialogService DialogService => DialogService.Instance;
+    public ServiceUsuario ServicioServiceUsuario => (ServiceUsuario)ServiceFactory.GetService<Usuario>();
+
+    public ViewModelBase PageSelectViewModel
+    {
+        get => _pageSelectViewModel;
+        set => SetProperty(ref _pageSelectViewModel, value);
+    }
+
+    public IAsyncRelayCommand AccountView { get; }
+
+    public IItemNav SelectedItemNav
+    {
+        get => _selectedItemNav;
+        set
+        {
+            if (SetProperty(ref _selectedItemNav, value)) PageSelectViewModel = value.Page;
+        }
+    }
+
+    public List<IItemNav> ListItemsNav { get; } =
+    [
+        new ItemNavigationM
+        {
+            Title = "Configuracion Sistema",
+            SelectedIcon = PackIconKind.TablePlus,
+            UnselectedIcon = PackIconKind.TablePlus,
+            Page = new PageProcesosVM()
+        },
+        new ItemNavigationM
+        {
+            Title = "Gestion de Personal",
+            SelectedIcon = PackIconKind.AccountSupervisor,
+            UnselectedIcon = PackIconKind.AccountSupervisor,
+            Page = new PageGestionEmployerVM()
+        }
+    ];
 
     private async Task VerPerfilUsuarioAsync()
     {
@@ -69,7 +77,7 @@ public class MainVM : ViewModelBase, IBarNavegacion
             CloseSeccionCommand = new AsyncRelayCommand(CerrarSesionAsync),
             ChangedPasswordCommand = new AsyncRelayCommand<Usuario>(CambiarPasswordAsync),
             DialogOpenIdentifier = DialogDefaults.Main,
-            DialogNameIdentifier = DialogDefaults.Sub01,
+            DialogNameIdentifier = DialogDefaults.Sub01
         };
 
         await DialogService.MostrarDialogo(dialog);
@@ -83,7 +91,7 @@ public class MainVM : ViewModelBase, IBarNavegacion
             Message = "¿Estás seguro de que quieres cerrar sesión?",
             AceptarCommand = new AsyncRelayCommand(EjecutarCierreSesionAsync),
             DialogOpenIdentifier = DialogDefaults.Sub01,
-            DialogNameIdentifier = DialogDefaults.Sub02,
+            DialogNameIdentifier = DialogDefaults.Sub02
         };
 
         await DialogService.MostrarDialogo(confirmDialog);
@@ -103,10 +111,12 @@ public class MainVM : ViewModelBase, IBarNavegacion
 
         var dialog = new ChangePassDialog
         {
-            AceptarCommand = new AsyncRelayCommand<ChangePassDialog>((changePass) => EjecutarCambioPasswordAsync(changePass, usuario)),
+            AceptarCommand =
+                new AsyncRelayCommand<ChangePassDialog>(changePass =>
+                    EjecutarCambioPasswordAsync(changePass, usuario)),
             OldPasswordRequired = Visibility.Visible,
             DialogOpenIdentifier = DialogDefaults.Sub01,
-            DialogNameIdentifier = DialogDefaults.Sub02,
+            DialogNameIdentifier = DialogDefaults.Sub02
         };
 
         await DialogService.MostrarDialogo(dialog);
@@ -119,7 +129,9 @@ public class MainVM : ViewModelBase, IBarNavegacion
 
         await DialogService.MostrarDialogoProgreso(async () =>
         {
-            var result = await ServicioServiceUsuario.ChangePasswordAsync(usuario.Id, changePass.OldPassword, changePass.NewPassword);
+            var result =
+                await ServicioServiceUsuario.ChangePasswordAsync(usuario.Id, changePass.OldPassword,
+                    changePass.NewPassword);
             await DialogService.ValidarRespuesta(result);
             return result;
         }, DialogDefaults.Sub02);

@@ -1,20 +1,14 @@
-﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using System;
+using System.Linq;
+using System.Text;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Hosting;
 using Microsoft.IdentityModel.Tokens;
-using Servidor.src.Extensiones;
-using Servidor.src.Helper;
-using Servidor.src.Hubs;
-using Servidor.src.HubsService;
-using Servidor.src.Objs;
-using Servidor.src.Repositorios;
-using Servidor.src.Services;
-using System;
-using System.Linq;
-using System.Text;
 using Servidor;
+using Servidor.Extensiones;
+using Servidor.Helper;
+using Servidor.Hubs;
 using Shared.Interfaces.Model;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -41,8 +35,8 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAllOrigins",
         policy => policy.AllowAnyOrigin()
-                        .AllowAnyMethod()
-                        .AllowAnyHeader()); // <-- Permitir Authorization en los headers
+            .AllowAnyMethod()
+            .AllowAnyHeader()); // <-- Permitir Authorization en los headers
 });
 
 // 🔹 Configurar JWT
@@ -66,7 +60,6 @@ builder.Services.AddAuthentication("Bearer")
 builder.Services.AddScoped<AppInitializer>();
 
 
-
 var app = builder.Build();
 
 
@@ -83,8 +76,8 @@ using (var scope = app.Services.CreateScope())
 app.UseHttpsRedirection();
 app.UseRouting();
 app.UseCors("AllowAllOrigins");
-app.UseAuthentication();  // <-- JWT Authentication
-app.UseAuthorization();   // <-- Authorization
+app.UseAuthentication(); // <-- JWT Authentication
+app.UseAuthorization(); // <-- Authorization
 
 // Middleware para capturar headers (después de autorización)
 app.Use(async (context, next) =>
@@ -94,10 +87,7 @@ app.Use(async (context, next) =>
     if (!string.IsNullOrEmpty(token))
     {
         var Usuario = GenerateTokenForUser.ValidateToken(token.Replace("Bearer ", ""));
-        if (Usuario != null)
-        {
-            context.User = Usuario;
-        }
+        if (Usuario != null) context.User = Usuario;
     }
 
     await next();
@@ -108,5 +98,3 @@ app.MapControllers();
 app.MapAllGenericHubs<IModelObj>();
 
 app.Run();
-
-

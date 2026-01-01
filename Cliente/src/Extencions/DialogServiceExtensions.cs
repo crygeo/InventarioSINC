@@ -20,13 +20,14 @@ namespace Cliente.Extencions;
 
 public static class DialogServiceExtensions
 {
-
-    public static async Task BuscarMostrarDialogAsync<TEntity>(this DialogService dialogS, TEntity entity, string header, Func<TEntity?, Task> confirDialog)
-    where TEntity : class, IModelObj
+    public static async Task BuscarMostrarDialogAsync<TEntity>(this DialogService dialogS, TEntity entity,
+        string header, Func<TEntity?, Task> confirDialog)
+        where TEntity : class, IModelObj
     {
         var dialogPersonalizado = ComponetesHelp.GetDialogoPersonalizado<TEntity>(entity);
         if (dialogPersonalizado is IDialog<TEntity> dialogo)
         {
+            dialogo.TextHeader = header;
             dialogo.Entity = entity;
             dialogo.AceptarCommand = new AsyncRelayCommand<TEntity?>(confirDialog);
             dialogo.DialogOpenIdentifier = DialogDefaults.Main;
@@ -34,11 +35,16 @@ public static class DialogServiceExtensions
             await dialogS.MostrarDialogo(dialogo);
         }
         else
-            await dialogS.MostrarFormularioDinamicoAsync(entity, header, confirDialog, DialogDefaults.Main, DialogDefaults.Sub01);
+        {
+            await dialogS.MostrarFormularioDinamicoAsync(entity, header, confirDialog, DialogDefaults.Main,
+                DialogDefaults.Sub01);
+        }
     }
 
-    public static async Task<TEntity> MostrarFormularioDinamicoAsync<TEntity>(this DialogService dialogS, TEntity instancia, string header, Func<TEntity?, Task> aceptarCommand, string openId, string nameId, Dictionary<string, string> nombresCampos = null)
-    where TEntity : class, IModelObj
+    public static async Task<TEntity> MostrarFormularioDinamicoAsync<TEntity>(this DialogService dialogS,
+        TEntity instancia, string header, Func<TEntity?, Task> aceptarCommand, string openId, string nameId,
+        Dictionary<string, string> nombresCampos = null)
+        where TEntity : class, IModelObj
     {
         var form = new FormularioDinamico<TEntity>(instancia, nombresCampos)
         {
@@ -51,7 +57,6 @@ public static class DialogServiceExtensions
         await dialogS.MostrarDialogo(form);
         return instancia;
     }
-
 }
 
 //public static class DialogService
@@ -65,7 +70,6 @@ public static class DialogServiceExtensions
 //    public static string DialogSub02 { get; } = $"Dialog_Sub02";
 
 //    public SnackbarMessageQueue MensajeQueue { get; } = new SnackbarMessageQueue(TimeSpan.FromSeconds(2));
-
 
 //    // Múltiples banderas por identificador
 //    private readonly Dictionary<string, bool> _dialogosAbiertos = new();
@@ -147,7 +151,6 @@ public static class DialogServiceExtensions
 //                })
 //            );
 
-
 //            // Espera a que DialogHost.Show cierre
 //            while (resultado == null)
 //            {
@@ -161,8 +164,6 @@ public static class DialogServiceExtensions
 //            EstablecerEstado(dialogId, false);
 //        }
 //    }
-
-
 
 //    public static async Task<TEntity?> BuscarYMostrarFormularioAsyncMain<TEntity>(TEntity instancia, string header, Func<TEntity, Task> aceptar)
 //        where TEntity : class
@@ -245,12 +246,9 @@ public static class DialogServiceExtensions
 //        return false;
 //    }
 
-
-
 //    private bool EstaAbierto(string dialogId) => _dialogosAbiertos.TryGetValue(dialogId, out var abierto) && abierto;
 //    private void EstablecerEstado(string dialogId, bool abierto) =>
 //        _dialogosAbiertos[dialogId] = abierto;
-
 
 //    public async Task ValidarRespuesta<T>(IResultResponse<T> resp, string? dialogOpen = null, string? menssagePersonalizado = null)
 //    {

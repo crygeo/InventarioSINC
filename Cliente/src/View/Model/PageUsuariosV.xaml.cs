@@ -3,7 +3,7 @@
 namespace Cliente.View.Model;
 
 /// <summary>
-/// Lógica de interacción para PageUsuariosV.xaml
+///     Lógica de interacción para PageUsuariosV.xaml
 /// </summary>
 public partial class PageUsuariosV : UserControl
 {

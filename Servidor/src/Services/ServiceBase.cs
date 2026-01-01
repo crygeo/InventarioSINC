@@ -1,28 +1,24 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using Servidor.src.HubsService;
-using Servidor.src.Model;
-using Servidor.src.Repositorios;
+using Servidor.HubsService;
+using Servidor.Model;
+using Servidor.Repositorios;
+using Shared.ClassModel;
 using Shared.Interfaces;
 using Shared.Interfaces.Model;
 
 namespace Servidor.Services;
 
-public class ServiceBase<TObj> : IService<TObj> where TObj :class, IModelObj
+public class ServiceBase<TObj> : IService<TObj> where TObj : class, IModelObj
 {
-    private RepositorioBase<TObj>? _repository;
     private HubServiceBase<TObj>? _hubService;
+    private RepositorioBase<TObj>? _repository;
 
-    public virtual IRepository<TObj> Repository => _repository ??= RepositorioFactory.GetRepositorio<TObj>(); 
+    public virtual IRepository<TObj> Repository => _repository ??= RepositorioFactory.GetRepositorio<TObj>();
     public virtual IHubService<TObj> HubService => _hubService ??= HubServiceFactory.GetHubService<TObj>();
-
-    public virtual Task InitServiceAsync()
-    {
-        return Task.CompletedTask;
-    }
 
     public async Task<bool> CreateAsync(TObj entity)
     {
@@ -31,6 +27,7 @@ public class ServiceBase<TObj> : IService<TObj> where TObj :class, IModelObj
             await HubService.NewItem(entity);
             return true;
         }
+
         return false;
     }
 
@@ -41,6 +38,7 @@ public class ServiceBase<TObj> : IService<TObj> where TObj :class, IModelObj
             await HubService.UpdateItem(entity);
             return true;
         }
+
         return false;
     }
 
@@ -52,7 +50,13 @@ public class ServiceBase<TObj> : IService<TObj> where TObj :class, IModelObj
             await HubService.DeleteItem(entity);
             return true;
         }
+
         return false;
+    }
+
+    public virtual Task<PagedResult<TObj>> GetPagedAsync(int page, int pageSize)
+    {
+        return Repository.GetPagedAsync(page, pageSize);
     }
 
     public Task<IEnumerable<TObj>> GetAllAsync()
@@ -63,6 +67,11 @@ public class ServiceBase<TObj> : IService<TObj> where TObj :class, IModelObj
     public Task<TObj?> GetByIdAsync(string id)
     {
         return Repository.GetByIdAsync(id);
+    }
+
+    public virtual Task InitServiceAsync()
+    {
+        return Task.CompletedTask;
     }
 
     public async Task<bool> VerificarPermiso(string idUser, string NamePermiso)
@@ -76,7 +85,6 @@ public class ServiceBase<TObj> : IService<TObj> where TObj :class, IModelObj
         var usuario = (await repUser.FindAsync(filterUsuario)).FirstOrDefault();
 
         return await VerificarPermiso(usuario, NamePermiso);
-
     }
 
     public async Task<bool> VerificarPermiso(Usuario user, string NamePermiso)
@@ -88,19 +96,27 @@ public class ServiceBase<TObj> : IService<TObj> where TObj :class, IModelObj
         var repRol = database.GetCollection<Rol>("RepRol");
 
         if (user != null)
-        {
             foreach (var idRol in user.Roles)
             {
                 var filtroRol = Builders<Rol>.Filter.Eq(r => r.Id, idRol);
                 var rol = (await repRol.FindAsync(filtroRol)).FirstOrDefault();
-                if (rol != null && rol.Permisos.Contains(NamePermiso))
-                {
-                    return true;
-                }
+                if (rol != null && rol.Permisos.Contains(NamePermiso)) return true;
             }
-        }
 
         return false;
     }
+
+    public async Task<bool> UpdateProperty(string entityId, string selector, object itemId)
+    {
+        var entity = await Repository.UpdateProperty(entityId, selector, itemId);
+        if (entity)
+        {
+            await HubService.UpdateProperty(entityId, selector, itemId );;
+        }
+
+        return entity;
+    }
+    
+   
 
 }

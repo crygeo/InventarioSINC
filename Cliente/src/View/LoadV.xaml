@@ -5,26 +5,27 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:viewModel="clr-namespace:Cliente.ViewModel"
         mc:Ignorable="d"
-        Title="LoadView" Height="160" Width="160" AllowsTransparency="True" 
+        Title="LoadView" Height="160" Width="160" AllowsTransparency="True"
         Background="Transparent" WindowStyle="None" WindowStartupLocation="CenterScreen">
 
     <Window.DataContext>
-        <viewModel:LoadVM/>
+        <viewModel:LoadVM />
     </Window.DataContext>
 
-    <Grid >
+    <Grid>
         <Border Background="#002B38" CornerRadius="30" Margin="10">
             <Border.Effect>
-                <DropShadowEffect Color="#FFF" ShadowDepth="0" BlurRadius="15"/>
+                <DropShadowEffect Color="#FFF" ShadowDepth="0" BlurRadius="15" />
             </Border.Effect>
             <Image Source="/src/Img/loading-process.png" Height="70" Width="70" Margin="0,-30,0,0">
                 <Image.RenderTransform>
-                    <RotateTransform x:Name="ImageRotateTransform" CenterX="35" CenterY="35"/>
+                    <RotateTransform x:Name="ImageRotateTransform" CenterX="35" CenterY="35" />
                 </Image.RenderTransform>
             </Image>
         </Border>
         <Grid Margin="0,0,0,25" Width="130" Height="34" VerticalAlignment="Bottom" HorizontalAlignment="Center">
-            <TextBlock Name="LogText" Text="{Binding LogText}" FontSize="12" TextWrapping="Wrap" Foreground="White" VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center"/>
+            <TextBlock Name="LogText" Text="{Binding LogText}" FontSize="12" TextWrapping="Wrap" Foreground="White"
+                       VerticalAlignment="Center" HorizontalAlignment="Center" TextAlignment="Center" />
         </Grid>
     </Grid>
 </Window>

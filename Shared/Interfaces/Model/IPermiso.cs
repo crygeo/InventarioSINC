@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Shared.Interfaces.ModelsBase;
 
-namespace Shared.Interfaces.ModelsBase
+public interface IPermiso : IIdentifiable
 {
-    public interface IPermiso : IIdentifiable
-    {
-        string Name { get; } //Nombre del permiso
-    }
+    string Name { get; } //Nombre del permiso
 }

@@ -1,49 +1,44 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using Microsoft.AspNetCore.Mvc;
 
-namespace Servidor.src.Statics
+namespace Servidor.Statics;
+
+public static class Permisos
 {
-    public static class Permisos
+    private static List<string>? _list;
+
+    public static List<string> List
     {
-        private static List<string>? _list = null;
-        public static List<string> List
+        get
         {
-            get
-            {
-                if (_list == null)
-                    _list = GetPermisos();
-                return _list;
-            }
+            if (_list == null)
+                _list = GetPermisos();
+            return _list;
         }
-
-        private static List<string> GetPermisos()
-        {
-            var list = new List<string>();
-            var assambly = Assembly.GetEntryAssembly();
-            var controllers = assambly?.GetTypes().Where(t => typeof(ControllerBase).IsAssignableFrom(t) && !t.IsAbstract);
-
-            if (controllers == null) return list;
-            foreach (var controller in controllers)
-            {
-                var methods = controller.GetMethods(BindingFlags.Instance | BindingFlags.Public);
-                foreach (var method in methods)
-                {
-                    if (method.CustomAttributes.Any(a => a.AttributeType == typeof(ActionNameAttribute)))
-                    {
-                        var actionName = method.GetCustomAttribute<ActionNameAttribute>();
-                        var FullName = $"{controller?.Name.Replace("Controller", "")}.{actionName?.Name}";
-                        list.Add(FullName);
-                    }
-                }
-            }
-            return list;
-        }
-
-        
     }
 
+    private static List<string> GetPermisos()
+    {
+        var list = new List<string>();
+        var assambly = Assembly.GetEntryAssembly();
+        var controllers = assambly?.GetTypes()
+            .Where(t => typeof(ControllerBase).IsAssignableFrom(t) && !t.IsAbstract);
 
+        if (controllers == null) return list;
+        foreach (var controller in controllers)
+        {
+            var methods = controller.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+            foreach (var method in methods)
+                if (method.CustomAttributes.Any(a => a.AttributeType == typeof(ActionNameAttribute)))
+                {
+                    var actionName = method.GetCustomAttribute<ActionNameAttribute>();
+                    var FullName = $"{controller?.Name.Replace("Controller", "")}.{actionName?.Name}";
+                    list.Add(FullName);
+                }
+        }
+
+        return list;
+    }
 }

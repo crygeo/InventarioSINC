@@ -4,12 +4,17 @@ namespace Cliente.Extencions;
 
 public class BindingProxy : Freezable
 {
-    protected override Freezable CreateInstanceCore() => new BindingProxy();
+    public static readonly DependencyProperty DataProperty =
+        DependencyProperty.Register("Data", typeof(object), typeof(BindingProxy), new PropertyMetadata(null));
+
     public object Data
     {
         get => GetValue(DataProperty);
         set => SetValue(DataProperty, value);
     }
-    public static readonly DependencyProperty DataProperty =
-        DependencyProperty.Register("Data", typeof(object), typeof(BindingProxy), new PropertyMetadata(null));
+
+    protected override Freezable CreateInstanceCore()
+    {
+        return new BindingProxy();
+    }
 }

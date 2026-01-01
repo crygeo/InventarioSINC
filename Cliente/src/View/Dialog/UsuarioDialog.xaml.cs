@@ -3,32 +3,47 @@ using System.Windows.Controls;
 using Cliente.Extencions;
 using Cliente.Obj.Model;
 using CommunityToolkit.Mvvm.Input;
-using Utilidades.Interfaces;
 using Utilidades.Dialogs;
 
 namespace Cliente.View.Dialog;
 
 /// <summary>
-/// Lógica de interacción para UsuarioItemDetall.xaml
+///     Lógica de interacción para UsuarioItemDetall.xaml
 /// </summary>
 public partial class UsuarioDialog : UserControl, IDialog<Usuario>
 {
-    public static readonly DependencyProperty EntityProperty = DependencyProperty.Register(nameof(Entity), typeof(Usuario), typeof(UsuarioDialog));
-    public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptarCommand), typeof(IAsyncRelayCommand), typeof(UsuarioDialog));
-    public static readonly DependencyProperty TextHeaderProperty = DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(UsuarioDialog));
-    public static readonly DependencyProperty CancelarCommandProperty = DependencyProperty.Register(nameof(CancelarCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog), new PropertyMetadata(null));
+    public static readonly DependencyProperty EntityProperty =
+        DependencyProperty.Register(nameof(Entity), typeof(Usuario), typeof(UsuarioDialog));
+
+    public static readonly DependencyProperty AceptedCommandProperty =
+        DependencyProperty.Register(nameof(AceptarCommand), typeof(IAsyncRelayCommand), typeof(UsuarioDialog));
+
+    public static readonly DependencyProperty TextHeaderProperty =
+        DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(UsuarioDialog));
+
+    public static readonly DependencyProperty CancelarCommandProperty =
+        DependencyProperty.Register(nameof(CancelarCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog),
+            new PropertyMetadata(null));
+
     private string _dialogIdentifier;
+
+    public UsuarioDialog()
+    {
+        InitializeComponent();
+    }
 
     public IAsyncRelayCommand CancelarCommand
     {
         get => (IAsyncRelayCommand)GetValue(CancelarCommandProperty);
         set => SetValue(CancelarCommandProperty, value);
     }
+
     public Usuario Entity
     {
         get => (Usuario)GetValue(EntityProperty);
         set => SetValue(EntityProperty, value);
     }
+
     public IAsyncRelayCommand<Usuario> AceptarCommand
     {
         get => (IAsyncRelayCommand<Usuario>)GetValue(AceptedCommandProperty);
@@ -41,10 +56,8 @@ public partial class UsuarioDialog : UserControl, IDialog<Usuario>
         set => SetValue(TextHeaderProperty, value);
     }
 
-    public UsuarioDialog()
-    {
-        InitializeComponent();
-    }
+    public string DialogNameIdentifier { get; set; } = $"Dialog_{Guid.NewGuid():N}";
+    public required string DialogOpenIdentifier { get; set; }
 
     private async void ButtonCancelar(object sender, RoutedEventArgs e)
     {
@@ -55,7 +68,4 @@ public partial class UsuarioDialog : UserControl, IDialog<Usuario>
     {
         await AceptarCommand.TryEjecutarYCerrarDialogoAsync(this, Entity);
     }
-
-    public string DialogNameIdentifier { get; set; } = $"Dialog_{Guid.NewGuid():N}";
-    public required string DialogOpenIdentifier { get; set; }
 }

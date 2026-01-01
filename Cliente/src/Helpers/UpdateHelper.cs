@@ -1,5 +1,4 @@
 ﻿using System.Collections.Concurrent;
-using Shared.Interfaces.Model;
 using System.Reflection;
 using Cliente.Attributes;
 
@@ -21,11 +20,10 @@ public static class UpdateHelper
                 .Where(p =>
                     p.CanRead &&
                     p.CanWrite &&
-                    !p.IsDefined(typeof(NoActualizarAttribute), inherit: true)) // excluye marcados
+                    !p.IsDefined(typeof(NoActualizarAttribute), true)) // excluye marcados
                 .ToArray());
 
         foreach (var prop in properties)
-        {
             try
             {
                 var value = prop.GetValue(source);
@@ -35,6 +33,5 @@ public static class UpdateHelper
             {
                 // Ignorar errores de asignación
             }
-        }
     }
 }

@@ -4,45 +4,67 @@ using Cliente.Extencions;
 using Cliente.Obj.Model;
 using CommunityToolkit.Mvvm.Input;
 using Utilidades.Dialogs;
-using Utilidades.Interfaces;
 
 namespace Cliente.View.Dialog;
 
 /// <summary>
-/// Lógica de interacción para UsuarioItemDetall.xaml
+///     Lógica de interacción para UsuarioItemDetall.xaml
 /// </summary>
 public partial class AccountDialog : UserControl, IDialog
 {
-    public static readonly DependencyProperty UsuarioProperty = DependencyProperty.Register(nameof(Usuario), typeof(Usuario), typeof(AccountDialog));
-    public static readonly DependencyProperty AceptarCommandProperty = DependencyProperty.Register(nameof(AceptarCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog));
-    public static readonly DependencyProperty CloseSeccionCommandProperty = DependencyProperty.Register(nameof(CloseSeccionCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog));
-    public static readonly DependencyProperty ChangedPasswordCommandProperty = DependencyProperty.Register(nameof(ChangedPasswordCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog));
-    public static readonly DependencyProperty TextHeaderProperty = DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(AccountDialog));
-    public static readonly DependencyProperty CancelarCommandProperty = DependencyProperty.Register(nameof(CancelarCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog), new PropertyMetadata(null));
+    public static readonly DependencyProperty UsuarioProperty =
+        DependencyProperty.Register(nameof(Usuario), typeof(Usuario), typeof(AccountDialog));
+
+    public static readonly DependencyProperty AceptarCommandProperty =
+        DependencyProperty.Register(nameof(AceptarCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog));
+
+    public static readonly DependencyProperty CloseSeccionCommandProperty =
+        DependencyProperty.Register(nameof(CloseSeccionCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog));
+
+    public static readonly DependencyProperty ChangedPasswordCommandProperty =
+        DependencyProperty.Register(nameof(ChangedPasswordCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog));
+
+    public static readonly DependencyProperty TextHeaderProperty =
+        DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(AccountDialog));
+
+    public static readonly DependencyProperty CancelarCommandProperty =
+        DependencyProperty.Register(nameof(CancelarCommand), typeof(IAsyncRelayCommand), typeof(AccountDialog),
+            new PropertyMetadata(null));
+
+
+    public AccountDialog()
+    {
+        InitializeComponent();
+    }
+
     public IAsyncRelayCommand CancelarCommand
     {
         get => (IAsyncRelayCommand)GetValue(CancelarCommandProperty);
         set => SetValue(CancelarCommandProperty, value);
     }
+
     public Usuario Usuario
     {
         get => (Usuario)GetValue(UsuarioProperty);
         set => SetValue(UsuarioProperty, value);
     }
-    public IAsyncRelayCommand AceptarCommand
-    {
-        get => (IAsyncRelayCommand)GetValue(AceptarCommandProperty);
-        set => SetValue(AceptarCommandProperty, value);
-    }
+
     public IAsyncRelayCommand CloseSeccionCommand
     {
         get => (IAsyncRelayCommand)GetValue(CloseSeccionCommandProperty);
         set => SetValue(CloseSeccionCommandProperty, value);
     }
+
     public IAsyncRelayCommand ChangedPasswordCommand
     {
         get => (IAsyncRelayCommand)GetValue(ChangedPasswordCommandProperty);
         set => SetValue(ChangedPasswordCommandProperty, value);
+    }
+
+    public IAsyncRelayCommand AceptarCommand
+    {
+        get => (IAsyncRelayCommand)GetValue(AceptarCommandProperty);
+        set => SetValue(AceptarCommandProperty, value);
     }
 
     public string TextHeader
@@ -53,12 +75,6 @@ public partial class AccountDialog : UserControl, IDialog
 
     public required string DialogNameIdentifier { get; set; }
     public required string DialogOpenIdentifier { get; set; }
-
-
-    public AccountDialog()
-    {
-        InitializeComponent();
-    }
 
     private async void ButtonChangedPass_OnClick(object sender, RoutedEventArgs e)
     {
@@ -74,5 +90,4 @@ public partial class AccountDialog : UserControl, IDialog
     {
         await CloseSeccionCommand.TryEjecutarAsync(this);
     }
-
 }

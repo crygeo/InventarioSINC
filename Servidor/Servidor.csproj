@@ -1,44 +1,41 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
-  <PropertyGroup>
-    <TargetFramework>net9.0</TargetFramework>
-    <Nullable>enable</Nullable>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <UserSecretsId>515ccffc-a374-46b4-a49c-10425751e248</UserSecretsId>
-  </PropertyGroup>
+    <PropertyGroup>
+        <TargetFramework>net9.0</TargetFramework>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>disable</ImplicitUsings>
+        <UserSecretsId>515ccffc-a374-46b4-a49c-10425751e248</UserSecretsId>
+    </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
-    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
-    <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
-    <PackageReference Include="MongoDB.Driver" Version="3.2.1" />
-    <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.0" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.0" />
-  </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
+        <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.2" />
+        <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
+        <PackageReference Include="MongoDB.Driver" Version="3.2.1" />
+        <PackageReference Include="Swashbuckle.AspNetCore" Version="7.3.0" />
+        <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.6.0" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\Shared\Shared.csproj" />
-  </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\Shared\Shared.csproj" />
+        <ProjectReference
+                Include="..\CodeGen.SourceGenerators\CodeGen.SourceGenerators.csproj"
+                OutputItemType="Analyzer"
+                ReferenceOutputAssembly="false"/>
+    </ItemGroup>
 
-  <ItemGroup>
-    <None Update="src\Controllers\GenerarControladores.tt">
-      <Generator>TextTemplatingFileGenerator</Generator>
-      <LastGenOutput>GenerarControladores.g.cs</LastGenOutput>
-    </None>
-  </ItemGroup>
+    <ItemGroup>
+        <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
+    </ItemGroup>
 
-  <ItemGroup>
-    <Service Include="{508349b6-6b84-4df5-91f0-309beebad82d}" />
-  </ItemGroup>
+    <ItemGroup>
+        <Compile Update="src\Controllers\GenerarControladores.cs">
+          <AutoGen>True</AutoGen>
+          <DesignTime>True</DesignTime>
+          <DependentUpon>GenerarControladores.tt</DependentUpon>
+        </Compile>
+    </ItemGroup>
 
-  <ItemGroup>
-    <Compile Update="src\Controllers\GenerarControladores.g.cs">
-      <DesignTime>True</DesignTime>
-      <AutoGen>True</AutoGen>
-      <DependentUpon>GenerarControladores.tt</DependentUpon>
-    </Compile>
-  </ItemGroup>
 
-	
 </Project>

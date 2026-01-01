@@ -1,36 +1,48 @@
-﻿using System.Windows;
+using System.Windows;
 using System.Windows.Controls;
 using Cliente.Extencions;
 using Cliente.Obj.Model;
 using CommunityToolkit.Mvvm.Input;
+using Utilidades.Dialogs;
 using Utilidades.Extencions;
 using Utilidades.Factory;
-using Utilidades.Interfaces;
-using Utilidades.Dialogs;
 
 namespace Cliente.View.Dialog;
 
 /// <summary>
-/// Lógica de interacción para UsuarioItemDetall.xaml
+///     Lógica de interacción para UsuarioItemDetall.xaml
 /// </summary>
 public partial class RolDialog : UserControl, IDialog<Rol>
 {
-    private IDialog _dialogImplementation;
-    public static readonly DependencyProperty EntityProperty = DependencyProperty.Register(nameof(Entity), typeof(Rol), typeof(RolDialog));
-    public static readonly DependencyProperty ListPermsProperty = DependencyProperty.Register(nameof(ListPerms), typeof(List<Nodos>), typeof(RolDialog));
-    public static readonly DependencyProperty AceptedCommandProperty = DependencyProperty.Register(nameof(AceptarCommand), typeof(IAsyncRelayCommand), typeof(RolDialog));
-    public static readonly DependencyProperty TextHeaderProperty = DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(RolDialog));
+    public static readonly DependencyProperty EntityProperty =
+        DependencyProperty.Register(nameof(Entity), typeof(Rol), typeof(RolDialog));
 
-    public Rol Entity
+    public static readonly DependencyProperty ListPermsProperty =
+        DependencyProperty.Register(nameof(ListPerms), typeof(List<Nodos>), typeof(RolDialog));
+
+    public static readonly DependencyProperty AceptedCommandProperty =
+        DependencyProperty.Register(nameof(AceptarCommand), typeof(IAsyncRelayCommand), typeof(RolDialog));
+
+    public static readonly DependencyProperty TextHeaderProperty =
+        DependencyProperty.Register(nameof(TextHeader), typeof(string), typeof(RolDialog));
+
+    public RolDialog()
     {
-        get => (Rol)GetValue(EntityProperty);
-        set => SetValue(EntityProperty, value);
+        InitializeComponent();
     }
 
     public List<Nodos> ListPerms
     {
         get => (List<Nodos>)GetValue(ListPermsProperty);
         set => SetValue(ListPermsProperty, value);
+    }
+
+    public IAsyncRelayCommand CancelarCommand { get; set; }
+
+    public Rol Entity
+    {
+        get => (Rol)GetValue(EntityProperty);
+        set => SetValue(EntityProperty, value);
     }
 
     public IAsyncRelayCommand<Rol> AceptarCommand
@@ -45,10 +57,9 @@ public partial class RolDialog : UserControl, IDialog<Rol>
         set => SetValue(TextHeaderProperty, value);
     }
 
-    public RolDialog()
-    {
-        InitializeComponent();
-    }
+
+    public string DialogNameIdentifier { get; set; } = $"Dialog_{Guid.NewGuid():N}";
+    public required string DialogOpenIdentifier { get; set; }
 
     private async void ButtonGuardar(object sender, RoutedEventArgs e)
     {
@@ -60,10 +71,6 @@ public partial class RolDialog : UserControl, IDialog<Rol>
 
     private async void ButtonCancelar(object sender, RoutedEventArgs e)
     {
-        await AceptarCommand.TryEjecutarYCerrarDialogoAsync(this);
+        await CancelarCommand.TryEjecutarYCerrarDialogoAsync(this);
     }
-
-
-    public string DialogNameIdentifier { get; set; } = $"Dialog_{Guid.NewGuid():N}";
-    public required string DialogOpenIdentifier { get; set; }
 }

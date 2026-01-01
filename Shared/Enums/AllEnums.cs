@@ -1,66 +1,45 @@
-﻿
-using Shared.Attributes;
-using System.Runtime.CompilerServices;
+﻿using Shared.Attributes;
 
 namespace Shared.Enums;
 
 public enum TypeItem
 {
-    [Display("UNIQUE", "Todos")]
-    UNIQUE,
+    [Display("UNIQUE", "Todos")] UNIQUE,
 
-    [Display("BAG", "Bolsa")]
-    BAG,
+    [Display("BAG", "Bolsa")] BAG,
 
-    [Display("HEAD", "Cabeza")]
-    HEAD,
+    [Display("HEAD", "Cabeza")] HEAD,
 
-    [Display("CAPEITEM", "Capa")]
-    CAPEITEM,
+    [Display("CAPEITEM", "Capa")] CAPEITEM,
 
-    [Display("MAIN", "Mano Principal")]
-    MAIN,
+    [Display("MAIN", "Mano Principal")] MAIN,
 
-    [Display("ARMOR", "Armadura")]
-    ARMOR,
+    [Display("ARMOR", "Armadura")] ARMOR,
 
-    [Display("OFF", "Mano Secundaria")]
-    OFF,
+    [Display("OFF", "Mano Secundaria")] OFF,
 
-    [Display("POTION", "Poción")]
-    POTION,
+    [Display("POTION", "Poción")] POTION,
 
-    [Display("SHOES", "Botas")]
-    SHOES,
+    [Display("SHOES", "Botas")] SHOES,
 
-    [Display("MEAL", "Comida")]
-    MEAL,
+    [Display("MEAL", "Comida")] MEAL,
 
-    [Display("MOUNT", "Montura")]
-    MOUNT,
+    [Display("MOUNT", "Montura")] MOUNT,
 
-    [Display("2H", "Ambas Manos")]
-    H2,
+    [Display("2H", "Ambas Manos")] H2,
 
-    [Display("SKIN", "Skin")]
-    SKIN,
+    [Display("SKIN", "Skin")] SKIN
 }
-
 
 public enum Calidades
 {
+    [Display("Normal", "Normal")] Unknown = 0,
 
-    [Display("Normal", "Normal")]
-    Unknown = 0,
+    [Display("Normal", "Normal")] Normal = 1,
 
-    [Display("Normal", "Normal")]
-    Normal = 1,
+    [Display("Bueno", "Bueno")] Bueno = 2,
 
-    [Display("Bueno", "Bueno")]
-    Bueno = 2,
-
-    [Display("MuyBueno", "Muy Bueno")]
-    MuyBueno = 3,
+    [Display("MuyBueno", "Muy Bueno")] MuyBueno = 3,
 
     [Display("Sobresaliente", "Sobresaliente")]
     Sobresaliente = 4,
@@ -71,43 +50,30 @@ public enum Calidades
 
 public enum TierType
 {
-    [Display("NUll", "Sin Tier")]
-    N0 = 0,
-    [Display("T1", "Tier 1")]
-    T1 = 1,
-    [Display("T2", "Tier 2")]
-    T2 = 2,
-    [Display("T3", "Tier 3")]
-    T3 = 3,
-    [Display("T4", "Tier 4")]
-    T4 = 4,
-    [Display("T5", "Tier 5")]
-    T5 = 5,
-    [Display("T6", "Tier 6")]
-    T6 = 6,
-    [Display("T7", "Tier 7")]
-    T7 = 7,
-    [Display("T8", "Tier 8")]
-    T8 = 8
+    [Display("NUll", "Sin Tier")] N0 = 0,
+    [Display("T1", "Tier 1")] T1 = 1,
+    [Display("T2", "Tier 2")] T2 = 2,
+    [Display("T3", "Tier 3")] T3 = 3,
+    [Display("T4", "Tier 4")] T4 = 4,
+    [Display("T5", "Tier 5")] T5 = 5,
+    [Display("T6", "Tier 6")] T6 = 6,
+    [Display("T7", "Tier 7")] T7 = 7,
+    [Display("T8", "Tier 8")] T8 = 8
 }
 
 public enum EncanType
 {
-    [Display("", "Sin Encantamiento")]
-    E0,
+    [Display("", "Sin Encantamiento")] E0,
 
-    [Display("@1", "Encantamiento 1")]
-    E1,
+    [Display("@1", "Encantamiento 1")] E1,
 
-    [Display("@2", "Encantamiento 2")]
-    E2,
+    [Display("@2", "Encantamiento 2")] E2,
 
-    [Display("@3", "Encantamiento 3")]
-    E3,
+    [Display("@3", "Encantamiento 3")] E3,
 
-    [Display("@4", "Encantamiento 4")]
-    E4
+    [Display("@4", "Encantamiento 4")] E4
 }
+
 public enum Categoria
 {
     other
@@ -124,7 +90,7 @@ public static class Enums
             return true;
 
         // Normalizamos: "1" -> "@1", "2" -> "@2" ...
-        string normalizado = "@" + encant;
+        var normalizado = "@" + encant;
 
         foreach (var value in Enum.GetValues(typeof(EncanType)).Cast<EncanType>())
         {
@@ -138,7 +104,6 @@ public static class Enums
 
         return false;
     }
-
 }
 
 public static class EnumExtensions
