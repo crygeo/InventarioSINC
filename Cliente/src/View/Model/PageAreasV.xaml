@@ -19,46 +19,61 @@
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <StackPanel Grid.Column="0">
-            <TextBlock Text="Areas" />
-            <Button Style="{StaticResource MaterialDesignOutlinedSecondaryDarkButton}"
-                    Command="{Binding CrearEntityCommand}">
-                <md:PackIcon
-                    Kind="Add" />
-            </Button>
-            <TreeView ItemsSource="{Binding TreeNode}"
-                      bg:TreeViewSelectedItemBehavior.Enable="True"
-                      bg:TreeViewSelectedItemBehavior.SelectedItem="{Binding SelectedTreeNode, Mode=TwoWay}">
+        <Grid Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/> <!-- aquí vive el TreeView -->
+            </Grid.RowDefinitions>
+            
+            <TextBlock Text="Areas" Grid.Row="0"/>
 
+            <StackPanel Grid.Row="1" Orientation="Horizontal">
+                <Button Style="{StaticResource MaterialDesignOutlinedSecondaryDarkButton}"
+                        Command="{Binding ActualizarArbolCommand}">
+                    <md:PackIcon Kind="Reload"/>
+                </Button>
+
+                <Button Style="{StaticResource MaterialDesignOutlinedSecondaryDarkButton}"
+                        Command="{Binding CrearEntityCommand}">
+                    <md:PackIcon Kind="Add"/>
+                </Button>
+            </StackPanel>
+            
+            <TreeView Grid.Row="2" ItemsSource="{Binding TreeNode}"
+                      bg:TreeViewSelectedItemBehavior.Enable="True"
+                      bg:TreeViewSelectedItemBehavior.SelectedItem="{Binding SelectedTreeNode, Mode=TwoWay}" Padding="0,0,0,60">
+
+                
                 <TreeView.Resources>
 
                     <!-- ÁREA -->
                     <HierarchicalDataTemplate DataType="{x:Type obj:AreaNode}"
                                               ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Nombre}" />
+                        <TextBlock Text="{Binding Area.Nombre}" />
                     </HierarchicalDataTemplate>
 
 
                     <!-- TURNO -->
                     <HierarchicalDataTemplate DataType="{x:Type obj:TurnoNode}"
                                               ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Nombre}" />
+                        <TextBlock Text="{Binding Turno.Nombre}" />
                     </HierarchicalDataTemplate>
 
 
                     <!-- SECCIÓN -->
                     <HierarchicalDataTemplate DataType="{x:Type obj:SeccionNode}"
                                               ItemsSource="{Binding Children}">
-                        <TextBlock Text="{Binding Nombre}" />
+                        <TextBlock Text="{Binding Seccion.Nombre}" />
                     </HierarchicalDataTemplate>
 
 
                     <!-- GRUPO -->
                     <DataTemplate DataType="{x:Type obj:GrupoNode}">
-                        <TextBlock Text="{Binding Nombre}" />
+                        <TextBlock Text="{Binding Grupo.Nombre}" />
                     </DataTemplate>
 
                 </TreeView.Resources>
@@ -84,11 +99,13 @@
                             </Setter.Value>
                         </Setter>
 
+                            <EventSetter Event="PreviewMouseRightButtonDown"
+                                         Handler="TreeViewItem_PreviewMouseRightButtonDown"/>
                     </Style>
                 </TreeView.ItemContainerStyle>
 
             </TreeView>
-        </StackPanel>
+        </Grid>
 
 
         <Grid Grid.Column="1">

@@ -24,8 +24,9 @@ public class Turno : ITurno
     public TimeSpan HoraInicio { get; set; }
     public TimeSpan HoraFin { get; set; }
     public bool EsRotativo { get; set; }
-    public IList<string> SeccionIds{ get; set; }
 
+    public string AreaId { get; set; }
+    
     public void Update(IModelObj entity)
     {
     }

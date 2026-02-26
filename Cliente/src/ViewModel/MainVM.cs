@@ -52,7 +52,7 @@ public class MainVM : ViewModelBase, IBarNavegacion
             Title = "Configuracion Sistema",
             SelectedIcon = PackIconKind.TablePlus,
             UnselectedIcon = PackIconKind.TablePlus,
-            Page = new PageProcesosVM()
+            Page = new PageProcesosVm()
         },
         new ItemNavigationM
         {

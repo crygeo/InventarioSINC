@@ -26,12 +26,12 @@ public partial class PageSeccionVM : ViewModelServiceBase<Seccion>
     protected override bool CanEditarEntity => EntitySelect is not null;
     protected override bool CanEliminarEntity => EntitySelect is not null;
 
-    protected async override Task InitAsync()
+    public async override Task ActivateAsync()
     {
         PageIndex = 0;
         PageSize = int.MaxValue;
         
-        await base.InitAsync();
+        await base.ActivateAsync();
     }
 
     public async override Task ConfirmarCrearEntityAsync(Seccion? entity)

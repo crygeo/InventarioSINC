@@ -23,7 +23,7 @@
             </Grid.RowDefinitions>
 
             <items:RolList
-                ItemsSource="{Binding DataContext.Entitys, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                ItemsSource="{Binding DataContext.Entities, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 Item="{Binding DataContext.EntitySelect, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
                 EditarItemCommand="{Binding DataContext.EditarEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 EliminarItemCommand="{Binding DataContext.EliminarEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />

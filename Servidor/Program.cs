@@ -6,9 +6,11 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Servidor;
+using Servidor.DomainService;
 using Servidor.Extensiones;
 using Servidor.Helper;
 using Servidor.Hubs;
+using Servidor.Helper;
 using Shared.Interfaces.Model;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -58,6 +60,9 @@ builder.Services.AddAuthentication("Bearer")
 
 
 builder.Services.AddScoped<AppInitializer>();
+builder.Services.AddScoped<DomainAreaTurno>();
+builder.Services.AddAutoServices();
+
 
 
 var app = builder.Build();

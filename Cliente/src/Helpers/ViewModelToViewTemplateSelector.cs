@@ -4,9 +4,11 @@ using System.Windows.Controls;
 using System.Windows.Media;
 using Cliente.View.Model;
 using Cliente.ViewModel.Model;
+using Utilidades.Attributes;
 using Utilidades.Mvvm;
 
 namespace Cliente.Helpers;
+
 
 public class ViewModelToViewTemplateSelector : DataTemplateSelector
 {
@@ -15,45 +17,39 @@ public class ViewModelToViewTemplateSelector : DataTemplateSelector
         if (item is not ViewModelBase vm)
             return base.SelectTemplate(item, container);
 
-        // SubViewModelBase con lógica de vista padre
-        if (vm is SubViewModelBase subVM) return TryFindTemplate($"{subVM.ID}Template");
-        // Agrega más condiciones aquí si lo necesitas
-        // ViewModelServiceBase<T> con inferencia por tipo
-        var entityType = GetEntityTypeFromViewModel(vm);
+        var viewType = GetViewTypeFromViewModel(vm);
 
-        if (entityType != null)
-        {
-            var template = TryFindTemplate($"ViewTemplate_{entityType.Name}");
-            if (template != null)
-                return template;
-        }
+        if (viewType == null)
+            viewType = typeof(PageBaseV);
 
-        // ✅ Fallback genérico: PageBaseV
-        Debug.WriteLine($"🟠 Usando vista genérica (PageBaseV) para: {vm.GetType().Name}");
-        return new DataTemplate
-        {
-            VisualTree = new FrameworkElementFactory(typeof(PageBaseV))
-        };
+        return CreateTemplate(viewType);
     }
 
-    private DataTemplate? TryFindTemplate(string key)
+    private Type? GetViewTypeFromViewModel(ViewModelBase vm)
     {
-        if (Application.Current.Resources[key] is DataTemplate template)
-            return template;
+        var entityType = GetEntityTypeFromViewModel(vm);
+        if (entityType == null)
+            return null;
 
-        // Aquí podrías loguear si usas algún sistema de logs
-        Debug.WriteLine($"⚠ No se encontró un DataTemplate con clave '{key}'");
-        return null;
+        var attr = entityType
+            .GetCustomAttributes(typeof(AutoViewModelAttribute), true)
+            .FirstOrDefault() as AutoViewModelAttribute;
+
+        return attr?.ViewType;
     }
 
-    private Type? GetEntityTypeFromViewModel(object viewModel)
+
+    private Type? GetEntityTypeFromViewModel(ViewModelBase viewModel)
     {
         var currentType = viewModel.GetType();
 
         while (currentType != null)
         {
-            if (currentType.IsGenericType && currentType.GetGenericTypeDefinition() == typeof(ViewModelServiceBase<>))
+            if (currentType.IsGenericType &&
+                currentType.GetGenericTypeDefinition() == typeof(ViewModelServiceBase<>))
+            {
                 return currentType.GetGenericArguments().FirstOrDefault();
+            }
 
             currentType = currentType.BaseType;
         }
@@ -61,19 +57,10 @@ public class ViewModelToViewTemplateSelector : DataTemplateSelector
         return null;
     }
 
-    private DataTemplate CreateErrorTemplate(string typeName)
+
+    private DataTemplate CreateTemplate(Type viewType)
     {
-        var factory = new FrameworkElementFactory(typeof(Border));
-        factory.SetValue(Border.BackgroundProperty, Brushes.LightCoral);
-        factory.SetValue(Border.PaddingProperty, new Thickness(10));
-
-        var textFactory = new FrameworkElementFactory(typeof(TextBlock));
-        textFactory.SetValue(TextBlock.TextProperty, $"❌ No se encontró DataTemplate para: {typeName}");
-        textFactory.SetValue(TextBlock.ForegroundProperty, Brushes.White);
-        textFactory.SetValue(TextBlock.FontWeightProperty, FontWeights.Bold);
-
-        factory.AppendChild(textFactory);
-
+        var factory = new FrameworkElementFactory(viewType);
         return new DataTemplate { VisualTree = factory };
     }
 }

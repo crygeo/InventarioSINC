@@ -20,7 +20,7 @@ public class PageValoresVM : ViewModelServiceBase<ElementoJerarquico>
     public PageValoresVM()
     {
         CrearEntityCommand = new AsyncRelayCommand<Identificador>(CrearEntityAsync);
-        Entitys.CollectionChanged += ChangedCollection;
+        Entities.CollectionChanged += ChangedCollection;
 
         IdentificadoresSubModelBase = new SubViewModelBase(this, "Identificadores");
         AtributosSubModelBase = new SubViewModelBase(this, "Atributos");
@@ -55,7 +55,7 @@ public class PageValoresVM : ViewModelServiceBase<ElementoJerarquico>
     }
         
 
-    public Dictionary<string, List<ElementoJerarquico>> ValoresPorIdentificador => Entitys
+    public Dictionary<string, List<ElementoJerarquico>> ValoresPorIdentificador => Entities
         .Where(v => !string.IsNullOrEmpty(v.IdPerteneciente))
         .GroupBy(v => v.IdPerteneciente)
         .ToDictionary(g => g.Key!, g => g.OrderByDescending(e => e.FechaCreacion).ToList());

@@ -14,67 +14,79 @@ public partial class UsuarioController : BaseController<Usuario>
 {
     private ServiceUsuario ServiceUsuario => (ServiceUsuario)Service;
 
+    // =========================
+    // USUARIO ACTUAL
+    // =========================
+
     [HttpGet("this")]
     public async Task<IActionResult> GetThisUser()
-    {
-        var userId = User.Claims.FirstOrDefault()?.Value ?? "";
+        => await ExecuteSafeAsync(async () =>
+        {
+            var userId = User.Claims.FirstOrDefault()?.Value ?? "";
 
-        if (string.IsNullOrWhiteSpace(userId))
-            return Unauthorized(new ErrorResponse("No se pudo identificar al usuario actual."));
+            if (!IdValidator.IsValidObjectId(userId))
+                return Unauthorized(new ErrorResponse("No se pudo identificar al usuario actual."));
 
-        var usuario = await ServiceUsuario.GetByIdAsync(userId);
-        if (usuario == null) return NotFound(new ErrorResponse("Usuario no encontrado."));
+            var usuario = await ServiceUsuario.GetByIdAsync(userId);
+            return usuario != null
+                ? Ok(usuario)
+                : NotFound(new ErrorResponse("Usuario no encontrado."));
+        }, "Error al obtener el usuario actual.");
 
-        return Ok(usuario);
-    }
+    // =========================
+    // CAMBIAR CONTRASEÑA
+    // =========================
 
     [HttpPut("change-password")]
     [ActionName("CambiarContraseña")]
     public async Task<IActionResult> ChangedPassword([FromBody] ChangedPasswordRequest request)
-    {
-        try
+        => await ExecuteSafeAsync(async () =>
         {
             var solicitanteId = User.Claims.FirstOrDefault()?.Value ?? "";
 
-            if (!IdValidator.IsValidObjectId(solicitanteId) || !IdValidator.IsValidObjectId(request.UserId))
+            // Validación de IDs
+            if (!IdValidator.IsValidObjectId(solicitanteId) ||
+                !IdValidator.IsValidObjectId(request.UserId))
                 return BadRequest(new ErrorResponse("ID(s) no válidos."));
 
             var esMismoUsuario = solicitanteId == request.UserId;
 
+            // Si NO es el mismo usuario → requiere permiso
             if (!esMismoUsuario)
             {
-                var validacion = await ValidarUsuarioAsync();
-                if (validacion != null) return validacion;
+                var auth = await ValidateUserAsync();
+                if (auth != null) return auth;
             }
 
+            // Si ES el mismo usuario → validar contraseña actual
             if (esMismoUsuario)
             {
                 if (string.IsNullOrWhiteSpace(request.OldPassword))
                     return BadRequest(new ErrorResponse("Debe ingresar su contraseña actual."));
 
                 var usuario = await ServiceUsuario.GetByIdAsync(solicitanteId);
-                if (usuario == null || !BCrypt.Net.BCrypt.Verify(request.OldPassword, usuario.Password))
+                if (usuario == null ||
+                    !BCrypt.Net.BCrypt.Verify(request.OldPassword, usuario.Password))
                     return Unauthorized(new ErrorResponse("La contraseña actual es incorrecta."));
             }
 
-            var actualizado = await ServiceUsuario.ActualizarPasswordAsync(request.UserId, request.NewPassword);
-            if (!actualizado)
-                return NotFound(new ErrorResponse("No se encontró el usuario o falló la actualización."));
+            var actualizado = await ServiceUsuario.ActualizarPasswordAsync(
+                request.UserId,
+                request.NewPassword);
 
-            return Ok(true);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex + "\n" + request);
-            return StatusCode(500, new ErrorResponse("Error al cambiar la contraseña.", ex.Message));
-        }
-    }
+            return actualizado
+                ? Ok(true)
+                : NotFound(new ErrorResponse("No se encontró el usuario o falló la actualización."));
+        }, "Error al cambiar la contraseña.");
+
+    // =========================
+    // ASIGNAR ROL
+    // =========================
 
     [HttpPut("asignar-rol")]
     [ActionName("AsignarRol")]
     public async Task<IActionResult> AsignarRol([FromBody] AsignarRolRequest request)
-    {
-        try
+        => await ExecuteSafeAsync(async () =>
         {
             var solicitanteId = User.Claims.FirstOrDefault()?.Value ?? "";
 
@@ -83,17 +95,11 @@ public partial class UsuarioController : BaseController<Usuario>
                 !IdValidator.IsValidObjectId(request.RolId))
                 return BadRequest(new ErrorResponse("ID(s) no válidos."));
 
-            var validacion = await ValidarUsuarioAsync();
-            if (validacion != null) return validacion;
+            var auth = await ValidateUserAsync();
+            if (auth != null) return auth;
 
             await ServiceUsuario.AsignarRol(request.UserId, request.RolId);
 
             return Ok(true);
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine(ex + "\n" + request);
-            return StatusCode(500, new ErrorResponse("Error al asignar el rol.", ex.Message));
-        }
-    }
+        }, "Error al asignar el rol.");
 }

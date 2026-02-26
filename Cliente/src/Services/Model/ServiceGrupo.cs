@@ -8,15 +8,14 @@ namespace Cliente.Services.Model;
 public class ServiceGrupo : ServiceBase<Grupo>, ICustomObjs
 {
     
-    public async Task<IResultResponse<bool>> CreateInSeccionAsync(Grupo seccion, string? seccionId)
+    public async Task<IResultResponse<bool>> CreateInSeccionAsync(Grupo grupo, string? seccionId)
     {
         if (string.IsNullOrWhiteSpace(seccionId))
-            return ResultResponse<bool>.Fail("No hay seccion seleccionado.");
+            return ResultResponse<bool>.Fail("No hay Grupo seleccionado.");
 
-        string url = $"{BaseUrl}/{seccionId}";
-    
-        var request = await GetRequest<Grupo>(HttpMethod.Post, url, seccion);
-        return await HandleResponseAsync<bool, Grupo>(request, "Creado exitosamente", true);
+        grupo.SeccionId = seccionId;
+        return await CreateAsync(grupo);
+        
     }
 
 }

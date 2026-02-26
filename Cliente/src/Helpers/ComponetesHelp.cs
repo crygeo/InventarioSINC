@@ -26,7 +26,7 @@ public static class ComponetesHelp
 
     private static readonly Dictionary<Type, Type[]> CompatibilidadTipos = new()
     {
-        { typeof(TextBox), new[] { typeof(string), typeof(int) } },
+        { typeof(TextBox), new[] { typeof(string), typeof(int), typeof(float) } },
         { typeof(CheckBox), new[] { typeof(bool), typeof(bool?) } },
         { typeof(DatePicker), new[] { typeof(DateTime), typeof(DateTime?) } },
         { typeof(IdentificadoresSelect), new[] { typeof(IEnumerable<string>) } },

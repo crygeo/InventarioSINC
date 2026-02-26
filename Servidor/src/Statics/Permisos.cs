@@ -21,24 +21,40 @@ public static class Permisos
 
     private static List<string> GetPermisos()
     {
-        var list = new List<string>();
-        var assambly = Assembly.GetEntryAssembly();
-        var controllers = assambly?.GetTypes()
-            .Where(t => typeof(ControllerBase).IsAssignableFrom(t) && !t.IsAbstract);
+        var permisos = new HashSet<string>();
 
-        if (controllers == null) return list;
+        var assembly = Assembly.GetExecutingAssembly();
+
+        var controllers = assembly.GetTypes()
+            .Where(t =>
+                typeof(ControllerBase).IsAssignableFrom(t) &&
+                !t.IsAbstract);
+
         foreach (var controller in controllers)
         {
-            var methods = controller.GetMethods(BindingFlags.Instance | BindingFlags.Public);
+            var controllerName = controller.Name.Replace("Controller", "");
+
+            var methods = controller.GetMethods(BindingFlags.Instance | BindingFlags.Public)
+                .Where(m =>
+                    !m.IsDefined(typeof(NonActionAttribute)) &&
+                    !m.IsSpecialName);
+
             foreach (var method in methods)
-                if (method.CustomAttributes.Any(a => a.AttributeType == typeof(ActionNameAttribute)))
-                {
-                    var actionName = method.GetCustomAttribute<ActionNameAttribute>();
-                    var FullName = $"{controller?.Name.Replace("Controller", "")}.{actionName?.Name}";
-                    list.Add(FullName);
-                }
+            {
+                var actionName = NormalizeActionName(method.Name);
+                permisos.Add($"{controllerName}.{actionName}");
+            }
         }
 
-        return list;
+        return permisos.ToList();
     }
+    
+    private static string NormalizeActionName(string methodName)
+    {
+        return methodName.EndsWith("Async")
+            ? methodName[..^5]
+            : methodName;
+    }
+
+
 }

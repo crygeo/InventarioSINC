@@ -18,7 +18,7 @@
                   IsReadOnly="True"
                   AutoGenerateColumns="False"
                   SelectedItem="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=Item, Mode=TwoWay}"
-                  ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=ItemsSource}"
+                  ItemsSource="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=ItemsSource, UpdateSourceTrigger=PropertyChanged}"
                   EnableRowVirtualization="True"
                   EnableColumnVirtualization="True"
                   VirtualizingPanel.IsVirtualizing="True"

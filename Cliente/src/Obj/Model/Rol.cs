@@ -1,5 +1,6 @@
 ﻿using Cliente.Attributes;
 using Cliente.View.Dialog;
+using Cliente.View.Model;
 using MaterialDesignThemes.Wpf;
 using Shared.Interfaces.Model.Obj;
 using Utilidades.Attributes;
@@ -7,7 +8,7 @@ using Utilidades.Interfaces;
 
 namespace Cliente.Obj.Model;
 
-[AutoViewModel]
+[AutoViewModel(typeof(PageRolesV))]
 [Navegacion("PanelConfig", TituloS = "Roles", SelectedIcon = PackIconKind.AlphaRBox,
     UnselectedIcon = PackIconKind.AlphaRBoxOutline, DialogoPersonalizado = typeof(RolDialog))]
 public class Rol : ModelBase<IRol>, IRol, IClassified

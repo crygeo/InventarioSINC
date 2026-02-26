@@ -1,4 +1,5 @@
 ﻿using System.Collections.ObjectModel;
+using System.Diagnostics;
 using Cliente.Default;
 using Cliente.Extencions;
 using Cliente.Helpers;
@@ -17,10 +18,10 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
 {
     // ==============================
     // VARIABLES PRIVADAS
-    private readonly int _tiempoEsperaS = 5; // Variable para controlar si ya estamos en el proceso de carga
-    private bool _isLoading; // Variable para controlar si ya estamos en el proceso de carga
+    private const int TiempoEsperaSegundos = 5; // Variable para controlar si ya estamos en el proceso de carga
 
 
+    private bool _canRefresh = true; // Variable para controlar si ya estamos en el proceso de carga
     private bool _autoCarga = true;
     private TEntity? _entitySelect;
     private int _progressValue;
@@ -38,7 +39,8 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
 
     // ==============================
     // PROPIEDADES PÚBLICAS
-    public ObservableCollection<TEntity> Entitys { get; } = [];
+    public ObservableCollection<TEntity> Entities { get; } = [];
+
     public TEntity? EntitySelect
     {
         get => _entitySelect;
@@ -49,48 +51,63 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
             EliminarEntityCommand.NotifyCanExecuteChanged();
         }
     }
+
+    public bool CanRefresh
+    {
+        get => _canRefresh;
+        set
+        {
+            if(SetProperty(ref _canRefresh, value))
+                CargarPageCommand.NotifyCanExecuteChanged();
+        }
+    }
+
     public bool ProgressVisible
     {
         get => _progressVisible;
         set => SetProperty(ref _progressVisible, value);
     }
+
     public int ProgressValue
     {
         get => _progressValue;
         set => SetProperty(ref _progressValue, value);
     }
+
     public bool AutoCarga
     {
         get => _autoCarga;
         set => SetProperty(ref _autoCarga, value);
     }
+
     public int PageSize
     {
         get => _pageSize;
         set => SetProperty(ref _pageSize, value);
     }
+
     public int TotalItems
     {
         get => _totalItems;
         set => SetProperty(ref _totalItems, value);
     }
+
     public int PageIndex
     {
         get => _pageIndex;
         set => SetProperty(ref _pageIndex, value);
     }
     // ==============================
-    
+
     protected bool CanNextPage => (PageIndex + 1) * PageSize < TotalItems;
     protected bool CanPreviousPage => PageIndex > 0;
-    
+
     public Type EntityType => typeof(TEntity);
 
     /* ==============================
       MÉTODOS VIRTUALES CanExecute
       ============================== */
 
-    protected virtual bool CanCargarPage => true;
     protected virtual bool CanCrearEntity => true;
     protected virtual bool CanEditarEntity => true;
     protected virtual bool CanEliminarEntity => true;
@@ -118,7 +135,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
     {
         CargarPageCommand = new AsyncRelayCommand(
             CargarPageAsync,
-            () => CanCargarPage
+            () => CanRefresh
         );
 
         CrearEntityCommand = new AsyncRelayCommand(
@@ -144,21 +161,100 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
             PrevPageAsync,
             () => CanPreviousPage
         );
-
-        _ = InitAsync(); // 🔥 fire & forget CONTROLADO
     }
 
     #region Metodos de inicialización y cierre
 
-    protected virtual async Task InitAsync()
+    private bool _initialized;
+    private bool _disposed;
+    private bool _active;
+
+    public virtual async Task ActivateAsync()
+    {
+
+        if (!_initialized)
+        {
+            _initialized = true;
+            await InitInternalAsync(); // SOLO una vez
+        }
+
+        if (_active) return; // ya activo
+
+        _active = true;
+        await OnActivateAsync(); // se puede repetir
+        
+        
+
+
+    }
+
+
+    public virtual async Task DeactivateAsync()
+    {
+        if (!_active) return;
+
+        _active = false;
+        await OnDeactivateAsync();
+    }
+
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        OnDispose();
+        GC.SuppressFinalize(this);
+    }
+
+    
+    protected virtual async Task InitInternalAsync()
     {
         await ServicioBase.InitializeAsync();
+    }
+
+    protected virtual async Task OnActivateAsync()
+    {
+        ServicioBase.CollectionChanged += OnServiceCollectionChanged;
         await LoadPageAsync(0);
     }
 
-    protected async Task StopAsync()   
+    protected virtual async Task OnDeactivateAsync()
     {
+        ServicioBase.CollectionChanged -= OnServiceCollectionChanged;
         await ServicioBase.ShutdownAsync();
+    }
+
+    protected virtual void OnDispose()
+    {
+        ServicioBase.CollectionChanged -= OnServiceCollectionChanged;
+        //ServicioBase.Dispose();
+    }
+
+    
+    protected virtual void OnServiceCollectionChanged(EntityChangeType type, string id, TEntity? entity)
+    {
+        switch (type)
+        {
+            case EntityChangeType.Created:
+                Entities.Add(entity!);
+                break;
+
+            case EntityChangeType.Updated:
+                var existing = Entities.FirstOrDefault(x => x.Id == id);
+                if (existing != null)
+                {
+                    var index = Entities.IndexOf(existing);
+                    Entities[index] = entity!;
+                }
+                break;
+
+            case EntityChangeType.Deleted:
+                var toRemove = Entities.FirstOrDefault(x => x.Id == id);
+                if (toRemove != null)
+                    Entities.Remove(toRemove);
+                break;
+        }
     }
 
     #endregion
@@ -168,10 +264,12 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
     public async Task LoadPageAsync(int pageNumber)
     {
         PageIndex = pageNumber;
+        
         await CargarPageAsync();
         OnPropertyChanged(nameof(CanNextPage));
         OnPropertyChanged(nameof(CanPreviousPage));
     }
+
     public async Task NextPageAsync()
     {
         if (!CanNextPage) return;
@@ -189,8 +287,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
     #endregion
 
     #region MÉTODOS Crud Asíncronos
-    
-   
+
     public virtual async Task CreateAsync()
     {
         await DialogServiceI.BuscarMostrarDialogAsync(
@@ -230,8 +327,9 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
 
         await DialogServiceI.MostrarDialogo(confirmDialog);
     }
+
     #endregion
-    
+
     #region MÉTODOS PRIVADOS CRUD
 
     public virtual async Task ConfirmarCrearEntityAsync(TEntity? entity)
@@ -251,14 +349,25 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
     private async Task ConfirmarEditarEntityAsync(TEntity? entity)
     {
         if (entity == null) return;
+        var entityOriginal = ServicioBase.GetFromCache(entity.Id);
+        if (entityOriginal == null) return;
 
-        await DialogServiceI.MostrarDialogoProgreso(async () =>
+        var changes = entityOriginal.GetChanges(entity);
+        if (changes.Count < 0) return;
+
+        foreach (var property in changes)
         {
-            var result = await ServicioBase.UpdateAsync(entity.Id, entity);
-            result.ObjInteration = typeof(TEntity);
-            await DialogServiceI.ValidarRespuesta(result);
-            return result;
-        }, DialogDefaults.Progress);
+            if (property.NewValue != null)
+            {
+                await DialogServiceI.MostrarDialogoProgreso(async () =>
+                {
+                    var result = await ServicioBase.PropertyUpdateAsync(entity.Id, property.Name, property.NewValue);
+                    result.ObjInteration = typeof(TEntity);
+                    await DialogServiceI.ValidarRespuesta(result);
+                    return result;
+                }, DialogDefaults.Progress);
+            }
+        }
     }
 
     private async Task ConfirmarEliminarEntityAsync()
@@ -275,47 +384,55 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
     }
 
     #endregion
-    
+
     // ==============================
     // MÉTODOS PRIVADOS
     // ==============================
     private async Task CargarPageAsync()
     {
-        if (_isLoading)
+        #region  CanRefresh
+        if (!CanRefresh)
             return;
 
-        _isLoading = true;
+        CanRefresh = false;
         ProgressVisible = true;
         ProgressValue = 0;
 
-        var progressTask = Task.Run(async () =>
-        {
-            for (var i = 0; i <= 100; i++)
-            {
-                ProgressValue = i;
-                await Task.Delay(_tiempoEsperaS * 10);
-            }
+        _ = StartCooldownAsync(TiempoEsperaSegundos); // 5 segundos
 
-            ProgressVisible = false;
-            _isLoading = false;
-        });
+        #endregion
 
         var result = await ServicioBase.GetPagedAsync(PageIndex, PageSize);
         await DialogServiceI.ValidarRespuesta(result);
         if (result.Success)
         {
-            Entitys.Clear();
+            Entities.Clear();
             foreach (var entity in result.EntityGet!.Items)
             {
-                Entitys.Add(entity);
+                Entities.Add(entity);
                 ServicioBase.CacheById[entity.Id] = entity;
             }
 
             TotalItems = result.EntityGet.TotalCount;
         }
 
-        await progressTask;
     }
+    
+    private async Task StartCooldownAsync(int seconds)
+    {
+        int steps = 100;
+        int delay = (seconds * 1000) / steps;
+
+        for (int i = 0; i <= steps; i++)
+        {
+            ProgressValue = i;
+            await Task.Delay(delay);
+        }
+
+        ProgressVisible = false;
+        CanRefresh = true;
+    }
+
 
     protected override void UpdateChanged()
     {

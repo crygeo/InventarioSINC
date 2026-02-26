@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
 using Cliente.Attributes;
+using Cliente.View.Model;
 using MaterialDesignThemes.Wpf;
 using Shared.Interfaces.Model.Obj;
 using Utilidades.Attributes;
@@ -9,7 +10,7 @@ using Utilidades.Controls;
 // ReSharper disable once IdentifierTypo
 namespace Cliente.Obj.Model;
 
-[AutoViewModel]
+[AutoViewModel(typeof(PageValoresV))]
 [Navegacion("PanelConfig", TituloS = "Valores", SelectedIcon = PackIconKind.AlphaVBox,
     UnselectedIcon = PackIconKind.AlphaVBoxOutline)]
 public class ElementoJerarquico : ModelBase<ElementoJerarquico>, IElementoJerarquico

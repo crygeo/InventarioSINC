@@ -15,7 +15,7 @@
             <RowDefinition Height="80" />
         </Grid.RowDefinitions>
         <items:ObjectIList Grid.Row="0"
-                           ItemsSource="{Binding Entitys}"
+                           ItemsSource="{Binding Entities}"
                            Item="{Binding EntitySelect, Mode=TwoWay}"
                            EditarItemCommand="{Binding EditarEntityCommand}"
                            EliminarItemCommand="{Binding EliminarEntityCommand}"
@@ -28,7 +28,7 @@
                     md:ButtonProgressAssist.Value="{Binding ProgressValue}"
                     VerticalAlignment="Center"
                     HorizontalAlignment="Right"
-                    Command="{Binding CargarEntityCommand}"
+                    Command="{Binding CargarPageCommand}"
                     ToolTip="MaterialDesignFloatingActionDarkButton">
                 <md:PackIcon Width="24"
                              Height="24"

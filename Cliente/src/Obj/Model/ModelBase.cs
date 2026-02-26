@@ -84,6 +84,7 @@ public abstract class ModelBase : NotifyProperty, INotifyDataErrorInfo, IRemoteU
 
     protected override bool SetProperty<T1>(ref T1 field, T1 value, [CallerMemberName] string? propertyName = null)
     {
+        
         var cambiado = base.SetProperty(ref field, value, propertyName);
         if (cambiado)
             Validar(propertyName!);

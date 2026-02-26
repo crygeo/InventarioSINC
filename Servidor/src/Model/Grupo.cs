@@ -11,6 +11,7 @@ namespace Servidor.Model;
 [AutoController]
 public class Grupo : IGrupo
 {
+
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
     public string Id { get; set; }
@@ -19,6 +20,9 @@ public class Grupo : IGrupo
     public bool Updatable { get; set; }
 
     public string Nombre { get; set; }
+
+    public string SeccionId{ get; set; }
+
     public string JefeId { get; set; }
     public int Cupo { get; set; }
     public IList<string> EmpleadoIds { get; set; }

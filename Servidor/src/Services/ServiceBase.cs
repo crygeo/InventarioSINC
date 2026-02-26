@@ -12,15 +12,15 @@ using Shared.Interfaces.Model;
 
 namespace Servidor.Services;
 
-public class ServiceBase<TObj> : IService<TObj> where TObj : class, IModelObj
+public class ServiceBase<TEntity> : IService<TEntity> where TEntity : class, IModelObj
 {
-    private HubServiceBase<TObj>? _hubService;
-    private RepositorioBase<TObj>? _repository;
+    private HubServiceBase<TEntity>? _hubService;
+    private RepositorioBase<TEntity>? _repository;
 
-    public virtual IRepository<TObj> Repository => _repository ??= RepositorioFactory.GetRepositorio<TObj>();
-    public virtual IHubService<TObj> HubService => _hubService ??= HubServiceFactory.GetHubService<TObj>();
+    public virtual IRepository<TEntity> Repository => _repository ??= RepositorioFactory.GetRepositorio<TEntity>();
+    public virtual IHubService<TEntity> HubService => _hubService ??= HubServiceFactory.GetHubService<TEntity>();
 
-    public async Task<bool> CreateAsync(TObj entity)
+    public async Task<bool> CreateAsync(TEntity entity)
     {
         if (await Repository.CreateAsync(entity))
         {
@@ -31,7 +31,7 @@ public class ServiceBase<TObj> : IService<TObj> where TObj : class, IModelObj
         return false;
     }
 
-    public async Task<bool> UpdateAsync(string id, TObj entity)
+    public async Task<bool> UpdateAsync(string id, TEntity entity)
     {
         if (await Repository.UpdateAsync(id, entity))
         {
@@ -42,7 +42,7 @@ public class ServiceBase<TObj> : IService<TObj> where TObj : class, IModelObj
         return false;
     }
 
-    public async Task<bool> DeleteAsync(string id)
+    public virtual async Task<bool> DeleteAsync(string id)
     {
         var entity = await Repository.GetByIdAsync(id);
         if (entity != null && await Repository.DeleteAsync(id))
@@ -54,21 +54,62 @@ public class ServiceBase<TObj> : IService<TObj> where TObj : class, IModelObj
         return false;
     }
 
-    public virtual Task<PagedResult<TObj>> GetPagedAsync(int page, int pageSize)
+    public virtual Task<PagedResult<TEntity>> GetPagedAsync(int page, int pageSize)
     {
         return Repository.GetPagedAsync(page, pageSize);
     }
 
-    public Task<IEnumerable<TObj>> GetAllAsync()
+    public Task<IEnumerable<TEntity>> GetAllAsync()
     {
         return Repository.GetAllAsync();
     }
 
-    public Task<TObj?> GetByIdAsync(string id)
+    public Task<TEntity?> GetByIdAsync(string id)
     {
         return Repository.GetByIdAsync(id);
     }
 
+    public async Task<bool> UpdateProperty(string entityId, string selector, object itemId)
+    {
+        var entity = await Repository.UpdateProperty(entityId, selector, itemId);
+        if (entity)
+        {
+            await HubService.UpdateProperty(entityId, selector, itemId);
+            ;
+        }
+
+        return entity;
+    }
+
+    public async Task<bool> AddItemIdToListAsync(string entityId, string selector, object itemId)
+    {
+        var update = await Repository.AddItemIdToListAsync(entityId, selector, itemId);
+        if (update) await HubService.AddItemToListAsync(entityId, selector, itemId);
+        return update;
+    }
+
+    public async Task<bool> RemoveItemIdToListAsync(string entityId, string selector, object itemId)
+    {
+        var update = await Repository.RemoveItemIdToListAsync(entityId, selector, itemId);
+        if (update) await HubService.RemoveItemToListAsync(entityId, selector, itemId);
+        return update;
+    }
+
+    public Task<long> RemoveItemFromAllListsAsync(string selector, object itemId)
+    {
+        return Repository.RemoveItemFromAllListsAsync(selector, itemId);
+    }
+
+    public Task<long> RemoveItemsAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        return Repository.RemoveItemsAsync(predicate);
+    }
+
+    public Task<List<TEntity>> GetItemsAsync(Expression<Func<TEntity, bool>> predicate)
+    {
+        return Repository.GetItemsAsync(predicate);
+    }
+    
     public virtual Task InitServiceAsync()
     {
         return Task.CompletedTask;
@@ -105,18 +146,4 @@ public class ServiceBase<TObj> : IService<TObj> where TObj : class, IModelObj
 
         return false;
     }
-
-    public async Task<bool> UpdateProperty(string entityId, string selector, object itemId)
-    {
-        var entity = await Repository.UpdateProperty(entityId, selector, itemId);
-        if (entity)
-        {
-            await HubService.UpdateProperty(entityId, selector, itemId );;
-        }
-
-        return entity;
-    }
-    
-   
-
 }

@@ -3,6 +3,7 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Input;
 using Cliente.Converter;
 using Utilidades.Attributes;
 
@@ -84,5 +85,14 @@ public partial class PageAreasV : UserControl
         }
     }
 
+    private void TreeViewItem_PreviewMouseRightButtonDown(object sender, MouseButtonEventArgs e)
+    {
+        if (sender is TreeViewItem item)
+        {
+            item.IsSelected = true;
+            item.Focus();
+            e.Handled = false;
+        }
+    }
 }
 

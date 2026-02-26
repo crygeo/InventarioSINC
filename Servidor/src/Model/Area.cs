@@ -21,10 +21,6 @@ public class Area : IArea
 
     public string Nombre { get; set; }
 
-    [IdType(typeof(Turno))] 
-    public IList<string> TurnoIds { get; set; }
-
-
     public void Update(IModelObj entity)
     {
         throw new NotImplementedException();

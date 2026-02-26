@@ -1,5 +1,6 @@
 ﻿using System.Windows.Controls;
 using Cliente.Attributes;
+using Cliente.View.Model;
 using MaterialDesignThemes.Wpf;
 using Shared.Interfaces.Model.Obj;
 using Utilidades.Attributes;
@@ -7,7 +8,7 @@ using Utilidades.Controls;
 
 namespace Cliente.Obj.Model;
 
-[AutoViewModel]
+[AutoViewModel(typeof(PageUsuariosV))]
 [Navegacion("PanelConfig", TituloS = "Usuarios", SelectedIcon = PackIconKind.AlphaUBox,
     UnselectedIcon = PackIconKind.AlphaUBoxOutline)]
 public class Usuario : ModelBase<IUsuario>, IUsuario

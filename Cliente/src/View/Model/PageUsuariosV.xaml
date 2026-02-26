@@ -33,7 +33,7 @@
             </Grid.RowDefinitions>
 
             <items:UsuarioList
-                ItemsSource="{Binding DataContext.Entitys, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                ItemsSource="{Binding DataContext.Entities, RelativeSource={RelativeSource AncestorType=UserControl}}"
                 Grid.Row="0"
                 Item="{Binding DataContext.EntitySelect, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
                 EditarUsuarioCommand="{Binding DataContext.EditarEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"

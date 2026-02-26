@@ -7,7 +7,7 @@
                     xmlns:mvvm="clr-namespace:Utilidades.Mvvm;assembly=Utilidades">
 
 
-    <DataTemplate DataType="{x:Type vm:PageProcesosVM}">
+    <DataTemplate DataType="{x:Type vm:PageProcesosVm}">
         <view:PageProcesosV />
     </DataTemplate>
 
@@ -15,24 +15,4 @@
         <view:PageGestionEmployerV />
     </DataTemplate>
 
-    <DataTemplate x:Key="ViewTemplate_Rol">
-        <model:PageRolesV />
-    </DataTemplate>
-
-    <DataTemplate x:Key="ViewTemplate_Usuario">
-        <model:PageUsuariosV />
-    </DataTemplate>
-
-    <DataTemplate x:Key="ViewTemplate_ElementoJerarquico">
-        <model:PageValoresV />
-    </DataTemplate>
-    <DataTemplate x:Key="ViewTemplate_Area">
-        <model:PageAreasV />
-    </DataTemplate>
-
-    <DataTemplate x:Key="IdentificadoresTemplate" DataType="{x:Type mvvm:SubViewModelBase}">
-        <subPage:PageIdentificadoresV />
-    </DataTemplate>
-
-
-</ResourceDictionary>
+  </ResourceDictionary>

@@ -11,12 +11,10 @@ public class ServiceSeccion : ServiceBase<Seccion>, ICustomObjs
     public async Task<IResultResponse<bool>> CreateInTurnoAsync(Seccion seccion, string? turnoId)
     {
         if (string.IsNullOrWhiteSpace(turnoId))
-            return ResultResponse<bool>.Fail("No hay turno seleccionado.");
-
-        string url = $"{BaseUrl}/{turnoId}"; // Coincide con [HttpPost("{turnoId}")]
-    
-        var request = await GetRequest<Seccion>(HttpMethod.Post, url, seccion);
-        return await HandleResponseAsync<bool, Seccion>(request, "Creado exitosamente", true);
+            return ResultResponse<bool>.Fail("No hay turno selecionado.");
+                
+        seccion.TurnoId = turnoId;
+        return await CreateAsync(seccion);
     }
 
 }
