@@ -75,6 +75,10 @@ public partial class AccountDialog : UserControl, IDialog
 
     public required string DialogNameIdentifier { get; set; }
     public required string DialogOpenIdentifier { get; set; }
+    public void OnDialogOpened()
+    {
+        
+    }
 
     private async void ButtonChangedPass_OnClick(object sender, RoutedEventArgs e)
     {
