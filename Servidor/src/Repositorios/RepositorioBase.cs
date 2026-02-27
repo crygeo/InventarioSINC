@@ -3,27 +3,73 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Shared.ClassModel;
 using Shared.Interfaces;
 using Shared.Interfaces.Model;
+using Shared.Request;
 
 namespace Servidor.Repositorios;
 
 public class RepositorioBase<TEntity> : IRepository<TEntity> where TEntity : IModelObj
 {
-    
     public RepositorioBase()
     {
-        _ = new MongoDBConnection(); // Inicializa la conexión a la base de datos
+        _ = new MongoDBConnection();
         Collection = MongoDBConnection._database?.GetCollection<TEntity>(NameCollection)
                      ?? throw new InvalidOperationException($"No se pudo encontrar la colección: {NameCollection}");
     }
 
     public IMongoCollection<TEntity> Collection { get; }
 
-
     public virtual string NameCollection => $"Rep{typeof(TEntity).Name}";
+
+    // =========================
+    // SEARCH
+    // =========================
+
+    public async Task<IEnumerable<TEntity>> SearchAsync(SearchRequest request)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(request.Query) || request.Propiedades.Count == 0)
+                return Enumerable.Empty<TEntity>();
+
+            // Cada palabra del query debe aparecer en al menos una propiedad (AND entre palabras)
+            var palabras = request.Query
+                .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+                .Distinct()
+                .ToList();
+
+            var filtrosPorPalabra = palabras.Select(palabra =>
+            {
+                // OR entre propiedades para esta palabra
+                var regex = new BsonRegularExpression(palabra, "i"); // case insensitive
+                var filtrosPorPropiedad = request.Propiedades
+                    .Select(prop => Builders<TEntity>.Filter.Regex(prop, regex))
+                    .ToList();
+
+                return Builders<TEntity>.Filter.Or(filtrosPorPropiedad);
+            });
+
+            // AND entre todas las palabras
+            var filtroFinal = Builders<TEntity>.Filter.And(filtrosPorPalabra);
+
+            return await Collection.Find(filtroFinal)
+                .Limit(request.PageSize)
+                .ToListAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error en búsqueda: {ex.Message}");
+            return Enumerable.Empty<TEntity>();
+        }
+    }
+
+    // =========================
+    // CRUD
+    // =========================
 
     public virtual async Task<IEnumerable<TEntity>> GetAllAsync()
     {
@@ -34,7 +80,7 @@ public class RepositorioBase<TEntity> : IRepository<TEntity> where TEntity : IMo
         catch (Exception ex)
         {
             Console.WriteLine($"Error al obtener todos los documentos: {ex.Message}");
-            return Enumerable.Empty<TEntity>(); // Retorna una lista vacía en caso de error
+            return Enumerable.Empty<TEntity>();
         }
     }
 
@@ -60,7 +106,6 @@ public class RepositorioBase<TEntity> : IRepository<TEntity> where TEntity : IMo
         catch (Exception ex)
         {
             Console.WriteLine($"Error en paginación: {ex.Message}");
-
             return new PagedResult<TEntity>
             {
                 Items = [],
@@ -70,7 +115,6 @@ public class RepositorioBase<TEntity> : IRepository<TEntity> where TEntity : IMo
             };
         }
     }
-
 
     public virtual async Task<TEntity?> GetByIdAsync(string id)
     {
@@ -90,12 +134,12 @@ public class RepositorioBase<TEntity> : IRepository<TEntity> where TEntity : IMo
         try
         {
             await Collection.InsertOneAsync(entity);
-            return true; // Inserción exitosa
+            return true;
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error al insertar el documento: {ex.Message}");
-            return false; // Fallo en la inserción
+            return false;
         }
     }
 
@@ -118,7 +162,7 @@ public class RepositorioBase<TEntity> : IRepository<TEntity> where TEntity : IMo
         try
         {
             var obj = await GetByIdAsync(id);
-            if (obj == null || !obj.Deleteable) return false; // Si el objeto no existe, no se puede eliminar
+            if (obj == null || !obj.Deleteable) return false;
 
             var result = await Collection.DeleteOneAsync(x => x.Id == id);
             return result.DeletedCount > 0;
@@ -129,66 +173,51 @@ public class RepositorioBase<TEntity> : IRepository<TEntity> where TEntity : IMo
             return false;
         }
     }
-    
+
     public async Task<bool> UpdateProperty(string entityId, string selector, object newValues)
     {
         var filter = Builders<TEntity>.Filter.Eq(e => e.Id, entityId);
         var update = Builders<TEntity>.Update.Set(selector, newValues);
 
         var result = await Collection.UpdateOneAsync(filter, update);
-        return result.IsAcknowledged && result.MatchedCount > 0;
+        return result.ModifiedCount > 0;
     }
 
-    
     public async Task<bool> AddItemIdToListAsync(string entityId, string selector, object itemId)
     {
         var filter = Builders<TEntity>.Filter.Eq(e => e.Id, entityId);
-        var update = Builders<TEntity>.Update.AddToSet(selector, itemId);
+        var update = Builders<TEntity>.Update.Push(selector, itemId);
 
         var result = await Collection.UpdateOneAsync(filter, update);
-        return result.IsAcknowledged && result.MatchedCount > 0;
+        return result.ModifiedCount > 0;
     }
 
-    
-    public async Task<bool> RemoveItemIdToListAsync(
-        string entityId,
-        string selector,
-        object itemId)
+    public async Task<bool> RemoveItemIdToListAsync(string entityId, string selector, object itemId)
     {
         var filter = Builders<TEntity>.Filter.Eq(e => e.Id, entityId);
         var update = Builders<TEntity>.Update.Pull(selector, itemId);
 
         var result = await Collection.UpdateOneAsync(filter, update);
-
-        return result.IsAcknowledged && result.ModifiedCount > 0;
+        return result.ModifiedCount > 0;
     }
 
-
-    
-    public async Task<long> RemoveItemFromAllListsAsync(
-        string selector,
-        object itemId)
+    public async Task<long> RemoveItemFromAllListsAsync(string selector, object itemId)
     {
         var filter = Builders<TEntity>.Filter.AnyEq(selector, itemId);
         var update = Builders<TEntity>.Update.Pull(selector, itemId);
 
         var result = await Collection.UpdateManyAsync(filter, update);
-
         return result.ModifiedCount;
     }
 
-    public async Task<long> RemoveItemsAsync(
-        Expression<Func<TEntity, bool>> predicate)
+    public async Task<long> RemoveItemsAsync(Expression<Func<TEntity, bool>> predicate)
     {
         var result = await Collection.DeleteManyAsync(predicate);
         return result.DeletedCount;
     }
-    
-    public async Task<List<TEntity>> GetItemsAsync(
-        Expression<Func<TEntity, bool>> predicate)
+
+    public async Task<List<TEntity>> GetItemsAsync(Expression<Func<TEntity, bool>> predicate)
     {
-        return await Collection
-            .Find(predicate)
-            .ToListAsync();
+        return await Collection.Find(predicate).ToListAsync();
     }
 }

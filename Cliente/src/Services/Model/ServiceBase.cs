@@ -273,6 +273,12 @@ public class ServiceBase<TEntity> : HttpClientBase, IServiceClient<TEntity> wher
 
     protected virtual void OnItemRemovedToList(PropertyChangedEventRequest request) =>
         AplyItemRemovedToList(request.EntityId, request.Selector, request.NewValue);
+    
+    public async Task<IResultResponse<IEnumerable<TEntity>>> SearchAsync(SearchRequest request)
+    {
+        var req = await GetRequest<TEntity>(HttpMethod.Post, $"{BaseUrl}/search", request);
+        return await HandleResponseAsync<IEnumerable<TEntity>, TEntity>(req, "Búsqueda exitosa");
+    }
 
     private static PropertyInfo? GetPropertyIfExists(Type type, string propertyName)
     {

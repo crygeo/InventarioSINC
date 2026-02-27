@@ -8,15 +8,31 @@ using Servidor.Model;
 
 namespace Servidor.Helper;
 
+/// <summary>
+/// Wrapper simple para transportar la clave JWT via DI.
+/// </summary>
+public class JwtSecretKey
+{
+    public byte[] Key { get; }
+    public JwtSecretKey(byte[] key) => Key = key;
+}
+
 public static class GenerateTokenForUser
 {
-    private static readonly string
-        SecretKey = "ClaveSuperSeguraDesdeConfiguracion"; // Cárgala desde appsettings.json o variables de entorno
+    private static byte[] _key = Array.Empty<byte>();
 
-    private static readonly byte[] Key = Encoding.UTF8.GetBytes(SecretKey);
+    /// <summary>
+    /// Debe llamarse una sola vez al arrancar la aplicación (en Program.cs).
+    /// </summary>
+    public static void Initialize(byte[] key)
+    {
+        _key = key;
+    }
 
     public static string GenerateToken(Usuario usuario, int expireMinutes = 60)
     {
+        EnsureInitialized();
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var claims = GetClaims(usuario, expireMinutes);
 
@@ -24,22 +40,24 @@ public static class GenerateTokenForUser
         {
             Subject = new ClaimsIdentity(claims),
             Expires = DateTime.UtcNow.AddMinutes(expireMinutes),
-            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(Key),
+            SigningCredentials = new SigningCredentials(
+                new SymmetricSecurityKey(_key),
                 SecurityAlgorithms.HmacSha256Signature)
         };
 
-        // Agregar los roles del usuario al token como claims adicionales
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
 
     public static ClaimsPrincipal? ValidateToken(string token)
     {
+        EnsureInitialized();
+
         var tokenHandler = new JwtSecurityTokenHandler();
         var validationParameters = new TokenValidationParameters
         {
             ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Key),
+            IssuerSigningKey = new SymmetricSecurityKey(_key),
             ValidateIssuer = false,
             ValidateAudience = false,
             ClockSkew = TimeSpan.Zero
@@ -65,13 +83,20 @@ public static class GenerateTokenForUser
             new(ClaimTypes.Dns, usuario.Cedula),
             new(ClaimTypes.MobilePhone, usuario.Celular),
             new("exp",
-                DateTimeOffset.UtcNow.AddMinutes(expireMinutes).ToUnixTimeSeconds()
-                    .ToString()) // Agrega el tiempo de expiración
+                DateTimeOffset.UtcNow.AddMinutes(expireMinutes)
+                    .ToUnixTimeSeconds().ToString())
         };
 
-        // Agregar roles
-        foreach (var rol in usuario.Roles) claims.Add(new Claim(ClaimTypes.Role, rol));
+        foreach (var rol in usuario.Roles)
+            claims.Add(new Claim(ClaimTypes.Role, rol));
 
         return claims;
+    }
+
+    private static void EnsureInitialized()
+    {
+        if (_key.Length == 0)
+            throw new InvalidOperationException(
+                "GenerateTokenForUser no fue inicializado. Llama a Initialize() al arrancar la aplicación.");
     }
 }

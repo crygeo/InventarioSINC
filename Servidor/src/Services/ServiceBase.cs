@@ -9,6 +9,7 @@ using Servidor.Repositorios;
 using Shared.ClassModel;
 using Shared.Interfaces;
 using Shared.Interfaces.Model;
+using Shared.Request;
 
 namespace Servidor.Services;
 
@@ -20,6 +21,17 @@ public class ServiceBase<TEntity> : IService<TEntity> where TEntity : class, IMo
     public virtual IRepository<TEntity> Repository => _repository ??= RepositorioFactory.GetRepositorio<TEntity>();
     public virtual IHubService<TEntity> HubService => _hubService ??= HubServiceFactory.GetHubService<TEntity>();
 
+    // =========================
+    // SEARCH
+    // =========================
+
+    public Task<IEnumerable<TEntity>> SearchAsync(SearchRequest request)
+        => Repository.SearchAsync(request);
+
+    // =========================
+    // CRUD
+    // =========================
+
     public async Task<bool> CreateAsync(TEntity entity)
     {
         if (await Repository.CreateAsync(entity))
@@ -27,7 +39,6 @@ public class ServiceBase<TEntity> : IService<TEntity> where TEntity : class, IMo
             await HubService.NewItem(entity);
             return true;
         }
-
         return false;
     }
 
@@ -38,7 +49,6 @@ public class ServiceBase<TEntity> : IService<TEntity> where TEntity : class, IMo
             await HubService.UpdateItem(entity);
             return true;
         }
-
         return false;
     }
 
@@ -50,34 +60,22 @@ public class ServiceBase<TEntity> : IService<TEntity> where TEntity : class, IMo
             await HubService.DeleteItem(entity);
             return true;
         }
-
         return false;
     }
 
     public virtual Task<PagedResult<TEntity>> GetPagedAsync(int page, int pageSize)
-    {
-        return Repository.GetPagedAsync(page, pageSize);
-    }
+        => Repository.GetPagedAsync(page, pageSize);
 
     public Task<IEnumerable<TEntity>> GetAllAsync()
-    {
-        return Repository.GetAllAsync();
-    }
+        => Repository.GetAllAsync();
 
     public Task<TEntity?> GetByIdAsync(string id)
-    {
-        return Repository.GetByIdAsync(id);
-    }
+        => Repository.GetByIdAsync(id);
 
     public async Task<bool> UpdateProperty(string entityId, string selector, object itemId)
     {
         var entity = await Repository.UpdateProperty(entityId, selector, itemId);
-        if (entity)
-        {
-            await HubService.UpdateProperty(entityId, selector, itemId);
-            ;
-        }
-
+        if (entity) await HubService.UpdateProperty(entityId, selector, itemId);
         return entity;
     }
 
@@ -96,24 +94,16 @@ public class ServiceBase<TEntity> : IService<TEntity> where TEntity : class, IMo
     }
 
     public Task<long> RemoveItemFromAllListsAsync(string selector, object itemId)
-    {
-        return Repository.RemoveItemFromAllListsAsync(selector, itemId);
-    }
+        => Repository.RemoveItemFromAllListsAsync(selector, itemId);
 
     public Task<long> RemoveItemsAsync(Expression<Func<TEntity, bool>> predicate)
-    {
-        return Repository.RemoveItemsAsync(predicate);
-    }
+        => Repository.RemoveItemsAsync(predicate);
 
     public Task<List<TEntity>> GetItemsAsync(Expression<Func<TEntity, bool>> predicate)
-    {
-        return Repository.GetItemsAsync(predicate);
-    }
-    
+        => Repository.GetItemsAsync(predicate);
+
     public virtual Task InitServiceAsync()
-    {
-        return Task.CompletedTask;
-    }
+        => Task.CompletedTask;
 
     public async Task<bool> VerificarPermiso(string idUser, string NamePermiso)
     {
@@ -121,7 +111,6 @@ public class ServiceBase<TEntity> : IService<TEntity> where TEntity : class, IMo
         if (database == null) throw new Exception("Base de datos null");
 
         var repUser = database.GetCollection<Usuario>("RepUsuario");
-
         var filterUsuario = Builders<Usuario>.Filter.Eq(u => u.Id, idUser);
         var usuario = (await repUser.FindAsync(filterUsuario)).FirstOrDefault();
 
@@ -132,7 +121,6 @@ public class ServiceBase<TEntity> : IService<TEntity> where TEntity : class, IMo
     {
         var database = MongoDBConnection._database;
         if (database == null) return false;
-
 
         var repRol = database.GetCollection<Rol>("RepRol");
 

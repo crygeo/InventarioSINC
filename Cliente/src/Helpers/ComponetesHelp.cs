@@ -11,6 +11,7 @@ using Cliente.View.Items;
 using MaterialDesignThemes.Wpf;
 using Shared.Interfaces;
 using Shared.Interfaces.Model;
+using Shared.Request;
 using Utilidades.Attributes;
 using Utilidades.Controls;
 using Utilidades.Converters;
@@ -249,16 +250,58 @@ public static class ComponetesHelp
         return componente;
     }
 
-    public static FrameworkElement CrearEntitySelector(object dataContext, string nombrePropiedad, string? hint = null, Type? typeEntity = null)
+    // En FormularioHelper o donde viva CrearEntitySelector
+
+    public static FrameworkElement CrearEntitySelector(
+        object dataContext,
+        string nombrePropiedad,
+        string? hint = null,
+        Type? typeEntity = null)
     {
         var service = (IServiceClient)ServiceFactory.GetService(typeEntity);
-        var entitySelector = new EntitySelector()
+
+        // Recoger propiedades [Buscable] del tipo de entidad
+        var propiedadesBuscables = typeEntity?
+            .GetProperties()
+            .Where(p => p.GetCustomAttribute<BuscableAttribute>() != null)
+            .Select(p => p.Name)
+            .ToList() ?? [];
+
+        // Decidir si usar búsqueda remota (tiene [Buscable]) o local (caché)
+        Func<string, Task<IEnumerable<Empleado>>>? remoteSearch = null;
+
+        var serBase = (ServiceBase<Empleado>)service;
+        if (propiedadesBuscables.Count > 0)
+        {
+            remoteSearch = async query =>
+            {
+                var request = new SearchRequest
+                {
+                    Query = query,
+                    Propiedades = propiedadesBuscables,
+                    PageSize = 20
+                };
+
+                var result = await serBase.SearchAsync(request);
+                return result.Success ? (IEnumerable<Empleado>)result.EntityGet : Enumerable.Empty<Empleado>();
+            };
+        }
+
+        
+        
+        var entitySelector = new EntitySelector
         {
             DataContext = dataContext,
             Margin = new Thickness(5, 0, 5, 10),
             MinWidth = 200,
-            ItemsSource = service.GetAllFromCacheObj(),
-
+            HitText = hint,
+            RemoteSearchFunc = remoteSearch,
+            DisplayMemberPath = "DescripcionVisual",
+            InitialLoadFunc = async () =>
+            {
+                var re = await serBase.GetPagedAsync(0, 100);
+                return re.Success ? re.EntityGet.Items : Enumerable.Empty<Empleado>();
+            }
         };
 
         var binding = new Binding(nombrePropiedad)

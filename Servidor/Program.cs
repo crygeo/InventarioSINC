@@ -10,12 +10,13 @@ using Servidor.DomainService;
 using Servidor.Extensiones;
 using Servidor.Helper;
 using Servidor.Hubs;
-using Servidor.Helper;
 using Shared.Interfaces.Model;
 
 var builder = WebApplication.CreateBuilder(args);
-//var secretKey = Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"] ?? throw new InvalidOperationException("JWT Secret Key not found"));
-var secretKey = Encoding.UTF8.GetBytes("CryGeoElProgramadorDelSigloFracasadoPipipi");
+
+var secretKey = Encoding.UTF8.GetBytes(
+    builder.Configuration["JwtSettings:SecretKey"]
+    ?? throw new InvalidOperationException("JWT Secret Key not found in appsettings.json"));
 
 builder.WebHost.ConfigureKestrel(serverOptions =>
 {
@@ -25,7 +26,6 @@ builder.WebHost.ConfigureKestrel(serverOptions =>
         listenOptions.UseHttps(); // HTTPS con certificado de desarrollo
     });
 });
-
 
 // Add services to the container.
 
@@ -58,18 +58,20 @@ builder.Services.AddAuthentication("Bearer")
         };
     });
 
+// Registrar la clave JWT para que GenerateTokenForUser pueda accederla vía DI
+builder.Services.AddSingleton(new JwtSecretKey(secretKey));
 
 builder.Services.AddScoped<AppInitializer>();
 builder.Services.AddScoped<DomainAreaTurno>();
 builder.Services.AddAutoServices();
 
-
-
 var app = builder.Build();
-
 
 // ✅ Asignar el service provider global al HubFactory
 HubFactory.ServiceProvider = app.Services;
+
+// Inicializar la clave en GenerateTokenForUser
+GenerateTokenForUser.Initialize(app.Services.GetRequiredService<JwtSecretKey>().Key);
 
 // Inicialización con scope
 using (var scope = app.Services.CreateScope())
@@ -99,7 +101,5 @@ app.Use(async (context, next) =>
 });
 
 app.MapControllers();
-
 app.MapAllGenericHubs<IModelObj>();
-
 app.Run();

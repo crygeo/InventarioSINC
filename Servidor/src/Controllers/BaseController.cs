@@ -179,6 +179,26 @@ public class BaseController<TEntity> : ControllerBase, IController<TEntity, IAct
                     () => Service.RemoveItemIdToListAsync(request.EntityId, request.Selector, request.NewValue),
                     "El objeto no fue encontrado para remover el elemento.");
             });
+    
+    // =========================
+    // SEARCH   
+    // =========================
+
+    [HttpPost("search")]
+    public async Task<IActionResult> SearchAsync([FromBody] SearchRequest request)
+        => await ExecuteSafeAsync(async () =>
+        {
+            var auth = await ValidateUserAsync();
+            if (auth != null) return auth;
+
+            if (string.IsNullOrWhiteSpace(request.Query))
+                return BadRequest(new ErrorResponse(400, "El texto de búsqueda no puede estar vacío."));
+
+            if (request.Propiedades == null || request.Propiedades.Count == 0)
+                return BadRequest(new ErrorResponse(400, "Debe indicar al menos una propiedad para buscar."));
+
+            return Ok(await Service.SearchAsync(request));
+        }, "Error no controlado al buscar objetos.");
 
     // =========================
     // HELPERS
