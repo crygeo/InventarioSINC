@@ -84,6 +84,8 @@ public class ServiceBase<TEntity> : HttpClientBase, IServiceClient<TEntity> wher
         return result;
     }
 
+    
+
     public async Task<IResultResponse<TEntity>> GetByIdAsync(string id)
     {
         if (CacheById.TryGetValue(id, out var cached))
@@ -98,10 +100,37 @@ public class ServiceBase<TEntity> : HttpClientBase, IServiceClient<TEntity> wher
         return result;
     }
 
-    public async Task<IResultResponse<object?>> GetByIdAsyncObj(string id)
+    async Task<IResultResponse<object?>> IServiceClient.GetByIdAsync(string id)
     {
         var request = await GetRequest<object?>(HttpMethod.Get, $"{BaseUrl}/{id}");
         return await HandleResponseAsync<object?, object?>(request, "Consulta exitosa");
+    }
+
+    async Task<IResultResponse<PagedResult>> IServiceClient.GetPagedAsync(int page, int pageSize)
+    {
+        var result = await GetPagedAsync(page, pageSize);
+        if (!result.Success)
+            return ResultResponse<PagedResult>.Fail(result.Message);
+
+        var paged = new PagedResult
+        {
+            Items = result.EntityGet.Items,
+            Page = page,
+            PageSize = pageSize,
+            TotalCount = result.EntityGet.TotalCount
+        };
+        
+        return ResultResponse<PagedResult>.Ok(paged);
+
+    }
+    
+    async Task<IResultResponse<IEnumerable>> IServiceClient.SearchAsync(SearchRequest request)
+    {
+        var result = await SearchAsync(request);
+        if (!result.Success)
+            return ResultResponse<IEnumerable>.Fail(result.Message);
+        
+        return ResultResponse<IEnumerable>.Ok(result.EntityGet);
     }
 
     //==============================

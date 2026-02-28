@@ -23,7 +23,8 @@ namespace Cliente.Helpers;
 
 public static class ComponetesHelp
 {
-    private static readonly Dictionary<Type, Func<object, string, string?, Type?, FrameworkElement>> _constructores = new();
+    private static readonly Dictionary<Type, Func<object, string, string?, Type?, FrameworkElement>> _constructores =
+        new();
 
     private static readonly Dictionary<Type, Type[]> CompatibilidadTipos = new()
     {
@@ -45,6 +46,7 @@ public static class ComponetesHelp
     }
 
     #region Crear componente basado en el atributo [Solicitar]
+
     public static FrameworkElement CrearComponente(object objetoModelo, string nombrePropiedad, string? hint = null)
     {
         var tipo = objetoModelo.GetType();
@@ -66,8 +68,9 @@ public static class ComponetesHelp
         throw new Exception(
             $"No se pudo crear el componente para '{nombrePropiedad}'. Comprueve si existe una creacion para {itemType.Name}");
     }
-    
-    public static FrameworkElement CrearAtributesAdd(object objetoModelo, string nombrePropiedad, string? hint = null, Type? typeEntity = null)
+
+    public static FrameworkElement CrearAtributesAdd(object objetoModelo, string nombrePropiedad, string? hint = null,
+        Type? typeEntity = null)
     {
         var atradd = new AtributesAdd
         {
@@ -87,7 +90,8 @@ public static class ComponetesHelp
         return atradd;
     }
 
-    public static FrameworkElement CrearTextBoxConEstilo(object dataContext, string propiedad, string? hint = null, Type? typeEntity = null)
+    public static FrameworkElement CrearTextBoxConEstilo(object dataContext, string propiedad, string? hint = null,
+        Type? typeEntity = null)
     {
         var tipo = dataContext.GetType();
         var propInfo = tipo.GetProperty(propiedad);
@@ -101,7 +105,8 @@ public static class ComponetesHelp
 
         // Verificación: InputBoxConvert debe estar definido
         if (attr.InputBoxConvert == InputBoxType.None)
-            throw new InvalidOperationException($"Debe especificar InputBoxConvert en la propiedad '{propiedad}' del modelo {tipo.Name}.");
+            throw new InvalidOperationException(
+                $"Debe especificar InputBoxConvert en la propiedad '{propiedad}' del modelo {tipo.Name}.");
 
         var txt = new TextBox
         {
@@ -127,7 +132,8 @@ public static class ComponetesHelp
         return txt;
     }
 
-    public static FrameworkElement CrearIdentificadorSelect(object dataContext, string nombrePropiedad, string? hint = null, Type? typeEntity = null)
+    public static FrameworkElement CrearIdentificadorSelect(object dataContext, string nombrePropiedad,
+        string? hint = null, Type? typeEntity = null)
     {
         var identificadorSelect = new IdentificadoresSelect
         {
@@ -148,7 +154,8 @@ public static class ComponetesHelp
         return identificadorSelect;
     }
 
-    public static FrameworkElement CrearDatePickerConEstilo(object dataContext, string propiedad, string? hint = null, Type? typeEntity = null)
+    public static FrameworkElement CrearDatePickerConEstilo(object dataContext, string propiedad, string? hint = null,
+        Type? typeEntity = null)
     {
         var datePicker = new DatePicker
         {
@@ -177,8 +184,9 @@ public static class ComponetesHelp
 
         return datePicker;
     }
-    
-    public static FrameworkElement CrearCheckBoxConEstilo(object dataContext, string propiedad, string? hint = null, Type? typeEntity = null)
+
+    public static FrameworkElement CrearCheckBoxConEstilo(object dataContext, string propiedad, string? hint = null,
+        Type? typeEntity = null)
     {
         var tipo = dataContext.GetType();
         var propInfo = tipo.GetProperty(propiedad);
@@ -214,7 +222,8 @@ public static class ComponetesHelp
         return componente;
     }
 
-    public static FrameworkElement CrearTimePickerConEstilo(object dataContext, string propiedad, string? hint = null, Type? typeEntity = null)
+    public static FrameworkElement CrearTimePickerConEstilo(object dataContext, string propiedad, string? hint = null,
+        Type? typeEntity = null)
     {
         var tipo = dataContext.GetType();
         var propInfo = tipo.GetProperty(propiedad);
@@ -268,9 +277,8 @@ public static class ComponetesHelp
             .ToList() ?? [];
 
         // Decidir si usar búsqueda remota (tiene [Buscable]) o local (caché)
-        Func<string, Task<IEnumerable<Empleado>>>? remoteSearch = null;
+        Func<string, Task<IEnumerable<object>>>? remoteSearch = null;
 
-        var serBase = (ServiceBase<Empleado>)service;
         if (propiedadesBuscables.Count > 0)
         {
             remoteSearch = async query =>
@@ -282,13 +290,12 @@ public static class ComponetesHelp
                     PageSize = 20
                 };
 
-                var result = await serBase.SearchAsync(request);
-                return result.Success ? (IEnumerable<Empleado>)result.EntityGet : Enumerable.Empty<Empleado>();
+                var result = await service.SearchAsync(request);
+                return (IEnumerable<object>)(result.Success ? result.EntityGet : Enumerable.Empty<object>());
             };
         }
 
-        
-        
+
         var entitySelector = new EntitySelector
         {
             DataContext = dataContext,
@@ -299,8 +306,15 @@ public static class ComponetesHelp
             DisplayMemberPath = "DescripcionVisual",
             InitialLoadFunc = async () =>
             {
-                var re = await serBase.GetPagedAsync(0, 100);
-                return re.Success ? re.EntityGet.Items : Enumerable.Empty<Empleado>();
+                var result = await service.GetPagedAsync(0, 100);
+                return result.Success
+                    ? result.EntityGet.Items
+                    : Enumerable.Empty<object>();
+            },
+            GetByIdFunc = async id =>
+            {
+                var result = await service.GetByIdAsync(id);
+                return result.Success ? result.EntityGet : null;
             }
         };
 
@@ -315,6 +329,7 @@ public static class ComponetesHelp
 
         return entitySelector;
     }
+
     #endregion
 
     private static void ValidarCompatibilidad(Type itemType, Type tipoPropiedad, string nombrePropiedad)
@@ -333,7 +348,8 @@ public static class ComponetesHelp
         _constructores[itemType] = factory;
     }
 
-    public static bool TryCreate(Type? itemType, object modelo, string nombreProp, string? hint, Type? typeEntity, out FrameworkElement? control)
+    public static bool TryCreate(Type? itemType, object modelo, string nombreProp, string? hint, Type? typeEntity,
+        out FrameworkElement? control)
     {
         if (itemType != null && _constructores.TryGetValue(itemType, out var factory))
         {

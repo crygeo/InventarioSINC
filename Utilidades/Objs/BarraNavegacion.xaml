@@ -1,0 +1,50 @@
+﻿<UserControl x:Class="Utilidades.Objs.BarraNavegacion"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:objs="clr-namespace:Utilidades.Objs"
+             mc:Ignorable="d"
+             d:DesignHeight="450" d:DesignWidth="800">
+    <Control.FocusVisualStyle>
+        <Style>
+            <Setter Property="Control.Template">
+                <Setter.Value>
+                    <ControlTemplate>
+                        <!-- Sin contenido, o pon algo suave -->
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Control.FocusVisualStyle>
+    <Grid>
+        <ListBox x:Name="Lista" ItemsSource="{Binding ListItemsNav}"
+                 SelectedItem="{Binding SelectedItemNav, Mode=TwoWay}"
+                 SelectedIndex="0"
+                 Grid.Row="0"
+                 FocusVisualStyle="{x:Null}">
+            <ListBox.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel
+                        Orientation="{Binding Orientacion, RelativeSource={RelativeSource AncestorType=UserControl}}" />
+                </ItemsPanelTemplate>
+            </ListBox.ItemsPanel>
+
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesign3.NavigationRailListBoxItem}">
+                    <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+                    <Setter Property="md:BadgedAssist.Badge" Value="{Binding Notification}" />
+                    <Setter Property="md:NavigationRailAssist.IsTextVisible" Value="True" />
+                    <Setter Property="md:NavigationRailAssist.SelectedIcon" Value="{Binding SelectedIcon}" />
+                    <Setter Property="md:NavigationRailAssist.UnselectedIcon" Value="{Binding UnselectedIcon}" />
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.Resources>
+                <DataTemplate DataType="{x:Type objs:ItemNavigationM}">
+                    <TextBlock Text="{Binding Title}" FocusVisualStyle="{x:Null}" />
+                </DataTemplate>
+            </ListBox.Resources>
+        </ListBox>
+    </Grid>
+</UserControl>

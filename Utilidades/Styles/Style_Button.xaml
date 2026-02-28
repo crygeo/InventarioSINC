@@ -1,0 +1,136 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <SolidColorBrush x:Key="Button_Style1_Background">#5555DB83</SolidColorBrush>
+    <SolidColorBrush x:Key="Button_Style1_BorderColor">#55DB83</SolidColorBrush>
+    <SolidColorBrush x:Key="Button_Style1_FocusedBorderColor">#DC7456</SolidColorBrush>
+
+    <Color x:Key="CButton_Style1_BorderColor">#6ED9A1</Color>
+    <Color x:Key="CButton_Style1_FocusedBorderColor">#DC7456</Color>
+
+    <Style x:Key="ButtonStyle1" TargetType="{x:Type Button}">
+        <Setter Property="FocusVisualStyle" Value="{x:Null}" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="{x:Type Button}">
+                    <Grid>
+
+                        <Border x:Name="BorderControl" CornerRadius="10"
+                                BorderBrush="{StaticResource Button_Style1_BorderColor}" BorderThickness="2"
+                                Background="{StaticResource Button_Style1_Background}">
+                            <TextBlock Text="{TemplateBinding Content}" VerticalAlignment="Center"
+                                       HorizontalAlignment="Center" />
+                        </Border>
+                        <Ellipse x:Name="Ripple" Fill="White" Opacity="0" HorizontalAlignment="Center"
+                                 VerticalAlignment="Center" />
+
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsFocused" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="BorderControl"
+                                                        Storyboard.TargetProperty="BorderBrush.Color"
+                                                        To="{StaticResource CButton_Style1_FocusedBorderColor}"
+                                                        Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="BorderControl"
+                                                        Storyboard.TargetProperty="BorderBrush.Color"
+                                                        To="{StaticResource CButton_Style1_BorderColor}"
+                                                        Duration="0:0:0.2" />
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <EventTrigger RoutedEvent="Button.Click">
+                            <BeginStoryboard>
+                                <Storyboard>
+                                    <DoubleAnimation Storyboard.TargetName="Ripple" Storyboard.TargetProperty="Opacity"
+                                                     From="0.5" To="0" Duration="0:0:0:0.5" />
+                                    <DoubleAnimation Storyboard.TargetName="Ripple" Storyboard.TargetProperty="Width"
+                                                     From="0" To="300" Duration="0:0:0.5" />
+                                    <DoubleAnimation Storyboard.TargetName="Ripple" Storyboard.TargetProperty="Height"
+                                                     From="0" To="300" Duration="0:0:0.5" />
+                                </Storyboard>
+                            </BeginStoryboard>
+                        </EventTrigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="BaseButtonStyle" TargetType="Button">
+        <!-- Propiedades Generales -->
+        <Setter Property="Foreground" Value="White" />
+        <Setter Property="Background" Value="Transparent" />
+        <Setter Property="Width" Value="35" />
+        <Setter Property="Height" Value="35" />
+        <!-- Azul similar a Windows -->
+        <Setter Property="FontSize" Value="14" />
+        <Setter Property="FontWeight" Value="Bold" />
+        <!--<Setter Property="Padding" Value="0,5,0,0"/>-->
+        <Setter Property="HorizontalAlignment" Value="Center" />
+        <Setter Property="VerticalAlignment" Value="Center" />
+        <Setter Property="Tag" Value="" />
+        <Setter Property="Effect">
+            <Setter.Value>
+                <DropShadowEffect BlurRadius="8" Direction="270" Color="Black" ShadowDepth="2" />
+            </Setter.Value>
+        </Setter>
+
+        <!-- Plantilla del Botón -->
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Grid>
+                        <!-- Definir el fondo y el borde redondeado -->
+                        <Border Name="Border" Background="{TemplateBinding Background}"
+                                CornerRadius="35"
+                                Padding="{TemplateBinding Padding}"
+                                Effect="{TemplateBinding Effect}"
+                                ToolTip="{TemplateBinding Content}">
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                <!-- Ícono de Usuario -->
+                                <Path x:Name="IconPath"
+                                      Data="{Binding Tag, RelativeSource={RelativeSource TemplatedParent}}"
+                                      Stretch="UniformToFill" Width="20" Height="20"
+                                      Fill="White" />
+                            </StackPanel>
+                        </Border>
+
+                    </Grid>
+
+                    <!-- Animaciones de Color -->
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="#185156" />
+                        </Trigger>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Border" Property="Background" Value="#1F6456" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter TargetName="Border" Property="Background" Value="Gray" />
+                            <Setter Property="Foreground" Value="LightGray" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <Style x:Key="AddUserButtonStyle" BasedOn="{StaticResource BaseButtonStyle}" TargetType="Button">
+        <Setter Property="Tag"
+                Value="M17 6A5 5 0 1 1 7 6a5 5 0 0 1 10 0zm-7 7a7 7 0 0 0-7 7 3 3 0 0 0 3 3h7.41c.431 0 .677-.528.453-.898A5.972 5.972 0 0 1 13 19a5.993 5.993 0 0 1 2.56-4.917c.364-.255.333-.839-.101-.93-.47-.1-.959-.153-1.459-.153zm9 2a1 1 0 0 1 1 1v2h2a1 1 0 1 1 0 2h-2v2a1 1 0 0 1-2 0v-2h-2a1 1 0 1 1 0-2h2v-2a1 1 0 0 1 1-1z" />
+    </Style>
+    <Style x:Key="AddProductButtonStyle" BasedOn="{StaticResource BaseButtonStyle}" TargetType="Button">
+        <Setter Property="Tag"
+                Value="M22.724 2.035h-5.721v5.318a.66.66 0 0 1-1.027.546l-1.408-.94c-.35-.229-.797-.229-1.136 0l-1.42.94a.651.651 0 0 1-1.015-.546V2.035H5.276A3.278 3.278 0 0 0 2 5.311v17.378a3.271 3.271 0 0 0 3.276 3.276h17.448A3.278 3.278 0 0 0 26 22.689V5.311a3.285 3.285 0 0 0-3.276-3.276zm-6.17 16.834-1.466-.002-.002 1.466a1.092 1.092 0 1 1-2.184-.002l.002-1.466-1.466-.002a1.092 1.092 0 0 1 .001-2.184h.001l1.466.002.002-1.466c0-.603.49-1.09 1.092-1.09h.001c.603 0 1.092.49 1.091 1.092l-.002 1.466 1.466.002a1.092 1.092 0 0 1-.001 2.184z" />
+    </Style>
+</ResourceDictionary>

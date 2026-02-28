@@ -7,11 +7,13 @@
 
     <Grid>
         <ComboBox IsEditable="True"
-                  IsTextSearchEnabled="True"
+                  IsTextSearchEnabled="False"
+                  IsDropDownOpen="True"
+                  StaysOpenOnEdit="True"
                   Style="{StaticResource MaterialDesignComboBox}"
                   md:HintAssist.Hint="{Binding HitText,
                                                RelativeSource={RelativeSource AncestorType=UserControl}}"
-                  ItemsSource="{Binding View,
+                  ItemsSource="{Binding ItemsView,
                                         RelativeSource={RelativeSource AncestorType=UserControl}}"
                   SelectedItem="{Binding SelectedItem,
                                          RelativeSource={RelativeSource AncestorType=UserControl},
@@ -20,9 +22,9 @@
                                               RelativeSource={RelativeSource AncestorType=UserControl}}" >
 
             <i:Interaction.Behaviors>
-                <behaviors:AutoCompleteComboBoxBehavior
-                    OnTextChanged="{Binding OnFilterTextChanged,
-                                            RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                <behaviors:AutoCompleteComboBoxBehavior 
+                    TextChangedCommand="{Binding OnFilterTextChanged,
+                    RelativeSource={RelativeSource AncestorType=UserControl}}"/>
             </i:Interaction.Behaviors>
 
         </ComboBox>

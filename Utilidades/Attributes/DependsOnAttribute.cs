@@ -1,6 +1,6 @@
 using System;
 
-namespace Servidor.Atributos;
+namespace Utilidades.Attributes;
 
 [AttributeUsage(AttributeTargets.Property, AllowMultiple = true)]
 public sealed class DependsOnAttribute : Attribute
