@@ -1,12 +1,15 @@
+using System.Collections.ObjectModel;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using Cliente.Default;
 using Cliente.View.Dialog;
 using Cliente.View.Dialog.ViewModel;
+using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
 using Shared.Interfaces;
 using Utilidades.Dialogs;
-using Utilidades.Mvvm;
+using RelayCommand = Utilidades.Mvvm.RelayCommand;
 
 namespace Cliente.View.Items;
 
@@ -20,7 +23,7 @@ public partial class EntitySelector : UserControl
     {
         InitializeComponent();
         Loaded += OnLoaded;
-        OpenDialogCommand = new RelayCommand(async _ => await OpenDialogAsync());
+        OpenDialogCommand = new AsyncRelayCommand( OpenDialogAsync);
     }
 
     // =========================================================
@@ -40,7 +43,7 @@ public partial class EntitySelector : UserControl
         try
         {
             var items = await InitialLoadFunc();
-            if (items != null) AddInitialItems(items);
+            AddInitialItems(items);
         }
         catch (Exception ex)
         {
@@ -232,7 +235,21 @@ public partial class EntitySelector : UserControl
     }
 
     #endregion
+    #region EntityType
 
+    public static readonly DependencyProperty EntityTypeProperty =
+        DependencyProperty.Register(
+            nameof(EntityType),
+            typeof(Type),
+            typeof(EntitySelector));
+
+    public Type? EntityType
+    {
+        get => (Type?)GetValue(EntityTypeProperty);
+        set => SetValue(EntityTypeProperty, value);
+    }
+
+    #endregion
     // =========================================================
     // Sincronización SelectedItem ↔ SelectedId
     // =========================================================
@@ -285,27 +302,41 @@ public partial class EntitySelector : UserControl
 
         var vm = new EntitySelectorDialogViewModel
         {
-            SearchFunc = RemoteSearchFunc
+            SearchFunc = RemoteSearchFunc,
+            EntityType = EntityType!,
+            DefaultLoadFunc = InitialLoadFunc,
         };
 
-        var dialog = new EntitySelectorDialog { DataContext = vm };
+        var dialog = new EntitySelectorDialog
+        {
+            DataContext = vm,
+            TextHeader = HitText ?? "Seleccionar",
+            DialogOpenIdentifier = DialogDefaults.Sub01,
+            DialogNameIdentifier = DialogDefaults.Sub02,
+
+            // AceptarCommand: recibe el SelectedItem del VM, lo procesa y cierra
+            AceptarCommand = new AsyncRelayCommand<object?>(async selected =>
+            {
+                if (selected is not IIdentifiable identifiable) return;
+
+                _cache.TryAdd(identifiable.Id, selected);
+                SynchronizeSelectedItem(selected);
+
+                try
+                {
+                    _isSynchronizing = true;
+                    SelectedId = identifiable.Id;
+                }
+                finally
+                {
+                    _isSynchronizing = false;
+                }
+
+                DialogHost.CloseDialogCommand.Execute(null,  null);
+            })
+        };
 
         await DialogService.Instance.MostrarDialogo(dialog);
-
-        if (result is not IIdentifiable selected) return;
-
-        _cache.TryAdd(selected.Id, selected);
-        SynchronizeSelectedItem(selected);
-
-        try
-        {
-            _isSynchronizing = true;
-            SelectedId = selected.Id;
-        }
-        finally
-        {
-            _isSynchronizing = false;
-        }
     }
 
     // =========================================================

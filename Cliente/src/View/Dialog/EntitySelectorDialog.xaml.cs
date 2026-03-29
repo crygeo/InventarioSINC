@@ -1,42 +1,66 @@
+using System.Windows;
 using System.Windows.Controls;
+using Cliente.Helpers;
+using Cliente.View.Dialog.ViewModel;
 using CommunityToolkit.Mvvm.Input;
 using Utilidades.Dialogs;
 
 namespace Cliente.View.Dialog;
 
-public partial class EntitySelectorDialog : UserControl, IDialog
+public partial class EntitySelectorDialog : UserControl, IDialog, IDialogLifecycle
 {
-    private string _textHeader;
-    private string _dialogNameIdentifier;
-    private string _dialogOpenIdentifier;
-    private IAsyncRelayCommand _aceptarCommand;
+    private bool _columnsGenerated;
 
     public EntitySelectorDialog()
     {
         InitializeComponent();
+        DataContextChanged += OnDataContextChanged;
     }
 
-    public string TextHeader
+    // =========================================================
+    // IDialog
+    // =========================================================
+
+    public string TextHeader { get; set; } = string.Empty;
+    public string DialogNameIdentifier { get; set; } = string.Empty;
+    public string DialogOpenIdentifier { get; set; } = string.Empty;
+    public IAsyncRelayCommand AceptarCommand { get; set; } = null!;
+
+    // =========================================================
+    // Generación de columnas
+    // =========================================================
+
+    private EntitySelectorDialogViewModel? Vm =>
+        DataContext as EntitySelectorDialogViewModel;
+
+    private void OnDataContextChanged(object sender, DependencyPropertyChangedEventArgs e)
     {
-        get => _textHeader;
-        set => _textHeader = value;
+        if (e.OldValue is EntitySelectorDialogViewModel oldVm)
+            oldVm.Results.CollectionChanged -= OnResultsChanged;
+
+        if (e.NewValue is EntitySelectorDialogViewModel newVm)
+            newVm.Results.CollectionChanged += OnResultsChanged;
     }
 
-    public string DialogNameIdentifier
+    private void OnResultsChanged(object? sender,
+        System.Collections.Specialized.NotifyCollectionChangedEventArgs e)
     {
-        get => _dialogNameIdentifier;
-        set => _dialogNameIdentifier = value;
+        // Generar columnas solo una vez, cuando llega el primer resultado
+        if (_columnsGenerated || Vm == null) return;
+        if (e.NewItems == null || e.NewItems.Count == 0) return;
+
+        _columnsGenerated = true;
+        DataGridColumnBuilder.BuildColumns(ResultsGrid, Vm.EntityType);
+    }
+    
+    public void OnOpened()
+    {
+        if (DataContext is EntitySelectorDialogViewModel vm)
+            _ = vm.LoadDataDefaultAsync();
     }
 
-    public string DialogOpenIdentifier
+    public void OnClosed()
     {
-        get => _dialogOpenIdentifier;
-        set => _dialogOpenIdentifier = value;
-    }
-
-    public IAsyncRelayCommand AceptarCommand
-    {
-        get => _aceptarCommand;
-        set => _aceptarCommand = value;
+        throw new NotImplementedException();
     }
 }

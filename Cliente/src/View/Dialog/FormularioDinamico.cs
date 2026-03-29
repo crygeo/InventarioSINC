@@ -62,7 +62,11 @@ public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>, IDialo
     public string DialogNameIdentifier
     {
         get => (string)GetValue(DialogNameIdentifierProperty);
-        set => SetValue(DialogNameIdentifierProperty, value);
+        set
+        {
+            SetValue(DialogNameIdentifierProperty, value);
+            _dialogHost.Identifier = value;
+        }
     }
 
     public required string DialogOpenIdentifier { get; set; }
@@ -74,7 +78,8 @@ public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>, IDialo
         typeof(DatePicker),
         typeof(PasswordBox)
     };
-   
+
+    private DialogHost _dialogHost = new DialogHost();
 
     public FormularioDinamico(TEntity entity, Dictionary<string, string> nombreCampos = null)
     {
@@ -84,12 +89,6 @@ public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>, IDialo
         MaxWidth = 650;
         MaxHeight = 700;
 
-        // Root DialogHost
-        var dialogHost = new DialogHost
-        {
-            Identifier = DialogNameIdentifier,
-            
-        };
 
 
         var grid = new Grid();
@@ -159,8 +158,8 @@ public class FormularioDinamico<TEntity> : UserControl, IDialog<TEntity>, IDialo
         Grid.SetRow(botones, 2);
         grid.Children.Add(botones);
 
-        dialogHost.Content = grid;
-        Content = dialogHost;
+        _dialogHost.Content = grid;
+        Content = _dialogHost;
 
         GenerarCampos();
         

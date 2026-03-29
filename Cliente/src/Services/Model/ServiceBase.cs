@@ -99,11 +99,17 @@ public class ServiceBase<TEntity> : HttpClientBase, IServiceClient<TEntity> wher
 
         return result;
     }
-
+    
     async Task<IResultResponse<object?>> IServiceClient.GetByIdAsync(string id)
     {
-        var request = await GetRequest<object?>(HttpMethod.Get, $"{BaseUrl}/{id}");
-        return await HandleResponseAsync<object?, object?>(request, "Consulta exitosa");
+        var result = await GetByIdAsync(id);
+
+        return new ResultResponse<object?>
+        {
+            Success = result.Success,
+            Message = result.Message,
+            EntityGet = result.EntityGet
+        };
     }
 
     async Task<IResultResponse<PagedResult>> IServiceClient.GetPagedAsync(int page, int pageSize)

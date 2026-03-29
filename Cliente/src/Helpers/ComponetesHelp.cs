@@ -304,9 +304,10 @@ public static class ComponetesHelp
             HitText = hint,
             RemoteSearchFunc = remoteSearch,
             DisplayMemberPath = "DescripcionVisual",
+            EntityType = typeEntity,
             InitialLoadFunc = async () =>
             {
-                var result = await service.GetPagedAsync(0, 100);
+                var result = await service.GetPagedAsync(0, 25);
                 return result.Success
                     ? result.EntityGet.Items
                     : Enumerable.Empty<object>();

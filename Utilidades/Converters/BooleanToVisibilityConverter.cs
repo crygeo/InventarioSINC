@@ -29,3 +29,18 @@ public class BooleanToVisibilityConverter : IValueConverter
         return false;
     }
 }
+
+public class InverseBooleanToVisibilityConverter : IValueConverter
+{
+    private readonly BooleanToVisibilityConverter _baseConverter = new();
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return _baseConverter.Convert(value, targetType, "Invert", culture);
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        return _baseConverter.ConvertBack(value, targetType, "Invert", culture);
+    }
+}

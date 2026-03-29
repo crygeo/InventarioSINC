@@ -1,10 +1,7 @@
-
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Input;
-using Shared.Interfaces;
-using Utilidades.Command;
 using Utilidades.Mvvm;
 
 namespace Cliente.View.Dialog.ViewModel;
@@ -12,11 +9,13 @@ namespace Cliente.View.Dialog.ViewModel;
 public class EntitySelectorDialogViewModel : INotifyPropertyChanged
 {
     // =========================================================
-    // Configuración externa (se inyecta al abrir)
+    // Configuración externa (inyectada al construir)
     // =========================================================
 
     public required Func<string, Task<IEnumerable<object>>> SearchFunc { get; init; }
 
+    // Opcional: si se provee, carga items al abrir el diálogo
+    public Func<Task<IEnumerable<object>>>? DefaultLoadFunc { get; init; }
     // =========================================================
     // Estado
     // =========================================================
@@ -25,24 +24,14 @@ public class EntitySelectorDialogViewModel : INotifyPropertyChanged
     public string SearchText
     {
         get => _searchText;
-        set
-        {
-            if (_searchText == value) return;
-            _searchText = value;
-            OnPropertyChanged();
-        }
+        set { _searchText = value; OnPropertyChanged(); }
     }
 
     private object? _selectedItem;
     public object? SelectedItem
     {
         get => _selectedItem;
-        set
-        {
-            _selectedItem = value;
-            OnPropertyChanged();
-            OnPropertyChanged(nameof(CanConfirm));
-        }
+        set { _selectedItem = value; OnPropertyChanged(); OnPropertyChanged(nameof(CanConfirm)); }
     }
 
     private bool _isLoading;
@@ -56,6 +45,9 @@ public class EntitySelectorDialogViewModel : INotifyPropertyChanged
 
     public ObservableCollection<object> Results { get; } = [];
 
+    // Tipo de entidad — usado para generar columnas [Vista]
+    public required Type EntityType { get; init; }
+
     // =========================================================
     // Commands
     // =========================================================
@@ -68,13 +60,48 @@ public class EntitySelectorDialogViewModel : INotifyPropertyChanged
     }
 
     // =========================================================
-    // Lógica
+    // Carga inicial
+    // =========================================================
+
+    public async Task LoadDataDefaultAsync()
+    {
+        if (DefaultLoadFunc == null) return;
+
+        try
+        {
+            IsLoading = true;
+            Results.Clear();
+
+            var items = await DefaultLoadFunc();
+
+            foreach (var item in items)
+                Results.Add(item);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[EntitySelectorDialog] Error en carga inicial: {ex}");
+        }
+        finally
+        {
+            IsLoading = false;
+        }
+    }
+
+    // =========================================================
+    // Lógica de búsqueda
     // =========================================================
 
     private CancellationTokenSource? _cts;
 
     private async Task ExecuteSearchAsync()
     {
+        // Si no hay texto, restaurar los resultados iniciales sin ir a red
+        if (string.IsNullOrWhiteSpace(SearchText))
+        {
+            await LoadDataDefaultAsync();
+            return;
+        }
+
         _cts?.Cancel();
         _cts = new CancellationTokenSource();
         var token = _cts.Token;
@@ -95,7 +122,7 @@ public class EntitySelectorDialogViewModel : INotifyPropertyChanged
         catch (OperationCanceledException) { }
         catch (Exception ex)
         {
-            Console.WriteLine($"Error en búsqueda del diálogo: {ex}");
+            Console.WriteLine($"[EntitySelectorDialog] Error en búsqueda: {ex}");
         }
         finally
         {

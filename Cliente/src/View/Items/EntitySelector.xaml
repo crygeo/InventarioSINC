@@ -2,31 +2,26 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
-             xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
-             xmlns:behaviors="clr-namespace:Cliente.Behaviors">
+             x:Name="Root">
 
     <Grid>
-        <ComboBox IsEditable="True"
-                  IsTextSearchEnabled="False"
-                  IsDropDownOpen="True"
-                  StaysOpenOnEdit="True"
-                  Style="{StaticResource MaterialDesignComboBox}"
-                  md:HintAssist.Hint="{Binding HitText,
-                                               RelativeSource={RelativeSource AncestorType=UserControl}}"
-                  ItemsSource="{Binding ItemsView,
-                                        RelativeSource={RelativeSource AncestorType=UserControl}}"
-                  SelectedItem="{Binding SelectedItem,
-                                         RelativeSource={RelativeSource AncestorType=UserControl},
-                                         Mode=TwoWay}"
-                  DisplayMemberPath="{Binding DisplayMemberPath,
-                                              RelativeSource={RelativeSource AncestorType=UserControl}}" >
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
 
-            <i:Interaction.Behaviors>
-                <behaviors:AutoCompleteComboBoxBehavior 
-                    TextChangedCommand="{Binding OnFilterTextChanged,
-                    RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-            </i:Interaction.Behaviors>
+        <TextBox Grid.Column="0"
+                 IsReadOnly="True"
+                 Text="{Binding DisplayText, ElementName=Root, Mode=OneWay}"
+                 md:HintAssist.Hint="{Binding HitText, ElementName=Root}"
+                 Style="{StaticResource MaterialDesignOutlinedTextBox}"/>
 
-        </ComboBox>
+        <Button Grid.Column="1"
+                Command="{Binding OpenDialogCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                Style="{StaticResource MaterialDesignIconButton}"
+                VerticalAlignment="Bottom"
+                Margin="4,0,0,0">
+            <md:PackIcon Kind="Magnify"/>
+        </Button>
     </Grid>
 </UserControl>
