@@ -1,427 +1,235 @@
+// Cliente/src/ViewModel/Model/PageAreaVM.cs
 using System.Collections.ObjectModel;
+using Cliente.Helpers;
+using Cliente.Messages;
 using Cliente.Obj;
 using Cliente.Obj.Model;
 using Cliente.Services.Model;
+using Cliente.ViewModel.Model.Detail;
+using Cliente.ViewModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Shared.Interfaces.Model;
+using Utilidades.Mvvm;
 
 namespace Cliente.ViewModel.Model;
 
 public partial class PageAreaVM : ViewModelServiceBase<Area>
 {
-    private readonly Dictionary<string, AreaNode> _areaIndex = new();
-    private readonly Dictionary<string, GrupoNode> _grupoIndex = new();
-    private readonly Dictionary<string, SeccionNode> _seccionIndex = new();
-    private readonly Dictionary<string, TurnoNode> _turnoIndex = new();
+    // ── Árbol plano (izquierda) ──────────────────────────────────────────
+    public ObservableCollection<AreaNode> AreaNodes { get; } = [];
 
-    private TreeNodeBase? _selectedTreeNode;
-
-
-    public PageAreaVM()
+    private AreaNode? _selectedAreaNode;
+    public AreaNode? SelectedAreaNode
     {
-        PageTurnoVm = new PageTurnoVM();
-        PageSeccionVm = new PageSeccionVM();
-        PageGrupoVm = new PageGrupoVM();
-
-        ActualizarArbolCommand = new AsyncRelayCommand(LoadTreeAsync);
-    }
-
-    public ObservableCollection<TreeNodeBase> TreeNode { get; } = new();
-
-    public TreeNodeBase? SelectedTreeNode
-    {
-        get => _selectedTreeNode;
+        get => _selectedAreaNode;
         set
         {
-            SetProperty(ref _selectedTreeNode, value);
-            OnTreeNodeSelected(value);
+            if (!SetProperty(ref _selectedAreaNode, value)) return;
+            if (value != null)
+                NavigateToArea(value.Area);
         }
     }
 
+    // ── Navegación derecha ───────────────────────────────────────────────
+    public NavigationStack DetailNavigation { get; } = new();
 
+    // ── Hijos (se activan junto con el padre) ────────────────────────────
     public PageTurnoVM PageTurnoVm { get; }
     public PageSeccionVM PageSeccionVm { get; }
     public PageGrupoVM PageGrupoVm { get; }
 
-    public ObservableCollection<Empleado> Empleados { get; } = new();
+    public IAsyncRelayCommand RefreshCommand { get; }
 
-    protected override bool CanCrearEntity => true;
-    protected override bool CanEditarEntity => EntitySelect is not null;
-    protected override bool CanEliminarEntity => EntitySelect is not null;
+    public PageAreaVM()
+    {
+        PageTurnoVm  = new PageTurnoVM();
+        PageSeccionVm = new PageSeccionVM();
+        PageGrupoVm  = new PageGrupoVM();
 
-    public IAsyncRelayCommand ActualizarArbolCommand { get; protected set; }
+        RefreshCommand = new AsyncRelayCommand(LoadTreeAsync);
+        
+        
+    }
 
-    protected async override Task OnActivateAsync()
+    // ── Ciclo de vida ────────────────────────────────────────────────────
+
+    protected override async Task OnActivateAsync()
     {
         PageIndex = 0;
-        PageSize = int.MaxValue;
-        
+        PageSize  = int.MaxValue;
+
         await base.OnActivateAsync();
-        
-        PageTurnoVm.ServiceTurno.CollectionChanged += OnServiceCollectionChanged;
-        PageSeccionVm.ServiceSeccion.CollectionChanged += OnServiceCollectionChanged;
-        PageGrupoVm.ServiceGrupo.CollectionChanged += OnServiceCollectionChanged;
-        
+
+        // Suscribir hijos
+        PageTurnoVm.ServiceTurno.CollectionChanged   += OnTurnoChanged;
+        PageSeccionVm.ServiceSeccion.CollectionChanged += OnSeccionChanged;
+        PageGrupoVm.ServiceGrupo.CollectionChanged   += OnGrupoChanged;
+
         await PageTurnoVm.ActivateAsync();
         await PageSeccionVm.ActivateAsync();
         await PageGrupoVm.ActivateAsync();
+
+        WeakReferenceMessenger.Default.Register<NavigateToDetailMessage>(this, (r, m) =>
+        {
+            DetailNavigation.Push(m.Value);
+        });
         
-        await ActualizarArbolCommand.ExecuteAsync(null);
+        await LoadTreeAsync();
     }
 
-    protected async override Task OnDeactivateAsync()
+    protected override async Task OnDeactivateAsync()
     {
-        await base.OnDeactivateAsync();
+        PageTurnoVm.ServiceTurno.CollectionChanged   -= OnTurnoChanged;
+        PageSeccionVm.ServiceSeccion.CollectionChanged -= OnSeccionChanged;
+        PageGrupoVm.ServiceGrupo.CollectionChanged   -= OnGrupoChanged;
+
         await PageTurnoVm.DeactivateAsync();
         await PageSeccionVm.DeactivateAsync();
         await PageGrupoVm.DeactivateAsync();
+
+        WeakReferenceMessenger.Default.UnregisterAll(this);
+        
+        await base.OnDeactivateAsync();
     }
 
-    protected override async void OnServiceCollectionChanged(EntityChangeType type, string id, Area? entity)
-    {
-        switch (type)
-        {
-            case EntityChangeType.Created:
-                if (entity != null)
-                {
-                    var nodoC = CrearNodoArea(entity);
-                    TreeNode.Add(nodoC);
-                    _areaIndex[nodoC.Id] = nodoC;
-                }
-                break;
-
-            case EntityChangeType.Updated:
-                if (entity != null &&
-                    _areaIndex.TryGetValue(id, out var nodoU))
-                {
-                    nodoU.Area = entity;
-                }
-                break;
-
-            case EntityChangeType.Deleted:
-                if (_areaIndex.TryGetValue(id, out var nodo))
-                {
-                    TreeNode.Remove(nodo);
-                    _areaIndex.Remove(id);
-                }
-                break;
-        }
-    }
-
-    private void OnServiceCollectionChanged(EntityChangeType type, string id, Turno? entity)
-    {
-        switch (type)
-        {
-            case EntityChangeType.Created:
-                if (entity != null &&
-                    _areaIndex.TryGetValue(entity.AreaId, out var parent))
-                {
-                    var nodoC = CrearNodoTurno(entity, parent);
-                    parent.Children.Add(nodoC);
-                    _turnoIndex[nodoC.Id] = nodoC;
-                }
-                break;
-
-            case EntityChangeType.Updated:
-                if (entity != null &&
-                    _turnoIndex.TryGetValue(id, out var nodoU))
-                {
-                    nodoU.Turno = entity;
-                }
-                break;
-
-            case EntityChangeType.Deleted:
-                if (_turnoIndex.TryGetValue(id, out var nodo))
-                {
-                    nodo.Parent?.Children.Remove(nodo);
-                    _turnoIndex.Remove(id);
-                }
-                break;
-        }
-    }
-
-
-    private void OnServiceCollectionChanged(EntityChangeType type, string id, Seccion? entity)
-    {
-        switch (type)
-        {
-            case EntityChangeType.Created:
-                if (entity != null &&
-                    _turnoIndex.TryGetValue(entity.TurnoId, out var parent))
-                {
-                    var nodo = CrearNodoSeccion(entity, parent);
-                    parent.Children.Add(nodo);
-                    _seccionIndex[nodo.Id] = nodo;
-                }
-                break;
-
-            case EntityChangeType.Updated:
-                if (entity != null &&
-                    _seccionIndex.TryGetValue(id, out var nodoU))
-                {
-                    nodoU.Seccion = entity;
-                }
-                break;
-
-            case EntityChangeType.Deleted:
-                if (_seccionIndex.TryGetValue(id, out var nodoD))
-                {
-                    nodoD.Parent?.Children.Remove(nodoD);
-                    _seccionIndex.Remove(id);
-                }
-                break;
-        }
-    }
-
-    private void OnServiceCollectionChanged(EntityChangeType type, string id, Grupo? entity)
-    {
-        switch (type)
-        {
-            case EntityChangeType.Created:
-                if (entity != null &&
-                    _seccionIndex.TryGetValue(entity.SeccionId, out var parent))
-                {
-                    var nodo = CrearNodoGrupo(entity, parent);
-                    parent.Children.Add(nodo);
-                    _grupoIndex[nodo.Id] = nodo;
-                }
-                break;
-
-            case EntityChangeType.Updated:
-                if (entity != null &&
-                    _grupoIndex.TryGetValue(id, out var nodoU))
-                {
-                    nodoU.Grupo = entity;
-                }
-                break;
-
-            case EntityChangeType.Deleted:
-                if (_grupoIndex.TryGetValue(id, out var nodoD))
-                {
-                    nodoD.Parent?.Children.Remove(nodoD);
-                    _grupoIndex.Remove(id);
-                }
-                break;
-        }
-    }
-
-
+    // ── Carga del árbol ──────────────────────────────────────────────────
 
     private async Task LoadTreeAsync()
     {
-        try
-        {
-            await CreateTreeNode();
-        }
-        catch (Exception ex)
-        {
-            DialogServiceI.MensajeQueue.Enqueue("Error cargando el árbol: " + ex.Message);
-        }
-    }
+        AreaNodes.Clear();
+        DetailNavigation.Reset(new EmptyDetailVM());
 
-
-    private async Task CreateTreeNode()
-    {
-        TreeNode.Clear();
-
-        _areaIndex.Clear();
-        _turnoIndex.Clear();
-        _seccionIndex.Clear();
-        _grupoIndex.Clear();
-
-        var areas = ServicioBase.CacheById.Values.ToList();
-        var turnos = PageTurnoVm.ServiceTurno.CacheById.Values.ToList();
+        var areas    = ServicioBase.CacheById.Values.ToList();
+        var turnos   = PageTurnoVm.ServiceTurno.CacheById.Values.ToList();
         var secciones = PageSeccionVm.ServiceSeccion.CacheById.Values.ToList();
-        var grupos = PageGrupoVm.ServiceGrupo.CacheById.Values.ToList();
+        var grupos   = PageGrupoVm.ServiceGrupo.CacheById.Values.ToList();
 
-        // 1. Crear nodos de área
         foreach (var area in areas)
         {
-            var areaNode = CrearNodoArea(area);
-            TreeNode.Add(areaNode);
-            _areaIndex[area.Id] = areaNode;
+            var node = new AreaNode
+            {
+                Id   = area.Id,
+                Area = area,
+                AddCommand    = PageTurnoVm.CrearEntityFromItemCommand,
+                EditCommand   = EditarEntityFromItemCommand,
+                DeleteCommand = EliminarEntityFromItemCommand
+            };
+
+            // Turnos del área
+            foreach (var turno in turnos.Where(t => t.AreaId == area.Id))
+            {
+                var turnoNode = new TurnoNode
+                {
+                    Id     = turno.Id,
+                    Turno  = turno,
+                    Parent = node,
+                    AddCommand    = PageSeccionVm.CrearEntityFromItemCommand,
+                    EditCommand   = PageTurnoVm.EditarEntityFromItemCommand,
+                    DeleteCommand = PageTurnoVm.EliminarEntityFromItemCommand
+                };
+
+                foreach (var seccion in secciones.Where(s => s.TurnoId == turno.Id))
+                {
+                    var seccionNode = new SeccionNode
+                    {
+                        Id      = seccion.Id,
+                        Seccion = seccion,
+                        Parent  = turnoNode,
+                        AddCommand    = PageGrupoVm.CrearEntityFromItemCommand,
+                        EditCommand   = PageSeccionVm.EditarEntityFromItemCommand,
+                        DeleteCommand = PageSeccionVm.EliminarEntityFromItemCommand
+                    };
+
+                    foreach (var grupo in grupos.Where(g => g.SeccionId == seccion.Id))
+                    {
+                        seccionNode.Children.Add(new GrupoNode
+                        {
+                            Id     = grupo.Id,
+                            Grupo  = grupo,
+                            Parent = seccionNode,
+                            EditCommand   = PageGrupoVm.EditarEntityFromItemCommand,
+                            DeleteCommand = PageGrupoVm.EliminarEntityFromItemCommand
+                        });
+                    }
+
+                    turnoNode.Children.Add(seccionNode);
+                }
+
+                node.Children.Add(turnoNode);
+            }
+
+            AreaNodes.Add(node);
         }
-
-        await Task.Yield();
-
-        // 2. Crear nodos de turno y asignarlos a su área
-        foreach (var turno in turnos)
-        {
-            if (!_areaIndex.TryGetValue(turno.AreaId, out var parent))
-                continue;
-
-            var turnoNode = CrearNodoTurno(turno, parent);
-            parent.Children.Add(turnoNode);
-            _turnoIndex[turno.Id] = turnoNode;
-        }
-
-        await Task.Yield();
-
-        // 3. Crear nodos de sección y asignarlos a su turno
-        foreach (var seccion in secciones)
-        {
-            if (!_turnoIndex.TryGetValue(seccion.TurnoId, out var parent))
-                continue;
-
-            var seccionNode = CrearNodoSeccion(seccion, parent);
-            parent.Children.Add(seccionNode);
-            _seccionIndex[seccion.Id] = seccionNode;
-        }
-
-        await Task.Yield();
-
-        // 4. Crear nodos de grupo y asignarlos a su sección
-        foreach (var grupo in grupos)
-        {
-            if (!_seccionIndex.TryGetValue(grupo.SeccionId, out var parent))
-                continue;
-
-            var grupoNode = CrearNodoGrupo(grupo, parent);
-            parent.Children.Add(grupoNode);
-            _grupoIndex[grupo.Id] = grupoNode;
-        }
     }
 
+    // ── Navegación al detalle ─────────────────────────────────────────────
 
-    private async Task<List<T>> ObtenerEntidades<T>(IEnumerable<string> ids, ServiceBase<T> service)
-        where T : class, IModelObj, new()
+    /// <summary>
+    /// Construye el ViewModel de detalle y lo pushea al stack.
+    /// Toda la construcción está en la factory — no inline.
+    /// </summary>
+    private void NavigateToArea(Area area)
     {
-        var tasks = ids.Select(id => service.GetByIdAsync(id));
-        var results = await Task.WhenAll(tasks);
+        var detailVm = DetailViewModelFactory.BuildAreaDetail(
+            area,
+            PageTurnoVm.ServiceTurno.CacheById.Values,
+            PageSeccionVm.ServiceSeccion.CacheById.Values,
+            PageGrupoVm.ServiceGrupo.CacheById.Values);
 
-        return results
-            .Where(r => r.Success)
-            .Select(r => r.EntityGet)
-            .ToList();
+        DetailNavigation.Reset(detailVm);
+        SetChildContexts(null, null, null); // limpia contextos hijos
+        EntitySelect = area;
     }
 
+    // ── Reacciones a cambios en SignalR ──────────────────────────────────
 
-    private AreaNode CrearNodoArea(Area area)
+    protected override void OnServiceCollectionChanged(EntityChangeType type, string id, Area? entity)
     {
-        return new AreaNode
+        // Actualizamos el nodo en el árbol sin recargar todo
+        switch (type)
         {
-            Id = area.Id,
-            Area = area,
-
-            AddCommand = PageTurnoVm.CrearEntityCommand,
-            EditCommand = EditarEntityCommand,
-            DeleteCommand = EliminarEntityCommand
-        };
-    }
-
-    private TurnoNode CrearNodoTurno(Turno turno, AreaNode parent)
-    {
-        return new TurnoNode
-        {
-            Id = turno.Id,
-            Turno = turno,
-            Parent = parent,
-
-            AddCommand = PageSeccionVm.CrearEntityCommand,
-            EditCommand = PageTurnoVm.EditarEntityCommand,
-            DeleteCommand = PageTurnoVm.EliminarEntityCommand
-        };
-    }
-
-    private SeccionNode CrearNodoSeccion(Seccion seccion, TurnoNode parent)
-    {
-        return new SeccionNode
-        {
-            Id = seccion.Id,
-            Seccion = seccion,
-            Parent = parent,
-
-            AddCommand = PageGrupoVm.CrearEntityCommand,
-            EditCommand = PageSeccionVm.EditarEntityCommand,
-            DeleteCommand = PageSeccionVm.EliminarEntityCommand
-        };
-    }
-
-    private GrupoNode CrearNodoGrupo(Grupo grupo, SeccionNode parent)
-    {
-        return new GrupoNode
-        {
-            Id = grupo.Id,
-            Grupo = grupo,
-            Parent = parent,
-
-            EditCommand = PageGrupoVm.EditarEntityCommand,
-            DeleteCommand = PageGrupoVm.EliminarEntityCommand
-        };
-    }
-
-
-    private void OnTreeNodeSelected(TreeNodeBase? node)
-    {
-        // 🔥 LIMPIAR CONTEXTO
-        PageTurnoVm.AreaPadre = null;
-        PageSeccionVm.TurnoPadre = null;
-        PageGrupoVm.SeccionPadre = null;
-
-        ClearEntitySelections();
-
-        Area? area = null;
-        Turno? turno = null;
-        Seccion? seccion = null;
-
-        switch (node)
-        {
-            case AreaNode a:
-                area = a.Area;
-                EntitySelect = area;
+            case EntityChangeType.Created when entity != null:
+                var newNode = new AreaNode { Id = entity.Id, Area = entity,
+                    AddCommand = PageTurnoVm.CrearEntityFromItemCommand,
+                    EditCommand = EditarEntityFromItemCommand,
+                    DeleteCommand = EliminarEntityFromItemCommand };
+                AreaNodes.Add(newNode);
                 break;
 
-            case TurnoNode t:
-                area = FindAreaFromTurnoNode(t);
-                turno = t.Turno;
-                PageTurnoVm.EntitySelect = turno;
+            case EntityChangeType.Updated when entity != null:
+                var existing = AreaNodes.FirstOrDefault(n => n.Id == id);
+                if (existing != null) existing.Area = entity;
                 break;
 
-            case SeccionNode s:
-                turno = FindTurnoFromSeccionNode(s);
-                seccion = s.Seccion;
-                PageSeccionVm.EntitySelect = seccion;
-                break;
-
-            case GrupoNode g:
-                seccion = FindSeccionFromGrupo(g);
-                PageGrupoVm.EntitySelect = g.Grupo;
+            case EntityChangeType.Deleted:
+                var toRemove = AreaNodes.FirstOrDefault(n => n.Id == id);
+                if (toRemove != null) AreaNodes.Remove(toRemove);
                 break;
         }
+    }
 
-        // 🔥 REASIGNAR CONTEXTO
-        PageTurnoVm.AreaPadre = area;
+    private void OnTurnoChanged(EntityChangeType type, string id, Turno? entity)
+        => _ = LoadTreeAsync(); // reconstruye — los turnos son pocos
+
+    private void OnSeccionChanged(EntityChangeType type, string id, Seccion? entity)
+        => _ = LoadTreeAsync();
+
+    private void OnGrupoChanged(EntityChangeType type, string id, Grupo? entity)
+        => _ = LoadTreeAsync();
+
+    private void SetChildContexts(Area? area, Turno? turno, Seccion? seccion)
+    {
+        PageTurnoVm.AreaPadre   = area;
         PageSeccionVm.TurnoPadre = turno;
         PageGrupoVm.SeccionPadre = seccion;
     }
 
+    protected override void UpdateChanged() => base.UpdateChanged();
+}
 
-    private void ClearEntitySelections()
-    {
-        EntitySelect = null;
-        PageTurnoVm.EntitySelect = null;
-        PageSeccionVm.EntitySelect = null;
-        PageGrupoVm.EntitySelect = null;
-    }
-
-    private static Area FindAreaFromTurnoNode(TurnoNode node)
-    {
-        return ((AreaNode)node.Parent!).Area;
-    }
-
-    private static Turno FindTurnoFromSeccionNode(SeccionNode node)
-    {
-        return ((TurnoNode)node.Parent!).Turno;
-    }
-
-    private static Seccion FindSeccionFromGrupo(GrupoNode node)
-    {
-        return ((SeccionNode)node.Parent!).Seccion;
-    }
-
-
-    protected override void UpdateChanged()
-    {
-        base.UpdateChanged();
-    }
+/// <summary>Placeholder cuando no hay selección activa.</summary>
+public class EmptyDetailVM : ViewModelBase
+{
+    protected override void UpdateChanged() { }
 }

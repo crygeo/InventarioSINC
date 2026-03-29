@@ -3,6 +3,8 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:helpers="clr-namespace:Cliente.Helpers"
+             xmlns:convert="clr-namespace:Cliente.Converter"
+             xmlns:converters="clr-namespace:Utilidades.Converters;assembly=Utilidades"
              StartupUri="src/View/LoadV.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -22,6 +24,10 @@
 
             </ResourceDictionary.MergedDictionaries>
             <helpers:ViewModelToViewTemplateSelector x:Key="ViewModelTemplateSelector" />
+            
+            <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
+            <convert:CountNestedConverter x:Key="CountNestedConverter"/>
         </ResourceDictionary>
+        
     </Application.Resources>
 </Application>

@@ -119,6 +119,10 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
     public IAsyncRelayCommand CrearEntityCommand { get; protected set; }
     public IAsyncRelayCommand EditarEntityCommand { get; protected set; }
     public IAsyncRelayCommand EliminarEntityCommand { get; protected set; }
+    
+    public IAsyncRelayCommand<TEntity> EditarEntityFromItemCommand { get; protected set; }
+    public IAsyncRelayCommand<TEntity> EliminarEntityFromItemCommand { get; protected set; }
+    public IAsyncRelayCommand<TEntity> CrearEntityFromItemCommand { get; protected set; }
 
     public IAsyncRelayCommand NextPageCommand { get; protected set; }
     public IAsyncRelayCommand PrevPageCommand { get; protected set; }
@@ -153,6 +157,21 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
             () => CanEliminarEntity
         );
 
+        EditarEntityFromItemCommand = new AsyncRelayCommand<TEntity>(
+            UpdateFromItemAsync,
+            entity => entity != null && CanEditarEntity
+        );
+
+        EliminarEntityFromItemCommand = new AsyncRelayCommand<TEntity>(
+            DeleteFromItemAsync,
+            entity => entity != null && CanEliminarEntity
+        );
+
+        CrearEntityFromItemCommand = new AsyncRelayCommand<TEntity>(
+            CreateFromItemAsync,
+            entity => CanCrearEntity
+        );
+        
         NextPageCommand = new AsyncRelayCommand(
             NextPageAsync,
             () => CanNextPage
@@ -321,6 +340,37 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
             Message =
                 $"¿Estás seguro de que quieres eliminar el {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)} seleccionado?",
             AceptarCommand = new AsyncRelayCommand(ConfirmarEliminarEntityAsync),
+            DialogNameIdentifier = DialogDefaults.Sub01,
+            DialogOpenIdentifier = DialogDefaults.Main
+        };
+
+        await DialogServiceI.MostrarDialogo(confirmDialog);
+    }
+    
+    private async Task CreateFromItemAsync(TEntity? entity)
+    {
+        // opcional: usar entity como contexto padre
+        await CreateAsync();
+    }
+    private async Task UpdateFromItemAsync(TEntity? entity)
+    {
+        if (entity == null) return;
+
+        await DialogServiceI.BuscarMostrarDialogAsync(
+            entity.Clone(),
+            $"Editar {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
+            ConfirmarEditarEntityAsync
+        );
+    }
+    private async Task DeleteFromItemAsync(TEntity? entity)
+    {
+        if (entity == null) return;
+
+        var confirmDialog = new ConfirmDialog
+        {
+            TextHeader = $"Eliminar {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
+            Message = $"¿Eliminar elemento seleccionado?",
+            AceptarCommand = new AsyncRelayCommand(async () => { await ServicioBase.DeleteAsync(entity.Id); }),
             DialogNameIdentifier = DialogDefaults.Sub01,
             DialogOpenIdentifier = DialogDefaults.Main
         };
