@@ -26,7 +26,6 @@
             <helpers:ViewModelToViewTemplateSelector x:Key="ViewModelTemplateSelector" />
             
             <converters:BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
-            <convert:CountNestedConverter x:Key="CountNestedConverter"/>
         </ResourceDictionary>
         
     </Application.Resources>

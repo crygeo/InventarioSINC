@@ -1,234 +1,284 @@
-// Cliente/src/ViewModel/Model/PageAreaVM.cs
-using System.Collections.ObjectModel;
-using Cliente.Helpers;
-using Cliente.Messages;
-using Cliente.Obj;
 using Cliente.Obj.Model;
 using Cliente.Services.Model;
-using Cliente.ViewModel.Model.Detail;
-using Cliente.ViewModel;
-using CommunityToolkit.Mvvm.Input;
-using CommunityToolkit.Mvvm.Messaging;
-using Shared.Interfaces.Model;
+using Utilidades.Interfaces;
 using Utilidades.Mvvm;
 
 namespace Cliente.ViewModel.Model;
 
+/// <summary>
+/// Orquestador principal de la jerarquía Area → Turno → Seccion → Grupo.
+///
+/// Responsabilidades:
+/// - Lista de áreas (panel izquierdo) vía herencia de ViewModelServiceBase&lt;Area&gt;.
+/// - NavigationStack para el panel derecho.
+/// - Ciclo de vida de los VMs hijos (singletons) — activa/desactiva según navegación.
+/// - Coordinación ante eliminación remota (SignalR) del ítem activo en el stack.
+///
+/// Los VMs hijos (PageTurnoVM, PageSeccionVM, PageGrupoVM) son singletons
+/// instanciados aquí — un único objeto que se reconfigura al cambiar el contexto padre.
+/// Esto evita el costo de inicialización repetida y mantiene la caché caliente.
+/// </summary>
 public partial class PageAreaVM : ViewModelServiceBase<Area>
 {
-    // ── Árbol plano (izquierda) ──────────────────────────────────────────
-    public ObservableCollection<AreaNode> AreaNodes { get; } = [];
+    // ==============================
+    // VMs HIJOS (singletons)
+    // ==============================
 
-    private AreaNode? _selectedAreaNode;
-    public AreaNode? SelectedAreaNode
-    {
-        get => _selectedAreaNode;
-        set
-        {
-            if (!SetProperty(ref _selectedAreaNode, value)) return;
-            if (value != null)
-                NavigateToArea(value.Area);
-        }
-    }
+    public PageTurnoVM    PageTurnoVm   { get; }
+    public PageSeccionVM  PageSeccionVm { get; }
+    public PageGrupoVM    PageGrupoVm   { get; }
 
-    // ── Navegación derecha ───────────────────────────────────────────────
+    // ==============================
+    // NAVEGACIÓN
+    // ==============================
+
     public NavigationStack DetailNavigation { get; } = new();
 
-    // ── Hijos (se activan junto con el padre) ────────────────────────────
-    public PageTurnoVM PageTurnoVm { get; }
-    public PageSeccionVM PageSeccionVm { get; }
-    public PageGrupoVM PageGrupoVm { get; }
-
-    public IAsyncRelayCommand RefreshCommand { get; }
+    // ==============================
+    // CONSTRUCTOR
+    // ==============================
 
     public PageAreaVM()
     {
-        PageTurnoVm  = new PageTurnoVM();
+        PageTurnoVm   = new PageTurnoVM();
         PageSeccionVm = new PageSeccionVM();
-        PageGrupoVm  = new PageGrupoVM();
-
-        RefreshCommand = new AsyncRelayCommand(LoadTreeAsync);
-        
-        
+        PageGrupoVm   = new PageGrupoVM();
     }
 
-    // ── Ciclo de vida ────────────────────────────────────────────────────
+    // ==============================
+    // CICLO DE VIDA
+    // ==============================
 
     protected override async Task OnActivateAsync()
     {
-        PageIndex = 0;
-        PageSize  = int.MaxValue;
+        // 1. Pre-inicializar caché de servicios hijos (una sola vez).
+        //    Cuando el usuario seleccione un área, los datos ya están localmente
+        //    y el filtrado es instantáneo sin llamadas adicionales al servidor.
+        await PageTurnoVm.ServicioBase.InitializeAsync();
+        await PageSeccionVm.ServicioBase.InitializeAsync();
+        await PageGrupoVm.ServicioBase.InitializeAsync();
 
+        // 2. Inyectar servicios hijos en PageTurnoVM para que pueda
+        //    calcular las estadísticas de secciones y grupos en tiempo real.
+        PageTurnoVm.InjectChildServices(
+            PageSeccionVm.ServicioBase,
+            PageGrupoVm.ServicioBase);
+
+        PageSeccionVm.InjectChildServices(
+            PageGrupoVm.ServicioBase);
+
+        // 3. Activar base → carga áreas, suscribe CollectionChanged de Area
         await base.OnActivateAsync();
 
-        // Suscribir hijos
-        PageTurnoVm.ServiceTurno.CollectionChanged   += OnTurnoChanged;
-        PageSeccionVm.ServiceSeccion.CollectionChanged += OnSeccionChanged;
-        PageGrupoVm.ServiceGrupo.CollectionChanged   += OnGrupoChanged;
+        // 4. Suscribir eventos de hijos para detectar eliminación del padre activo
+        PageTurnoVm.ServicioBase.CollectionChanged   += OnTurnoChangedExternal;
+        PageSeccionVm.ServicioBase.CollectionChanged += OnSeccionChangedExternal;
 
-        await PageTurnoVm.ActivateAsync();
-        await PageSeccionVm.ActivateAsync();
-        await PageGrupoVm.ActivateAsync();
-
-        WeakReferenceMessenger.Default.Register<NavigateToDetailMessage>(this, (r, m) =>
-        {
-            DetailNavigation.Push(m.Value);
-        });
-        
-        await LoadTreeAsync();
+        // 5. Panel derecho vacío al iniciar
+        DetailNavigation.Reset(new EmptyDetailVM());
     }
 
     protected override async Task OnDeactivateAsync()
     {
-        PageTurnoVm.ServiceTurno.CollectionChanged   -= OnTurnoChanged;
-        PageSeccionVm.ServiceSeccion.CollectionChanged -= OnSeccionChanged;
-        PageGrupoVm.ServiceGrupo.CollectionChanged   -= OnGrupoChanged;
+        PageTurnoVm.ServicioBase.CollectionChanged   -= OnTurnoChangedExternal;
+        PageSeccionVm.ServicioBase.CollectionChanged -= OnSeccionChangedExternal;
 
-        await PageTurnoVm.DeactivateAsync();
-        await PageSeccionVm.DeactivateAsync();
-        await PageGrupoVm.DeactivateAsync();
+        // Liberar referencias a servicios hijos antes de desactivar
+        PageTurnoVm.DetachChildServices();
 
-        WeakReferenceMessenger.Default.UnregisterAll(this);
-        
+        // Desactivar hijos: limpia Entities y desuscribe CollectionChanged de la vista,
+        // pero NO cierra SignalR (DeactivateAsync ya no llama ShutdownAsync).
+        await TryDeactivateAsync(PageGrupoVm);
+        await TryDeactivateAsync(PageSeccionVm);
+        await TryDeactivateAsync(PageTurnoVm);
+
+        // Cerrar SignalR de los hijos — solo al destruir el orquestador completamente
+        await PageGrupoVm.ShutdownSignalRAsync();
+        await PageSeccionVm.ShutdownSignalRAsync();
+        await PageTurnoVm.ShutdownSignalRAsync();
+
+        DetailNavigation.Reset(new EmptyDetailVM());
+
         await base.OnDeactivateAsync();
     }
 
-    // ── Carga del árbol ──────────────────────────────────────────────────
+    // ==============================
+    // SELECCIÓN — NIVEL 1: ÁREA
+    // ==============================
 
-    private async Task LoadTreeAsync()
-    {
-        AreaNodes.Clear();
-        DetailNavigation.Reset(new EmptyDetailVM());
-
-        var areas    = ServicioBase.CacheById.Values.ToList();
-        var turnos   = PageTurnoVm.ServiceTurno.CacheById.Values.ToList();
-        var secciones = PageSeccionVm.ServiceSeccion.CacheById.Values.ToList();
-        var grupos   = PageGrupoVm.ServiceGrupo.CacheById.Values.ToList();
-
-        foreach (var area in areas)
-        {
-            var node = new AreaNode
-            {
-                Id   = area.Id,
-                Area = area,
-                AddCommand    = PageTurnoVm.CrearEntityFromItemCommand,
-                EditCommand   = EditarEntityFromItemCommand,
-                DeleteCommand = EliminarEntityFromItemCommand
-            };
-
-            // Turnos del área
-            foreach (var turno in turnos.Where(t => t.AreaId == area.Id))
-            {
-                var turnoNode = new TurnoNode
-                {
-                    Id     = turno.Id,
-                    Turno  = turno,
-                    Parent = node,
-                    AddCommand    = PageSeccionVm.CrearEntityFromItemCommand,
-                    EditCommand   = PageTurnoVm.EditarEntityFromItemCommand,
-                    DeleteCommand = PageTurnoVm.EliminarEntityFromItemCommand
-                };
-
-                foreach (var seccion in secciones.Where(s => s.TurnoId == turno.Id))
-                {
-                    var seccionNode = new SeccionNode
-                    {
-                        Id      = seccion.Id,
-                        Seccion = seccion,
-                        Parent  = turnoNode,
-                        AddCommand    = PageGrupoVm.CrearEntityFromItemCommand,
-                        EditCommand   = PageSeccionVm.EditarEntityFromItemCommand,
-                        DeleteCommand = PageSeccionVm.EliminarEntityFromItemCommand
-                    };
-
-                    foreach (var grupo in grupos.Where(g => g.SeccionId == seccion.Id))
-                    {
-                        seccionNode.Children.Add(new GrupoNode
-                        {
-                            Id     = grupo.Id,
-                            Grupo  = grupo,
-                            Parent = seccionNode,
-                            EditCommand   = PageGrupoVm.EditarEntityFromItemCommand,
-                            DeleteCommand = PageGrupoVm.EliminarEntityFromItemCommand
-                        });
-                    }
-
-                    turnoNode.Children.Add(seccionNode);
-                }
-
-                node.Children.Add(turnoNode);
-            }
-
-            AreaNodes.Add(node);
-        }
-    }
-
-    // ── Navegación al detalle ─────────────────────────────────────────────
+    private Area? _areaActiva;
 
     /// <summary>
-    /// Construye el ViewModel de detalle y lo pushea al stack.
-    /// Toda la construcción está en la factory — no inline.
+    /// Llamado desde la vista cuando el usuario selecciona un área en la lista izquierda.
+    /// Reconfigura PageTurnoVm con el nuevo contexto y lo coloca como raíz del stack.
     /// </summary>
-    private void NavigateToArea(Area area)
+    public async Task OnAreaSelectedAsync(Area area)
     {
-        var detailVm = DetailViewModelFactory.BuildAreaDetail(
-            area,
-            PageTurnoVm.ServiceTurno.CacheById.Values,
-            PageSeccionVm.ServiceSeccion.CacheById.Values,
-            PageGrupoVm.ServiceGrupo.CacheById.Values);
+        if (_areaActiva?.Id == area.Id) return;
 
-        DetailNavigation.Reset(detailVm);
-        SetChildContexts(null, null, null); // limpia contextos hijos
+        // Limpiar niveles inferiores antes de cambiar el contexto raíz
+        await TryDeactivateAsync(PageGrupoVm);
+        await TryDeactivateAsync(PageSeccionVm);
+        await TryDeactivateAsync(PageTurnoVm);
+
+        _areaActiva  = area;
         EntitySelect = area;
+
+        PageTurnoVm.AreaPadre = area;
+        
+        await PageTurnoVm.ActivateAsync();
+        await PageGrupoVm.ActivateAsync();
+        await PageSeccionVm.ActivateAsync();
+
+        DetailNavigation.Reset(PageTurnoVm);
     }
 
-    // ── Reacciones a cambios en SignalR ──────────────────────────────────
+    // ==============================
+    // SELECCIÓN — NIVEL 2: TURNO
+    // ==============================
+
+    /// <summary>
+    /// Llamado desde la vista de PageTurnoVM cuando el usuario selecciona un turno
+    /// para ver sus secciones. Empuja PageSeccionVM al stack.
+    /// </summary>
+    public async Task OnTurnoSelectedAsync(Turno turno)
+    {
+        await TryDeactivateAsync(PageGrupoVm);
+        await TryDeactivateAsync(PageSeccionVm);
+
+        PageSeccionVm.TurnoPadre = turno;
+        await PageSeccionVm.ActivateAsync();
+
+        DetailNavigation.Push(PageSeccionVm);
+    }
+
+    // ==============================
+    // SELECCIÓN — NIVEL 3: SECCIÓN
+    // ==============================
+
+    /// <summary>
+    /// Llamado desde la vista de PageSeccionVM cuando el usuario selecciona
+    /// una sección para ver sus grupos. Empuja PageGrupoVM al stack.
+    /// </summary>
+    public async Task OnSeccionSelectedAsync(Seccion seccion)
+    {
+        await TryDeactivateAsync(PageGrupoVm);
+
+        PageGrupoVm.SeccionPadre = seccion;
+        await PageGrupoVm.ActivateAsync();
+
+        DetailNavigation.Push(PageGrupoVm);
+    }
+
+    // ==============================
+    // ELIMINACIÓN REMOTA — ÁREA ACTIVA
+    // ==============================
 
     protected override void OnServiceCollectionChanged(EntityChangeType type, string id, Area? entity)
     {
-        // Actualizamos el nodo en el árbol sin recargar todo
-        switch (type)
+        base.OnServiceCollectionChanged(type, id, entity);
+
+        if (type == EntityChangeType.Deleted && _areaActiva?.Id == id)
         {
-            case EntityChangeType.Created when entity != null:
-                var newNode = new AreaNode { Id = entity.Id, Area = entity,
-                    AddCommand = PageTurnoVm.CrearEntityFromItemCommand,
-                    EditCommand = EditarEntityFromItemCommand,
-                    DeleteCommand = EliminarEntityFromItemCommand };
-                AreaNodes.Add(newNode);
-                break;
-
-            case EntityChangeType.Updated when entity != null:
-                var existing = AreaNodes.FirstOrDefault(n => n.Id == id);
-                if (existing != null) existing.Area = entity;
-                break;
-
-            case EntityChangeType.Deleted:
-                var toRemove = AreaNodes.FirstOrDefault(n => n.Id == id);
-                if (toRemove != null) AreaNodes.Remove(toRemove);
-                break;
+            _areaActiva = null;
+            _ = HandleRootDeletedAsync("El área fue eliminada por otro usuario.");
         }
     }
 
-    private void OnTurnoChanged(EntityChangeType type, string id, Turno? entity)
-        => _ = LoadTreeAsync(); // reconstruye — los turnos son pocos
+    // ==============================
+    // ELIMINACIÓN REMOTA — HIJOS
+    // ==============================
 
-    private void OnSeccionChanged(EntityChangeType type, string id, Seccion? entity)
-        => _ = LoadTreeAsync();
-
-    private void OnGrupoChanged(EntityChangeType type, string id, Grupo? entity)
-        => _ = LoadTreeAsync();
-
-    private void SetChildContexts(Area? area, Turno? turno, Seccion? seccion)
+    private void OnTurnoChangedExternal(EntityChangeType type, string id, Turno? entity)
     {
-        PageTurnoVm.AreaPadre   = area;
-        PageSeccionVm.TurnoPadre = turno;
-        PageGrupoVm.SeccionPadre = seccion;
+        if (type != EntityChangeType.Deleted) return;
+
+        if (PageSeccionVm.TurnoPadre?.Id == id)
+            _ = HandleIntermediateParentDeletedAsync(
+                vmAfectado:         PageSeccionVm,
+                vmHijoDelAfectado:  PageGrupoVm,
+                vmPadreSeguro:      PageTurnoVm,
+                mensaje:            "El turno fue eliminado por otro usuario.");
     }
 
-    protected override void UpdateChanged() => base.UpdateChanged();
+    private void OnSeccionChangedExternal(EntityChangeType type, string id, Seccion? entity)
+    {
+        if (type != EntityChangeType.Deleted) return;
+
+        if (PageGrupoVm.SeccionPadre?.Id == id)
+            _ = HandleIntermediateParentDeletedAsync(
+                vmAfectado:         PageGrupoVm,
+                vmHijoDelAfectado:  null,
+                vmPadreSeguro:      PageSeccionVm,
+                mensaje:            "La sección fue eliminada por otro usuario.");
+    }
+
+    // ==============================
+    // HELPERS DE NAVEGACIÓN
+    // ==============================
+
+    /// <summary>
+    /// Maneja la eliminación del área raíz: limpia todo el stack.
+    /// </summary>
+    private async Task HandleRootDeletedAsync(string mensaje)
+    {
+        await TryDeactivateAsync(PageGrupoVm);
+        await TryDeactivateAsync(PageSeccionVm);
+        await TryDeactivateAsync(PageTurnoVm);
+
+        DetailNavigation.Reset(new EmptyDetailVM());
+        EntitySelect  = null;
+        _areaActiva   = null;
+
+        DialogServiceI.MensajeQueue.Enqueue(mensaje);
+    }
+
+    /// <summary>
+    /// Maneja la eliminación de un padre intermedio (Turno o Sección).
+    /// Desactiva el VM afectado y sus hijos, navega al nivel seguro y notifica.
+    /// </summary>
+    /// <param name="vmAfectado">VM cuyo padre fue eliminado — sale del stack.</param>
+    /// <param name="vmHijoDelAfectado">VM hijo del afectado (puede ser null si no hay más niveles).</param>
+    /// <param name="vmPadreSeguro">VM al que el stack regresa como nueva raíz.</param>
+    /// <param name="mensaje">Texto para el snackbar.</param>
+    private async Task HandleIntermediateParentDeletedAsync(
+        IDeactivable vmAfectado,
+        IDeactivable? vmHijoDelAfectado,
+        ViewModelBase vmPadreSeguro,
+        string mensaje)
+    {
+        // Desactivar desde el nivel más profundo hacia arriba
+        if (vmHijoDelAfectado is not null)
+            await TryDeactivateAsync(vmHijoDelAfectado);
+
+        await TryDeactivateAsync(vmAfectado);
+
+        // Resetear el stack al nivel seguro — NavigationStack.Reset limpia
+        // la pila completa y establece el VM indicado como única entrada
+        DetailNavigation.Reset(vmPadreSeguro);
+
+        DialogServiceI.MensajeQueue.Enqueue(mensaje);
+    }
+
+    /// <summary>
+    /// Desactiva de forma segura sin propagar excepciones si el VM no estaba activo.
+    /// </summary>
+    private static async Task TryDeactivateAsync(IDeactivable vm)
+    {
+        try { await vm.DeactivateAsync(); }
+        catch { /* ya estaba inactivo o sin inicializar */ }
+    }
+
+    protected override void UpdateChanged()
+    {
+        base.UpdateChanged();
+    }
 }
 
-/// <summary>Placeholder cuando no hay selección activa.</summary>
+/// <summary>
+/// Placeholder para el panel derecho cuando no hay área seleccionada.
+/// La vista usa un DataTemplate vacío para este tipo.
+/// </summary>
 public class EmptyDetailVM : ViewModelBase
 {
     protected override void UpdateChanged() { }

@@ -1,23 +1,31 @@
-using System.Collections;
-using System.Reflection;
-using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Input;
-using Cliente.Converter;
-using Utilidades.Attributes;
+using Cliente.Obj.Model;
+using Cliente.ViewModel.Model;
 
 namespace Cliente.View.Model;
 
+/// <summary>
+/// Code-behind mínimo para PageAreasV.
+///
+/// La única lógica aquí es el puente entre el evento SelectionChanged de WPF
+/// (que no se puede bindear directamente a un Task) y el método async del VM.
+/// Todo lo demás está en PageAreaVM.
+/// </summary>
 public partial class PageAreasV : UserControl
 {
     public PageAreasV()
     {
         InitializeComponent();
-
-        // Esperamos a que el control ya tenga DataContext
     }
 
-    
-}
+    private void OnAreaSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (DataContext is not PageAreaVM vm) return;
+        if (e.AddedItems.Count == 0) return;
+        if (e.AddedItems[0] is not Area area) return;
 
+        // Lanzar la tarea async sin bloquear el hilo UI.
+        // PageAreaVM garantiza que no se lanza si el área ya está activa.
+        _ = vm.OnAreaSelectedAsync(area);
+    }
+}

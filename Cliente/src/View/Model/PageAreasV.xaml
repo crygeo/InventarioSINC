@@ -1,154 +1,160 @@
 <UserControl x:Class="Cliente.View.Model.PageAreasV"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:vm="clr-namespace:Cliente.ViewModel.Model"
-             xmlns:detail="clr-namespace:Cliente.ViewModel.Model.Detail"
-             xmlns:detailV="clr-namespace:Cliente.View.Model.Detail"
-             xmlns:obj="clr-namespace:Cliente.Obj"
-             xmlns:bg="clr-namespace:Cliente.Attributes"
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:local="clr-namespace:Cliente.View.Model"
+             xmlns:items="clr-namespace:Cliente.View.Items"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance vm:PageAreaVM}">
 
     <UserControl.Resources>
-        <!-- DataTemplates que mapean ViewModel → Vista -->
+
+        <!--
+            DataTemplates que mapean ViewModel → Vista en el panel derecho.
+            WPF selecciona automáticamente la plantilla correcta según el tipo
+            del objeto en DetailNavigation.Current.
+        -->
+
+        <!-- Sin selección activa -->
         <DataTemplate DataType="{x:Type vm:EmptyDetailVM}">
-            <TextBlock Text="Selecciona un área para ver el detalle"
+            <TextBlock Text="Selecciona un área para comenzar"
                        VerticalAlignment="Center"
                        HorizontalAlignment="Center"
                        Foreground="{DynamicResource MaterialDesignBodyLight}"
                        FontSize="14" />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type detail:AreaDetailVM}">
-            <detailV:AreaDetailV />
+        <!-- Nivel 1: Turnos del área seleccionada -->
+        <DataTemplate DataType="{x:Type vm:PageTurnoVM}">
+            <items:PageTurnoV />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type detail:TurnoDetailVM}">
-            <detailV:TurnoDetailV />
+        <!-- Nivel 2: Secciones del turno seleccionado -->
+        <DataTemplate DataType="{x:Type vm:PageSeccionVM}">
+            <items:PageSeccionV />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type detail:SeccionDetailVM}">
-            <detailV:SeccionDetailV />
+        <!-- Nivel 3: Grupos de la sección seleccionada -->
+        <DataTemplate DataType="{x:Type vm:PageGrupoVM}">
+            <items:PageGrupoV />
         </DataTemplate>
 
-        <DataTemplate DataType="{x:Type detail:GrupoDetailVM}">
-            <detailV:GrupoDetailV />
-        </DataTemplate>
     </UserControl.Resources>
 
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="260" MinWidth="200" />
-            <ColumnDefinition Width="5" />    <!-- Splitter -->
+            <!-- Panel izquierdo: lista de áreas -->
+            <ColumnDefinition Width="240" MinWidth="180" MaxWidth="360" />
+            <!-- Splitter redimensionable -->
+            <ColumnDefinition Width="5" />
+            <!-- Panel derecho: detalle navegable -->
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <!-- ══════════════════════════════════════════════════════
-             PANEL IZQUIERDO — Lista de Áreas colapsable
-             ══════════════════════════════════════════════════════ -->
+        <!-- ══════════════════════════════════════════════════
+             PANEL IZQUIERDO — Lista de Áreas
+             ══════════════════════════════════════════════════ -->
         <Grid Grid.Column="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <!-- Toolbar -->
-            <StackPanel Orientation="Horizontal" Margin="8,4">
-                <TextBlock Text="Áreas" FontSize="14" FontWeight="SemiBold"
-                           VerticalAlignment="Center" Margin="0,0,8,0"/>
+            <!-- Toolbar superior -->
+            <StackPanel Grid.Row="0"
+                        Orientation="Horizontal"
+                        Margin="8,8,8,4">
+                <TextBlock Text="Áreas"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           Margin="0,0,8,0" />
                 <Button Style="{StaticResource MaterialDesignIconButton}"
-                        Command="{Binding RefreshCommand}"
-                        ToolTip="Actualizar">
-                    <md:PackIcon Kind="Refresh" Width="18" Height="18"/>
+                        Command="{Binding CargarPageCommand}"
+                        ToolTip="Actualizar lista">
+                    <md:PackIcon Kind="Refresh" Width="18" Height="18" />
                 </Button>
                 <Button Style="{StaticResource MaterialDesignIconButton}"
                         Command="{Binding CrearEntityCommand}"
-                        ToolTip="Nueva Área">
-                    <md:PackIcon Kind="Plus" Width="18" Height="18"/>
+                        ToolTip="Nueva área">
+                    <md:PackIcon Kind="Plus" Width="18" Height="18" />
                 </Button>
             </StackPanel>
 
-            <!-- Lista de Áreas (colapsable) -->
+            <!-- Barra de progreso de carga -->
+            <ProgressBar Grid.Row="0"
+                         VerticalAlignment="Bottom"
+                         Height="2"
+                         IsIndeterminate="False"
+                         Value="{Binding ProgressValue}"
+                         Visibility="{Binding ProgressVisible,
+                                      Converter={StaticResource BooleanToVisibilityConverter}}" />
+
+            <!-- Lista de Áreas -->
             <ListBox Grid.Row="1"
-                     ItemsSource="{Binding AreaNodes}"
-                     SelectedItem="{Binding SelectedAreaNode}"
+                     ItemsSource="{Binding Entities}"
+                     SelectedItem="{Binding EntitySelect}"
                      Style="{StaticResource MaterialDesignListBox}"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                     HorizontalContentAlignment="Stretch">
-                <ListBox.ItemTemplate>
-                    <DataTemplate DataType="{x:Type obj:AreaNode}">
-                        <Expander IsExpanded="False"
-                                  HorizontalContentAlignment="Stretch">
-                            <Expander.Header>
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
-                                    <TextBlock Text="{Binding Area.Nombre}"
-                                               FontWeight="SemiBold"
-                                               VerticalAlignment="Center"/>
-                                    <StackPanel Grid.Column="1" Orientation="Horizontal">
-                                        <Button Style="{StaticResource MaterialDesignIconButton}"
-                                                Command="{Binding EditCommand}"
-                                                CommandParameter="{Binding Area}"
-                                                Width="24" Height="24" Padding="0"
-                                                ToolTip="Editar">
-                                            <md:PackIcon Kind="Pencil" Width="14" Height="14"/>
-                                        </Button>
-                                        <Button Style="{StaticResource MaterialDesignIconButton}"
-                                                Command="{Binding DeleteCommand}"
-                                                CommandParameter="{Binding Area}"
-                                                Width="24" Height="24" Padding="0"
-                                                ToolTip="Eliminar">
-                                            <md:PackIcon Kind="Delete" Width="14" Height="14"/>
-                                        </Button>
-                                    </StackPanel>
-                                </Grid>
-                            </Expander.Header>
+                     HorizontalContentAlignment="Stretch"
+                     SelectionChanged="OnAreaSelectionChanged">
 
-                            <!-- Turnos anidados -->
-                            <ItemsControl ItemsSource="{Binding Children}"
-                                          Margin="16,0,0,0">
-                                <ItemsControl.ItemTemplate>
-                                    <DataTemplate DataType="{x:Type obj:TurnoNode}">
-                                        <Expander IsExpanded="False">
-                                            <Expander.Header>
-                                                <TextBlock Text="{Binding Turno.Nombre}"
-                                                           VerticalAlignment="Center"/>
-                                            </Expander.Header>
-                                            <!-- Secciones -->
-                                            <ItemsControl ItemsSource="{Binding Children}"
-                                                          Margin="16,0,0,0">
-                                                <ItemsControl.ItemTemplate>
-                                                    <DataTemplate DataType="{x:Type obj:SeccionNode}">
-                                                        <Expander IsExpanded="False">
-                                                            <Expander.Header>
-                                                                <TextBlock Text="{Binding Seccion.Nombre}"/>
-                                                            </Expander.Header>
-                                                            <!-- Grupos -->
-                                                            <ItemsControl ItemsSource="{Binding Children}"
-                                                                          Margin="16,0,0,0">
-                                                                <ItemsControl.ItemTemplate>
-                                                                    <DataTemplate DataType="{x:Type obj:GrupoNode}">
-                                                                        <TextBlock Text="{Binding Grupo.Nombre}"
-                                                                                   Padding="4,2"/>
-                                                                    </DataTemplate>
-                                                                </ItemsControl.ItemTemplate>
-                                                            </ItemsControl>
-                                                        </Expander>
-                                                    </DataTemplate>
-                                                </ItemsControl.ItemTemplate>
-                                            </ItemsControl>
-                                        </Expander>
-                                    </DataTemplate>
-                                </ItemsControl.ItemTemplate>
-                            </ItemsControl>
-                        </Expander>
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem"
+                           BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                        <Setter Property="Padding" Value="12,8" />
+                    </Style>
+                </ListBox.ItemContainerStyle>
+
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Nombre del área -->
+                            <TextBlock Grid.Column="0"
+                                       Text="{Binding Nombre}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis" />
+
+                            <!-- Acciones contextuales -->
+                            <StackPanel Grid.Column="1"
+                                        Orientation="Horizontal"
+                                        Visibility="Hidden"
+                                        x:Name="ActionPanel">
+                                <Button Style="{StaticResource MaterialDesignIconButton}"
+                                        Command="{Binding DataContext.EditarEntityFromItemCommand,
+                                                          RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        CommandParameter="{Binding}"
+                                        Width="28" Height="28" Padding="0"
+                                        ToolTip="Editar área">
+                                    <md:PackIcon Kind="Pencil" Width="14" Height="14" />
+                                </Button>
+                                <Button Style="{StaticResource MaterialDesignIconButton}"
+                                        Command="{Binding DataContext.EliminarEntityFromItemCommand,
+                                                          RelativeSource={RelativeSource AncestorType=ListBox}}"
+                                        CommandParameter="{Binding}"
+                                        Width="28" Height="28" Padding="0"
+                                        ToolTip="Eliminar área">
+                                    <md:PackIcon Kind="Delete" Width="14" Height="14" />
+                                </Button>
+                            </StackPanel>
+                        </Grid>
+
+                        <!-- Mostrar acciones al hacer hover -->
+                        <DataTemplate.Triggers>
+                            <DataTrigger Binding="{Binding IsMouseOver,
+                                                   RelativeSource={RelativeSource AncestorType=ListBoxItem}}"
+                                         Value="True">
+                                <Setter TargetName="ActionPanel" Property="Visibility" Value="Visible" />
+                            </DataTrigger>
+                        </DataTemplate.Triggers>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
@@ -158,39 +164,42 @@
         <GridSplitter Grid.Column="1"
                       Width="5"
                       HorizontalAlignment="Stretch"
-                      ResizeBehavior="PreviousAndNext"/>
+                      ResizeBehavior="PreviousAndNext"
+                      Background="{DynamicResource MaterialDesignDivider}" />
 
-        <!-- ══════════════════════════════════════════════════════
-             PANEL DERECHO — Detalle con navegación hacia atrás
-             ══════════════════════════════════════════════════════ -->
+        <!-- ══════════════════════════════════════════════════
+             PANEL DERECHO — Detalle con NavigationStack
+             ══════════════════════════════════════════════════ -->
         <Grid Grid.Column="2">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <!-- Barra de navegación (solo visible cuando hay historial) -->
+                <RowDefinition Height="Auto" />
+                <!-- Contenido del nivel actual -->
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <!-- Barra de navegación -->
+            <!-- Barra de navegación hacia atrás -->
             <Border Grid.Row="0"
                     Background="{DynamicResource MaterialDesignCardBackground}"
-                    Padding="8,4"
+                    Padding="4,2"
                     Visibility="{Binding DetailNavigation.CanGoBack,
                                  Converter={StaticResource BooleanToVisibilityConverter}}">
                 <StackPanel Orientation="Horizontal">
                     <Button Style="{StaticResource MaterialDesignIconButton}"
                             Command="{Binding DetailNavigation.GoBackCommand}"
-                            ToolTip="Volver">
-                        <md:PackIcon Kind="ArrowLeft"/>
+                            ToolTip="Volver al nivel anterior">
+                        <md:PackIcon Kind="ArrowLeft" />
                     </Button>
                     <TextBlock Text="Volver"
                                VerticalAlignment="Center"
-                               Margin="4,0,0,0"/>
+                               Margin="4,0,0,0"
+                               Style="{StaticResource MaterialDesignBody1TextBlock}" />
                 </StackPanel>
             </Border>
 
-            <!-- Contenido del detalle — navega por DataTemplates -->
+            <!-- Vista del nivel actual — WPF selecciona el DataTemplate automáticamente -->
             <ContentControl Grid.Row="1"
-                            Content="{Binding DetailNavigation.Current}"
-                            Margin="8"/>
+                            Content="{Binding DetailNavigation.Current}" />
         </Grid>
     </Grid>
 </UserControl>

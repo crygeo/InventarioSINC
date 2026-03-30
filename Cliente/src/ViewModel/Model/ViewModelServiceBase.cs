@@ -1,5 +1,4 @@
 ﻿using System.Collections.ObjectModel;
-using System.Diagnostics;
 using Cliente.Default;
 using Cliente.Extencions;
 using Cliente.Helpers;
@@ -17,25 +16,24 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
     where TEntity : class, IModelObj, ISelectable, new()
 {
     // ==============================
-    // VARIABLES PRIVADAS
-    private const int TiempoEsperaSegundos = 5; // Variable para controlar si ya estamos en el proceso de carga
+    // CONSTANTES
+    private const int TiempoEsperaSegundos = 5;
 
-
-    private bool _canRefresh = true; // Variable para controlar si ya estamos en el proceso de carga
+    // ==============================
+    // ESTADO PRIVADO
+    private bool _canRefresh = true;
     private bool _autoCarga = true;
     private TEntity? _entitySelect;
     private int _progressValue;
     private bool _progressVisible;
-
     private int _pageIndex = 0;
     private int _pageSize = 50;
     private int _totalItems = 0;
 
     // ==============================
     // SERVICIOS
-    protected DialogService DialogServiceI { get; set; } = DialogService.Instance;
+    protected DialogService DialogServiceI { get; } = DialogService.Instance;
     public ServiceBase<TEntity> ServicioBase { get; } = ServiceFactory.GetService<TEntity>();
-
 
     // ==============================
     // PROPIEDADES PÚBLICAS
@@ -48,7 +46,9 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
         {
             SetProperty(ref _entitySelect, value);
             EditarEntityCommand.NotifyCanExecuteChanged();
-            EliminarEntityCommand.NotifyCanExecuteChanged();
+            EditarEntityCommand.NotifyCanExecuteChanged();
+            EditarEntityFromItemCommand.NotifyCanExecuteChanged();
+            EliminarEntityFromItemCommand.NotifyCanExecuteChanged();
         }
     }
 
@@ -57,7 +57,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
         get => _canRefresh;
         set
         {
-            if(SetProperty(ref _canRefresh, value))
+            if (SetProperty(ref _canRefresh, value))
                 CargarPageCommand.NotifyCanExecuteChanged();
         }
     }
@@ -97,92 +97,73 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
         get => _pageIndex;
         set => SetProperty(ref _pageIndex, value);
     }
-    // ==============================
 
+    // ==============================
+    // PROPIEDADES CALCULADAS
     protected bool CanNextPage => (PageIndex + 1) * PageSize < TotalItems;
     protected bool CanPreviousPage => PageIndex > 0;
-
     public Type EntityType => typeof(TEntity);
 
-    /* ==============================
-      MÉTODOS VIRTUALES CanExecute
-      ============================== */
-
+    // ==============================
+    // CAN EXECUTE VIRTUALES
     protected virtual bool CanCrearEntity => true;
     protected virtual bool CanEditarEntity => true;
     protected virtual bool CanEliminarEntity => true;
 
-    /* ==============================
-        COMANDOS ASÍNCRONOS
-      ============================== */
+    // ==============================
+    // COMANDOS
     public IAsyncRelayCommand CargarPageCommand { get; protected set; }
     public IAsyncRelayCommand CrearEntityCommand { get; protected set; }
     public IAsyncRelayCommand EditarEntityCommand { get; protected set; }
     public IAsyncRelayCommand EliminarEntityCommand { get; protected set; }
-    
     public IAsyncRelayCommand<TEntity> EditarEntityFromItemCommand { get; protected set; }
     public IAsyncRelayCommand<TEntity> EliminarEntityFromItemCommand { get; protected set; }
     public IAsyncRelayCommand<TEntity> CrearEntityFromItemCommand { get; protected set; }
-
     public IAsyncRelayCommand NextPageCommand { get; protected set; }
     public IAsyncRelayCommand PrevPageCommand { get; protected set; }
 
-
-    /// <summary>
-    /// </summary>
-    /// <param name="typeService">
-    ///     Tipo del servicio para crear la instacia del servicio, debe ser de tipo
-    ///     <see cref="ServiceBase" /> para que funcione
-    /// </param>
-    /// <exception cref="Exception">Si el tipo no es correcto lanzara un error</exception>
     protected ViewModelServiceBase()
     {
         CargarPageCommand = new AsyncRelayCommand(
             CargarPageAsync,
-            () => CanRefresh
-        );
+            () => CanRefresh);
 
         CrearEntityCommand = new AsyncRelayCommand(
             CreateAsync,
-            () => CanCrearEntity
-        );
+            () => CanCrearEntity);
 
         EditarEntityCommand = new AsyncRelayCommand(
             UpdateAsync,
-            () => CanEditarEntity
-        );
+            () => CanEditarEntity);
 
         EliminarEntityCommand = new AsyncRelayCommand(
             DeleteAsync,
-            () => CanEliminarEntity
-        );
+            () => CanEliminarEntity);
 
         EditarEntityFromItemCommand = new AsyncRelayCommand<TEntity>(
             UpdateFromItemAsync,
-            entity => entity != null && CanEditarEntity
-        );
+            entity => entity != null && CanEditarEntity);
 
         EliminarEntityFromItemCommand = new AsyncRelayCommand<TEntity>(
             DeleteFromItemAsync,
-            entity => entity != null && CanEliminarEntity
-        );
+            entity => entity != null && CanEliminarEntity);
 
         CrearEntityFromItemCommand = new AsyncRelayCommand<TEntity>(
             CreateFromItemAsync,
-            entity => CanCrearEntity
-        );
-        
+            _ => CanCrearEntity);
+
         NextPageCommand = new AsyncRelayCommand(
             NextPageAsync,
-            () => CanNextPage
-        );
+            () => CanNextPage);
+
         PrevPageCommand = new AsyncRelayCommand(
             PrevPageAsync,
-            () => CanPreviousPage
-        );
+            () => CanPreviousPage);
     }
 
-    #region Metodos de inicialización y cierre
+    // ==============================
+    // CICLO DE VIDA
+    // ==============================
 
     private bool _initialized;
     private bool _disposed;
@@ -190,23 +171,17 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
 
     public virtual async Task ActivateAsync()
     {
-
         if (!_initialized)
         {
             _initialized = true;
-            await InitInternalAsync(); // SOLO una vez
+            await InitInternalAsync();
         }
 
-        if (_active) return; // ya activo
+        if (_active) return;
 
         _active = true;
-        await OnActivateAsync(); // se puede repetir
-        
-        
-
-
+        await OnActivateAsync();
     }
-
 
     public virtual async Task DeactivateAsync()
     {
@@ -216,55 +191,112 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
         await OnDeactivateAsync();
     }
 
-
     public void Dispose()
     {
         if (_disposed) return;
         _disposed = true;
-
         OnDispose();
         GC.SuppressFinalize(this);
     }
 
-    
+    /// <summary>
+    /// Se ejecuta una única vez: conecta SignalR y carga la caché global.
+    /// Separado de OnActivateAsync para que los VMs singletons (PageTurnoVM, etc.)
+    /// mantengan SignalR activo aunque salgan del NavigationStack temporalmente.
+    /// </summary>
     protected virtual async Task InitInternalAsync()
     {
         await ServicioBase.InitializeAsync();
     }
 
+    /// <summary>
+    /// Se ejecuta cada vez que el VM entra al NavigationStack o se selecciona.
+    /// Suscribe CollectionChanged para actualizar Entities y carga los datos filtrados.
+    /// NO gestiona SignalR — eso lo hace InitInternalAsync/ShutdownSignalRAsync.
+    /// </summary>
     protected virtual async Task OnActivateAsync()
     {
+        // Evitar suscripcion duplicada si se activa mas de una vez sin desactivar
+        ServicioBase.CollectionChanged -= OnServiceCollectionChanged;
         ServicioBase.CollectionChanged += OnServiceCollectionChanged;
-        await LoadPageAsync(0);
+
+        await RefreshCacheAsync();
+        await LoadEntitiesAsync();
     }
 
-    protected virtual async Task OnDeactivateAsync()
+    /// <summary>
+    /// Se ejecuta cuando el VM sale del NavigationStack.
+    /// Solo limpia la vista — NO desconecta SignalR ni destruye la caché.
+    /// Los VMs singletons deben mantener la caché caliente para el filtrado rapido.
+    /// SignalR se cierra unicamente en ShutdownSignalRAsync (llamado al hacer Dispose).
+    /// </summary>
+    protected virtual Task OnDeactivateAsync()
     {
         ServicioBase.CollectionChanged -= OnServiceCollectionChanged;
+        Entities.Clear();
+        EntitySelect = null;
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Cierra la conexion SignalR. Llamado solo cuando el VM se destruye completamente
+    /// (PageAreaVM.OnDeactivateAsync o Dispose), no al salir del stack.
+    /// </summary>
+    public virtual async Task ShutdownSignalRAsync()
+    {
         await ServicioBase.ShutdownAsync();
     }
 
     protected virtual void OnDispose()
     {
         ServicioBase.CollectionChanged -= OnServiceCollectionChanged;
-        //ServicioBase.Dispose();
     }
 
-    
+    // ==============================
+    // PUNTO DE EXTENSIÓN PRINCIPAL
+    // ==============================
+
+    /// <summary>
+    /// Carga las entidades en <see cref="Entities"/>.
+    /// Por defecto puebla desde la caché (ya actualizada por RefreshCacheAsync).
+    /// Los VMs hijos con contexto padre sobreescriben este método para filtrar
+    /// por su padre activo sin llamadas adicionales al servidor.
+    /// </summary>
+    protected virtual Task LoadEntitiesAsync()
+    {
+        Entities.Clear();
+
+        foreach (var entity in ServicioBase.CacheById.Values)
+            Entities.Add(entity);
+
+        return Task.CompletedTask;
+    }
+
+    // ==============================
+    // REACCIÓN A SIGNALR
+    // ==============================
+
     protected virtual void OnServiceCollectionChanged(EntityChangeType type, string id, TEntity? entity)
     {
         switch (type)
         {
-            case EntityChangeType.Created:
-                Entities.Add(entity!);
+            case EntityChangeType.Created when entity != null:
+                // Solo añadir si pasa el filtro del contexto actual
+                if (ShouldIncludeEntity(entity))
+                    Entities.Add(entity);
                 break;
 
-            case EntityChangeType.Updated:
+            case EntityChangeType.Updated when entity != null:
                 var existing = Entities.FirstOrDefault(x => x.Id == id);
                 if (existing != null)
                 {
                     var index = Entities.IndexOf(existing);
-                    Entities[index] = entity!;
+                    Entities[index] = entity;
+                }
+                else if (ShouldIncludeEntity(entity))
+                {
+                    // Llegó una entidad que ahora pertenece a este contexto
+                    Entities.Add(entity);
                 }
                 break;
 
@@ -276,14 +308,22 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
         }
     }
 
-    #endregion
+    /// <summary>
+    /// Filtro de pertenencia al contexto padre actual.
+    /// Por defecto acepta todas las entidades (comportamiento global).
+    /// Los VMs hijos sobreescriben esto para filtrar por padre.
+    /// Se usa en <see cref="OnServiceCollectionChanged"/> para que
+    /// las actualizaciones SignalR respeten el contexto activo.
+    /// </summary>
+    protected virtual bool ShouldIncludeEntity(TEntity entity) => true;
 
-    #region Metodos de paginación
+    // ==============================
+    // PAGINACIÓN
+    // ==============================
 
     public async Task LoadPageAsync(int pageNumber)
     {
         PageIndex = pageNumber;
-        
         await CargarPageAsync();
         OnPropertyChanged(nameof(CanNextPage));
         OnPropertyChanged(nameof(CanPreviousPage));
@@ -292,53 +332,45 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
     public async Task NextPageAsync()
     {
         if (!CanNextPage) return;
-
         await LoadPageAsync(PageIndex + 1);
     }
 
     public async Task PrevPageAsync()
     {
         if (!CanPreviousPage) return;
-
         await LoadPageAsync(PageIndex - 1);
     }
 
-    #endregion
-
-    #region MÉTODOS Crud Asíncronos
+    // ==============================
+    // CRUD PÚBLICO
+    // ==============================
 
     public virtual async Task CreateAsync()
     {
         await DialogServiceI.BuscarMostrarDialogAsync(
             new TEntity(),
             $"Crear {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
-            ConfirmarCrearEntityAsync
-        );
+            ConfirmarCrearEntityAsync);
     }
 
     public virtual async Task UpdateAsync()
     {
-        if (EntitySelect == null)
-            return;
-
+        if (EntitySelect == null) return;
 
         await DialogServiceI.BuscarMostrarDialogAsync(
             EntitySelect.Clone(),
             $"Editar {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
-            ConfirmarEditarEntityAsync
-        );
+            ConfirmarEditarEntityAsync);
     }
 
     public virtual async Task DeleteAsync()
     {
-        if (EntitySelect == null)
-            return;
+        if (EntitySelect == null) return;
 
         var confirmDialog = new ConfirmDialog
         {
             TextHeader = $"Eliminar {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
-            Message =
-                $"¿Estás seguro de que quieres eliminar el {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)} seleccionado?",
+            Message = $"¿Estás seguro de que quieres eliminar el {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)} seleccionado?",
             AceptarCommand = new AsyncRelayCommand(ConfirmarEliminarEntityAsync),
             DialogNameIdentifier = DialogDefaults.Sub01,
             DialogOpenIdentifier = DialogDefaults.Main
@@ -346,12 +378,16 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
 
         await DialogServiceI.MostrarDialogo(confirmDialog);
     }
-    
-    private async Task CreateFromItemAsync(TEntity? entity)
+
+    // ==============================
+    // CRUD DESDE ITEM (con parámetro explícito — evita bug de EntitySelect)
+    // ==============================
+
+    private async Task CreateFromItemAsync(TEntity? _)
     {
-        // opcional: usar entity como contexto padre
         await CreateAsync();
     }
+
     private async Task UpdateFromItemAsync(TEntity? entity)
     {
         if (entity == null) return;
@@ -359,9 +395,9 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
         await DialogServiceI.BuscarMostrarDialogAsync(
             entity.Clone(),
             $"Editar {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
-            ConfirmarEditarEntityAsync
-        );
+            ConfirmarEditarEntityAsync);
     }
+
     private async Task DeleteFromItemAsync(TEntity? entity)
     {
         if (entity == null) return;
@@ -370,7 +406,16 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
         {
             TextHeader = $"Eliminar {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
             Message = $"¿Eliminar elemento seleccionado?",
-            AceptarCommand = new AsyncRelayCommand(async () => { await ServicioBase.DeleteAsync(entity.Id); }),
+            AceptarCommand = new AsyncRelayCommand(async () =>
+            {
+                await DialogServiceI.MostrarDialogoProgreso(async () =>
+                {
+                    var result = await ServicioBase.DeleteAsync(entity.Id);
+                    result.ObjInteration = typeof(TEntity);
+                    await DialogServiceI.ValidarRespuesta(result);
+                    return result;
+                }, DialogDefaults.Progress);
+            }),
             DialogNameIdentifier = DialogDefaults.Sub01,
             DialogOpenIdentifier = DialogDefaults.Main
         };
@@ -378,14 +423,13 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
         await DialogServiceI.MostrarDialogo(confirmDialog);
     }
 
-    #endregion
-
-    #region MÉTODOS PRIVADOS CRUD
+    // ==============================
+    // CRUD CONFIRMACIONES
+    // ==============================
 
     public virtual async Task ConfirmarCrearEntityAsync(TEntity? entity)
     {
-        if (entity == null)
-            return;
+        if (entity == null) return;
 
         await DialogServiceI.MostrarDialogoProgreso(async () =>
         {
@@ -399,24 +443,24 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
     private async Task ConfirmarEditarEntityAsync(TEntity? entity)
     {
         if (entity == null) return;
+
         var entityOriginal = ServicioBase.GetFromCache(entity.Id);
         if (entityOriginal == null) return;
 
         var changes = entityOriginal.GetChanges(entity);
-        if (changes.Count < 0) return;
+        if (changes.Count == 0) return;
 
         foreach (var property in changes)
         {
-            if (property.NewValue != null)
+            if (property.NewValue == null) continue;
+
+            await DialogServiceI.MostrarDialogoProgreso(async () =>
             {
-                await DialogServiceI.MostrarDialogoProgreso(async () =>
-                {
-                    var result = await ServicioBase.PropertyUpdateAsync(entity.Id, property.Name, property.NewValue);
-                    result.ObjInteration = typeof(TEntity);
-                    await DialogServiceI.ValidarRespuesta(result);
-                    return result;
-                }, DialogDefaults.Progress);
-            }
+                var result = await ServicioBase.PropertyUpdateAsync(entity.Id, property.Name, property.NewValue);
+                result.ObjInteration = typeof(TEntity);
+                await DialogServiceI.ValidarRespuesta(result);
+                return result;
+            }, DialogDefaults.Progress);
         }
     }
 
@@ -433,44 +477,57 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
         }, DialogDefaults.Progress);
     }
 
-    #endregion
+    // ==============================
+    // CARGA INTERNA
+    // ==============================
 
-    // ==============================
-    // MÉTODOS PRIVADOS
-    // ==============================
+    /// <summary>
+    /// Punto de entrada del comando CargarPageCommand.
+    /// Separa dos responsabilidades:
+    /// 1. RefreshCacheAsync → va al servidor y actualiza la caché global.
+    /// 2. LoadEntitiesAsync → puebla Entities (puede ser filtrado desde caché).
+    ///
+    /// Los VMs con contexto padre (PageTurnoVM, etc.) sobreescriben solo
+    /// LoadEntitiesAsync — el refresh del servidor sigue siendo global
+    /// para mantener la caché caliente para todos los contextos.
+    /// </summary>
     private async Task CargarPageAsync()
     {
-        #region  CanRefresh
-        if (!CanRefresh)
-            return;
+        if (!CanRefresh) return;
 
         CanRefresh = false;
         ProgressVisible = true;
         ProgressValue = 0;
 
-        _ = StartCooldownAsync(TiempoEsperaSegundos); // 5 segundos
+        _ = StartCooldownAsync(TiempoEsperaSegundos);
 
-        #endregion
+        await RefreshCacheAsync();
+        await LoadEntitiesAsync();
+    }
 
+    /// <summary>
+    /// Actualiza la caché global desde el servidor.
+    /// No toca Entities directamente — eso es responsabilidad de LoadEntitiesAsync.
+    /// Los VMs base (PageAreaVM) usan esto para poblar también su colección.
+    /// Los VMs hijos lo heredan sin cambios — solo refrescan su caché global.
+    /// </summary>
+    protected virtual async Task RefreshCacheAsync()
+    {
         var result = await ServicioBase.GetPagedAsync(PageIndex, PageSize);
         await DialogServiceI.ValidarRespuesta(result);
+
         if (result.Success)
         {
-            Entities.Clear();
-            foreach (var entity in result.EntityGet!.Items)
-            {
-                Entities.Add(entity);
+            foreach (var entity in result.EntityGet.Items)
                 ServicioBase.CacheById[entity.Id] = entity;
-            }
 
             TotalItems = result.EntityGet.TotalCount;
         }
-
     }
-    
+
     private async Task StartCooldownAsync(int seconds)
     {
-        int steps = 100;
+        const int steps = 100;
         int delay = (seconds * 1000) / steps;
 
         for (int i = 0; i <= steps; i++)
@@ -483,8 +540,5 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
         CanRefresh = true;
     }
 
-
-    protected override void UpdateChanged()
-    {
-    }
+    protected override void UpdateChanged() { }
 }
