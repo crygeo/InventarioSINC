@@ -1,5 +1,6 @@
 using Cliente.Obj.Model;
 using Cliente.Services.Model;
+using Cliente.ViewModel.Model.Sub;
 using Utilidades.Interfaces;
 using Utilidades.Mvvm;
 
@@ -27,6 +28,8 @@ public partial class PageAreaVM : ViewModelServiceBase<Area>
     public PageTurnoVM    PageTurnoVm   { get; }
     public PageSeccionVM  PageSeccionVm { get; }
     public PageGrupoVM    PageGrupoVm   { get; }
+    public PageEmpleadoAsignacionVM PageEmpleadoAsignacionVM { get; }
+
 
     // ==============================
     // NAVEGACIÓN
@@ -43,6 +46,8 @@ public partial class PageAreaVM : ViewModelServiceBase<Area>
         PageTurnoVm   = new PageTurnoVM();
         PageSeccionVm = new PageSeccionVM();
         PageGrupoVm   = new PageGrupoVM();
+        
+        PageEmpleadoAsignacionVM = new PageEmpleadoAsignacionVM(ServiceFactory.GetService<Empleado>());
     }
 
     // ==============================
@@ -91,11 +96,13 @@ public partial class PageAreaVM : ViewModelServiceBase<Area>
         await TryDeactivateAsync(PageGrupoVm);
         await TryDeactivateAsync(PageSeccionVm);
         await TryDeactivateAsync(PageTurnoVm);
+        await TryDeactivateAsync(PageEmpleadoAsignacionVM);
 
         // Cerrar SignalR de los hijos — solo al destruir el orquestador completamente
         await PageGrupoVm.ShutdownSignalRAsync();
         await PageSeccionVm.ShutdownSignalRAsync();
         await PageTurnoVm.ShutdownSignalRAsync();
+        await PageEmpleadoAsignacionVM.ShutdownAsync();
 
         DetailNavigation.Reset(new EmptyDetailVM());
 
@@ -163,11 +170,53 @@ public partial class PageAreaVM : ViewModelServiceBase<Area>
     public async Task OnSeccionSelectedAsync(Seccion seccion)
     {
         await TryDeactivateAsync(PageGrupoVm);
+        await TryDeactivateAsync(PageEmpleadoAsignacionVM);
 
-        PageGrupoVm.SeccionPadre = seccion;
-        await PageGrupoVm.ActivateAsync();
+        if (seccion.EsGrupo)
+        {
+            // Ruta existente → Grupos
+            PageGrupoVm.SeccionPadre = seccion;
+            await PageGrupoVm.ActivateAsync();
+            DetailNavigation.Push(PageGrupoVm);
+        }
+        else
+        {
+            // Ruta nueva → Empleados directos de la Sección
+            PageEmpleadoAsignacionVM.SetContexto(
+                nombreContexto: $"Empleados — {seccion.Nombre}",
+                cupo:           seccion.Cupo,
+                getEmpleadoIds: () => seccion.EmpleadoIds
+                                      ?? Enumerable.Empty<string>(),
+                addToList:      itemId => PageSeccionVm.ServicioBase
+                    .ItemAddedToListAsync(
+                        seccion.Id, nameof(Seccion.EmpleadoIds), itemId),
+                removeFromList: itemId => PageSeccionVm.ServicioBase
+                    .ItemRemovedToListAsync(
+                        seccion.Id, nameof(Seccion.EmpleadoIds), itemId));
 
-        DetailNavigation.Push(PageGrupoVm);
+            await PageEmpleadoAsignacionVM.ActivateAsync();
+            DetailNavigation.Push(PageEmpleadoAsignacionVM);
+        }
+    }
+    
+    public async Task OnGrupoSelectedAsync(Grupo grupo)
+    {
+        await TryDeactivateAsync(PageEmpleadoAsignacionVM);
+
+        PageEmpleadoAsignacionVM.SetContexto(
+            nombreContexto: $"Empleados — {grupo.Nombre}",
+            cupo:           grupo.Cupo,
+            getEmpleadoIds: () => grupo.EmpleadoIds
+                                  ?? Enumerable.Empty<string>(),
+            addToList:      itemId => PageGrupoVm.ServicioBase
+                .ItemAddedToListAsync(
+                    grupo.Id, nameof(Grupo.EmpleadoIds), itemId),
+            removeFromList: itemId => PageGrupoVm.ServicioBase
+                .ItemRemovedToListAsync(
+                    grupo.Id, nameof(Grupo.EmpleadoIds), itemId));
+
+        await PageEmpleadoAsignacionVM.ActivateAsync();
+        DetailNavigation.Push(PageEmpleadoAsignacionVM);
     }
 
     // ==============================

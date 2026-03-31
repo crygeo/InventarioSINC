@@ -171,14 +171,14 @@ public class ServiceBase<TEntity> : HttpClientBase, IServiceClient<TEntity> wher
     public async Task<IResultResponse<bool>> ItemAddedToListAsync(string idEntity, string nameProperty, object newValue)
     {
         var data = GetData(idEntity, nameProperty, newValue);
-        var request = await GetRequest<TEntity>(HttpMethod.Put, $"{BaseUrl}/property/update", data);
+        var request = await GetRequest<TEntity>(HttpMethod.Put, $"{BaseUrl}/property/add", data);
         return await HandleResponseAsync<bool, TEntity>(request, "Actualizado correctamente", true);
     }
 
     public async Task<IResultResponse<bool>> ItemRemovedToListAsync(string idEntity, string nameProperty, object newValue)
     {
         var data = GetData(idEntity, nameProperty, newValue);
-        var request = await GetRequest<TEntity>(HttpMethod.Put, $"{BaseUrl}/property/update", data);
+        var request = await GetRequest<TEntity>(HttpMethod.Put, $"{BaseUrl}/property/remove", data);
         return await HandleResponseAsync<bool, TEntity>(request, "Actualizado correctamente", true);
     }
 

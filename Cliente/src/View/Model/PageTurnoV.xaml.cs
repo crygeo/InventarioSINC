@@ -3,7 +3,7 @@ using System.Windows.Controls;
 using Cliente.Obj.Model;
 using Cliente.ViewModel.Model;
 
-namespace Cliente.View.Items;
+namespace Cliente.View.Model;
 
 /// <summary>
 /// Code-behind de PageTurnoV.

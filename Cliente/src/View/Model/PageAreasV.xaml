@@ -5,7 +5,9 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
              xmlns:vm="clr-namespace:Cliente.ViewModel.Model"
-             xmlns:items="clr-namespace:Cliente.View.Items"
+             xmlns:svm="clr-namespace:Cliente.ViewModel.Model.Sub"
+             xmlns:spage="clr-namespace:Cliente.View.Model.SubPage"
+             xmlns:page="clr-namespace:Cliente.View.Model"
              mc:Ignorable="d"
              d:DataContext="{d:DesignInstance vm:PageAreaVM}">
 
@@ -28,17 +30,21 @@
 
         <!-- Nivel 1: Turnos del área seleccionada -->
         <DataTemplate DataType="{x:Type vm:PageTurnoVM}">
-            <items:PageTurnoV />
+            <page:PageTurnoV />
         </DataTemplate>
 
         <!-- Nivel 2: Secciones del turno seleccionado -->
         <DataTemplate DataType="{x:Type vm:PageSeccionVM}">
-            <items:PageSeccionV />
+            <page:PageSeccionV />
         </DataTemplate>
 
         <!-- Nivel 3: Grupos de la sección seleccionada -->
         <DataTemplate DataType="{x:Type vm:PageGrupoVM}">
-            <items:PageGrupoV />
+            <page:PageGrupoV />
+        </DataTemplate>
+        
+        <DataTemplate DataType="{x:Type svm:PageEmpleadoAsignacionVM}">
+            <spage:PageEmpleadoAsignacionV/>
         </DataTemplate>
 
     </UserControl.Resources>

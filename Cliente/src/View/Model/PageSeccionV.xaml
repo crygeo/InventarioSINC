@@ -1,4 +1,4 @@
-<UserControl x:Class="Cliente.View.Items.PageSeccionV"
+<UserControl x:Class="Cliente.View.Model.PageSeccionV"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
@@ -33,7 +33,7 @@
                    Style="{StaticResource MaterialDesignHeadline6TextBlock}" />
                     </StackPanel>
                 </md:Card>
-                
+
                 <md:Card Margin="4" Padding="12">
                     <StackPanel>
                         <TextBlock Text="Secciones"
@@ -54,10 +54,10 @@
                     </StackPanel>
                 </md:Card>
 
-                
+
             </UniformGrid>
         </StackPanel>
-        
+
         <!-- Encabezado -->
         <StackPanel Grid.Row="1"
                     Orientation="Horizontal"
@@ -113,17 +113,27 @@
                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
                             <TextBlock Text="{Binding Nombre}"
                                        FontWeight="SemiBold"
-                                       FontSize="14" />
+                                       FontSize="12" />
                             <StackPanel Orientation="Horizontal">
-                                <TextBlock Text="Cupo: "
+                                <TextBlock x:Name="CupoText"
                                            FontSize="12"
-                                           Foreground="{DynamicResource MaterialDesignBodyLight}" />
-                                <TextBlock Text="{Binding Cupo}"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource MaterialDesignBodyLight}" />
-                                <md:PackIcon Margin="8,0,2,0"
-                                             Width="14" Height="14"
-                                             VerticalAlignment="Center">
+                                           Foreground="{DynamicResource MaterialDesignBodyLight}"
+                                           VerticalAlignment="Top"
+                                           Visibility="{Binding EsGrupo, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                           Margin="0,0,12,0">               
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="Cupo: {0}/{1}">
+                                            <Binding Path="EmpleadoIds.Count"/>
+                                            <Binding Path="Cupo"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+
+                                </TextBlock>
+
+                                <TextBlock FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}" VerticalAlignment="Top" >
+                                    <Run Text="Tipo Grupo: "/>
+                                </TextBlock>
+                                <md:PackIcon Width="15" Height="15">
                                     <md:PackIcon.Style>
                                         <Style TargetType="md:PackIcon">
                                             <Setter Property="Kind" Value="Close" />
@@ -137,9 +147,6 @@
                                         </Style>
                                     </md:PackIcon.Style>
                                 </md:PackIcon>
-                                <TextBlock Text="{Binding EsGrupo, StringFormat='{}Grupos: {0}'}"
-                                           FontSize="12"
-                                           Foreground="{DynamicResource MaterialDesignBodyLight}" />
                             </StackPanel>
                         </StackPanel>
 

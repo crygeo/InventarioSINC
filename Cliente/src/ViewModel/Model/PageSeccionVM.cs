@@ -72,6 +72,7 @@ public partial class PageSeccionVM : ViewModelServiceBase<Seccion>
         }
     }
 
+
     // ==============================
     // CAN EXECUTE
     // ==============================

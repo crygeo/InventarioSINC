@@ -129,10 +129,11 @@ public class BaseController<TEntity> : ControllerBase, IController<TEntity, IAct
             request,
             () =>
             {
-                if (!IsValueCompatibleWithProperty(
+                if (!TryConvertValueForProperty(
                         request.Selector,
                         request.NewValue,
-                        out var convertedValue))
+                        out var convertedValue,
+                        out _))
                 {
                     return Task.FromResult<IActionResult>(
                         BadRequest(new ErrorResponse(
@@ -144,7 +145,7 @@ public class BaseController<TEntity> : ControllerBase, IController<TEntity, IAct
                     () => Service.UpdateProperty(
                         request.EntityId,
                         request.Selector,
-                        convertedValue),
+                        convertedValue!),
                     "El objeto no fue encontrado para actualizar.");
             });
 
@@ -154,13 +155,24 @@ public class BaseController<TEntity> : ControllerBase, IController<TEntity, IAct
             request,
             () =>
             {
-                if (!IsNewValueCompatibleWithProperty(request.Selector, request.NewValue))
+                if (!TryConvertValueForProperty(
+                        request.Selector,
+                        request.NewValue,
+                        out var convertedValue,
+                        out _,
+                        expectCollectionItem: true))
+                {
                     return Task.FromResult<IActionResult>(
-                        BadRequest(new ErrorResponse(400,
+                        BadRequest(new ErrorResponse(
+                            400,
                             "El valor para agregar no es compatible con el tipo de la propiedad.")));
+                }
 
                 return ExecutePropertyActionAsync(
-                    () => Service.AddItemIdToListAsync(request.EntityId, request.Selector, request.NewValue),
+                    () => Service.AddItemIdToListAsync(
+                        request.EntityId,
+                        request.Selector,
+                        convertedValue!),
                     "El objeto no fue encontrado para modificar la lista.");
             });
 
@@ -170,13 +182,13 @@ public class BaseController<TEntity> : ControllerBase, IController<TEntity, IAct
             request,
             () =>
             {
-                if (!IsNewValueCompatibleWithProperty(request.Selector, request.NewValue))
+                if (!TryConvertValueForProperty(request.Selector, request.NewValue, out var convertedValue, out _, expectCollectionItem: true))
                     return Task.FromResult<IActionResult>(
                         BadRequest(new ErrorResponse(400,
                             "El valor a remover no es compatible con el tipo de la propiedad.")));
 
                 return ExecutePropertyActionAsync(
-                    () => Service.RemoveItemIdToListAsync(request.EntityId, request.Selector, request.NewValue),
+                    () => Service.RemoveItemIdToListAsync(request.EntityId, request.Selector, convertedValue!),
                     "El objeto no fue encontrado para remover el elemento.");
             });
     
@@ -274,30 +286,17 @@ public class BaseController<TEntity> : ControllerBase, IController<TEntity, IAct
            && typeof(TEntity).GetProperty(propertyName,
                BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase) != null;
 
-    protected static bool IsNewValueCompatibleWithProperty(string propertyName, object newValue)
-    {
-        if (newValue is null) return false;
-
-        var property = typeof(TEntity).GetProperty(
-            propertyName,
-            BindingFlags.Public | BindingFlags.Instance | BindingFlags.IgnoreCase);
-
-        if (property == null || !typeof(IEnumerable).IsAssignableFrom(property.PropertyType))
-            return false;
-
-        if (!property.PropertyType.IsGenericType)
-            return false;
-
-        var itemType = property.PropertyType.GetGenericArguments()[0];
-        return itemType.IsInstanceOfType(newValue);
-    }
-
-    protected static bool IsValueCompatibleWithProperty(
+    protected static bool TryConvertValueForProperty(
         string propertyName,
-        object? rawValue,
-        out object? convertedValue)
-    {
+        object? inputValue,
+        out object? convertedValue,
+        out Type? targetType,
+        bool expectCollectionItem = false)
+    {   
         convertedValue = null;
+        targetType = null;
+
+        if (inputValue is null) return false;
 
         var property = typeof(TEntity).GetProperty(
             propertyName,
@@ -306,64 +305,52 @@ public class BaseController<TEntity> : ControllerBase, IController<TEntity, IAct
         if (property == null)
             return false;
 
-        if (typeof(IEnumerable).IsAssignableFrom(property.PropertyType)
-            && property.PropertyType != typeof(string))
-            return false;
-
-        var targetType = Nullable.GetUnderlyingType(property.PropertyType)
-                         ?? property.PropertyType;
-
-        return TryConvertValue(rawValue, targetType, out convertedValue);
-    }
-
-    protected static bool TryConvertValue(object? value, Type targetType, out object? result)
-    {
-        result = null;
-
-        // null siempre es válido (la validación de nullable va afuera)
-        if (value == null)
-            return true;
-
-        // Ya es del tipo correcto
-        if (targetType.IsInstanceOfType(value))
+        if (expectCollectionItem)
         {
-            result = value;
-            return true;
+            if (!typeof(IEnumerable).IsAssignableFrom(property.PropertyType) ||
+                !property.PropertyType.IsGenericType)
+                return false;
+
+            targetType = property.PropertyType.GetGenericArguments()[0];
+        }
+        else
+        {
+            targetType = property.PropertyType;
         }
 
-        // Caso normal cuando viene de [FromBody] object
-        if (value is JsonElement json)
-        {
-            if (json.ValueKind == JsonValueKind.Null)
-                return true;
+        convertedValue = NormalizeValue(inputValue, targetType);
 
+        return convertedValue != null && targetType.IsInstanceOfType(convertedValue);
+    }
+    
+    private static object? NormalizeValue(object value, Type targetType)
+    {
+        // Caso System.Text.Json
+        if (value is JsonElement jsonElement)
+        {
             try
             {
-                result = JsonSerializer.Deserialize(
-                    json.GetRawText(),
-                    targetType,
-                    new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    });
-
-                return true;
+                return JsonSerializer.Deserialize(jsonElement.GetRawText(), targetType);
             }
             catch
             {
-                return false;
+                return null;
             }
         }
 
-        // Fallback para conversiones simples (int -> long, etc.)
+        // Caso ya correcto
+        if (targetType.IsInstanceOfType(value))
+            return value;
+
+        // Intento de conversión simple (string → int, etc.)
         try
         {
-            result = Convert.ChangeType(value, targetType);
-            return true;
+            return Convert.ChangeType(value, targetType);
         }
         catch
         {
-            return false;
+            return null;
         }
     }
+
 }

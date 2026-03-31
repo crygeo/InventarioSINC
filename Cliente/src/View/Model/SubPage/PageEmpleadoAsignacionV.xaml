@@ -1,0 +1,266 @@
+<UserControl x:Class="Cliente.View.Model.SubPage.PageEmpleadoAsignacionV"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:svm="clr-namespace:Cliente.ViewModel.Model.Sub"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance svm:PageEmpleadoAsignacionVM}">
+     <Grid>
+        <Grid.RowDefinitions>
+            <!-- Encabezado -->
+            <RowDefinition Height="Auto"/>
+            <!-- Buscador -->
+            <RowDefinition Height="Auto"/>
+            <!-- Contenido principal: asignados + resultados -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ═══════════════════════════════
+             ENCABEZADO
+             ═══════════════════════════════ -->
+        <StackPanel Grid.Row="0" Margin="16,16,16,8">
+
+            <TextBlock Text="{Binding NombreContexto}"
+                       Style="{StaticResource MaterialDesignHeadline5TextBlock}"/>
+
+            <StackPanel Orientation="Horizontal" Margin="0,4,0,0">
+                <md:PackIcon Kind="AccountGroup"
+                             VerticalAlignment="Center"
+                             Margin="0,0,6,0"/>
+                <TextBlock Text="{Binding ResumenCupo}"
+                           Style="{StaticResource MaterialDesignBody1TextBlock}"
+                           VerticalAlignment="Center"/>
+                <!-- Advertencia de cupo lleno -->
+                <md:PackIcon Kind="AlertCircle"
+                             Foreground="Orange"
+                             VerticalAlignment="Center"
+                             Margin="8,0,4,0"
+                             Visibility="{Binding CupoAlcanzado,
+                                          Converter={StaticResource BooleanToVisibilityConverter}}"/>
+                <TextBlock Text="Cupo completo"
+                           Foreground="Orange"
+                           VerticalAlignment="Center"
+                           Visibility="{Binding CupoAlcanzado,
+                                        Converter={StaticResource BooleanToVisibilityConverter}}"/>
+            </StackPanel>
+        </StackPanel>
+
+        <!-- ═══════════════════════════════
+             BUSCADOR
+             ═══════════════════════════════ -->
+        <Border Grid.Row="1"
+                Margin="16,0,16,8"
+                Background="{DynamicResource MaterialDesignCardBackground}"
+                CornerRadius="8"
+                Padding="12,8">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <md:PackIcon Grid.Column="0"
+                             Kind="Magnify"
+                             VerticalAlignment="Center"
+                             Margin="0,0,8,0"
+                             Opacity="0.6"/>
+
+                <TextBox Grid.Column="1"
+                         Text="{Binding TextoBusqueda,
+                                UpdateSourceTrigger=PropertyChanged,
+                                Mode=TwoWay}"
+                         md:HintAssist.Hint="Buscar por nombre o cédula..."
+                         BorderThickness="0"
+                         Background="Transparent"
+                         VerticalAlignment="Center"/>
+
+                <Button Grid.Column="2"
+                        Style="{StaticResource MaterialDesignIconButton}"
+                        Command="{Binding CargarCommand}"
+                        ToolTip="Recargar empleados"
+                        Width="28" Height="28" Padding="0">
+                    <md:PackIcon Kind="Refresh" Width="16" Height="16"/>
+                </Button>
+            </Grid>
+        </Border>
+
+        <ProgressBar Grid.Row="1"
+                     VerticalAlignment="Bottom" Height="2"
+                     IsIndeterminate="True"
+                     Visibility="{Binding ProgressVisible,
+                                  Converter={StaticResource BooleanToVisibilityConverter}}"/>
+
+        <!-- ═══════════════════════════════
+             CONTENIDO PRINCIPAL
+             ═══════════════════════════════ -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <!-- Asignados -->
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="5"/>
+                <!-- Resultados búsqueda -->
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ─── PANEL IZQUIERDO: Asignados ─── -->
+            <Grid Grid.Column="0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Text="Asignados"
+                           FontWeight="SemiBold"
+                           Margin="16,8,16,4"/>
+
+                <ListView Grid.Row="1"
+                          ItemsSource="{Binding EmpleadosAsignados}"
+                          SelectedItem="{Binding EmpleadoSelect}">
+
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem"
+                               BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="12,6"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding NombreCompleto}"
+                                               FontWeight="Medium"
+                                               FontSize="13"/>
+                                    <TextBlock Text="{Binding Cedula}"
+                                               FontSize="11"
+                                               Opacity="0.7"/>
+                                </StackPanel>
+
+                                <!-- Quitar — visible en hover -->
+                                <Button Grid.Column="1"
+                                        x:Name="BtnQuitar"
+                                        Style="{StaticResource MaterialDesignIconButton}"
+                                        Command="{Binding DataContext.QuitarCommand,
+                                                  RelativeSource={RelativeSource AncestorType=ListView}}"
+                                        CommandParameter="{Binding}"
+                                        Width="28" Height="28" Padding="0"
+                                        Visibility="Hidden"
+                                        ToolTip="Quitar">
+                                    <md:PackIcon Kind="AccountMinus"
+                                                 Width="14" Height="14"
+                                                 Foreground="OrangeRed"/>
+                                </Button>
+                            </Grid>
+
+                            <DataTemplate.Triggers>
+                                <DataTrigger Binding="{Binding IsMouseOver,
+                                                       RelativeSource={RelativeSource
+                                                       AncestorType=ListViewItem}}"
+                                             Value="True">
+                                    <Setter TargetName="BtnQuitar"
+                                            Property="Visibility"
+                                            Value="Visible"/>
+                                </DataTrigger>
+                            </DataTemplate.Triggers>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+
+            <GridSplitter Grid.Column="1"
+                          Width="5"
+                          HorizontalAlignment="Stretch"
+                          Background="{DynamicResource MaterialDesignDivider}"/>
+
+            <!-- ─── PANEL DERECHO: Resultados de búsqueda ─── -->
+            <Grid Grid.Column="2">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <TextBlock Grid.Row="0"
+                           Text="Resultados"
+                           FontWeight="SemiBold"
+                           Margin="16,8,16,4"/>
+
+                <!-- Placeholder cuando no hay búsqueda -->
+                <TextBlock Grid.Row="1"
+                           Text="Escribe para buscar empleados"
+                           HorizontalAlignment="Center"
+                           VerticalAlignment="Center"
+                           Opacity="0.5"
+                           FontSize="13">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Visibility" Value="Collapsed"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding ResultadosBusqueda.Count}"
+                                             Value="0">
+                                    <Setter Property="Visibility" Value="Visible"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+
+                <ListView Grid.Row="1"
+                          ItemsSource="{Binding ResultadosBusqueda}"
+                          Visibility="{Binding ResultadosBusqueda.Count,
+                                       Converter={StaticResource CountToVisibilityConverter}}">
+
+                    <ListView.ItemContainerStyle>
+                        <Style TargetType="ListViewItem"
+                               BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                            <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                            <Setter Property="Padding" Value="12,6"/>
+                        </Style>
+                    </ListView.ItemContainerStyle>
+
+                    <ListView.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+
+                                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                                    <TextBlock Text="{Binding NombreCompleto}"
+                                               FontWeight="Medium"
+                                               FontSize="13"/>
+                                    <TextBlock Text="{Binding Cedula}"
+                                               FontSize="11"
+                                               Opacity="0.7"/>
+                                </StackPanel>
+
+                                <!-- Asignar -->
+                                <Button Grid.Column="1"
+                                        Style="{StaticResource MaterialDesignIconButton}"
+                                        Command="{Binding DataContext.AsignarCommand,
+                                                  RelativeSource={RelativeSource AncestorType=ListView}}"
+                                        CommandParameter="{Binding}"
+                                        Width="28" Height="28" Padding="0"
+                                        ToolTip="Asignar">
+                                    <md:PackIcon Kind="AccountPlus"
+                                                 Width="14" Height="14"
+                                                 Foreground="MediumSeaGreen"/>
+                                </Button>
+                            </Grid>
+                        </DataTemplate>
+                    </ListView.ItemTemplate>
+                </ListView>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>
