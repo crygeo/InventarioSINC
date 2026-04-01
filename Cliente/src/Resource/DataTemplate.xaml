@@ -8,11 +8,11 @@
 
 
     <DataTemplate DataType="{x:Type vm:PageProcesosVm}">
-        <view:PageProcesosV />
+        <view:PageNavegacionV />
     </DataTemplate>
 
     <DataTemplate DataType="{x:Type vm:PageGestionEmployerVM}">
-        <view:PageGestionEmployerV />
+        <view:PageNavegacionV />
     </DataTemplate>
 
   </ResourceDictionary>

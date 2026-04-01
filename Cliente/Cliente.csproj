@@ -45,13 +45,6 @@
         </None>
     </ItemGroup>
     <ItemGroup>
-        <Page Update="src\View\PageGestionEmployerV.xaml">
-            <Generator>MSBuild:Compile</Generator>
-            <XamlRuntime>Wpf</XamlRuntime>
-            <SubType>Designer</SubType>
-        </Page>
-    </ItemGroup>
-    <ItemGroup>
       <Folder Include="src\Converter\Model\" />
     </ItemGroup>
 </Project>
