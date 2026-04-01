@@ -46,7 +46,7 @@ public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
 
         await DialogServiceI.MostrarDialogoProgreso(async () =>
         {
-            var result = await ServicioServiceUsuario.ChangePasswordAsync(EntitySelect.Id, changePass.OldPassword,
+            var result = await ServicioServiceUsuario.ChangePasswordAsync(EntitySelect.Model.Id, changePass.OldPassword,
                 changePass.NewPassword);
             await DialogServiceI.ValidarRespuesta(result);
             return result;
@@ -58,7 +58,7 @@ public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
         if (EntitySelect == null || rol == null)
             return;
 
-        var result = await ServicioServiceUsuario.AsignarRol(EntitySelect.Id, rol.Id);
+        var result = await ServicioServiceUsuario.AsignarRol(EntitySelect.Model.Id, rol.Id);
         await DialogServiceI.ValidarRespuesta(result);
 
         if (result.EntityGet)
@@ -86,7 +86,7 @@ public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
         var usuarioDialog = new UsuarioDialog
         {
             AceptarCommand = new AsyncRelayCommand<object?>(ConfirmarEditarUsuarioAsync),
-            Entity = EntitySelect.Clone(),
+            Entity = EntitySelect.Model.Clone(),
             TextHeader = "Editar Entity",
             DialogOpenIdentifier = DialogDefaults.Main
         };
@@ -143,7 +143,7 @@ public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
 
         await DialogServiceI.MostrarDialogoProgreso(async () =>
         {
-            var result = await ServicioBase.DeleteAsync(EntitySelect.Id);
+            var result = await ServicioBase.DeleteAsync(EntitySelect.Model.Id);
             await DialogServiceI.ValidarRespuesta(result);
             return result;
         }, DialogDefaults.Progress);
