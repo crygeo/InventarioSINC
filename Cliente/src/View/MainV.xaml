@@ -10,6 +10,7 @@
         xmlns:def="clr-namespace:Cliente.Default"
         xmlns:obj="clr-namespace:Cliente.Obj"
         xmlns:model1="clr-namespace:Cliente.ViewModel.Model"
+        xmlns:objs="clr-namespace:Utilidades.Objs;assembly=Utilidades"
         Style="{StaticResource MaterialDesignWindow}"
         WindowStartupLocation="CenterScreen">
     <Window.Resources>
@@ -51,7 +52,7 @@
                                 </Style>
                             </ListBox.ItemContainerStyle>
                             <ListBox.Resources>
-                                <DataTemplate DataType="{x:Type obj:ItemNavigationM}">
+                                <DataTemplate DataType="{x:Type objs:ItemNavigationM}">
                                     <TextBlock Text="{Binding Title}" />
                                 </DataTemplate>
                             </ListBox.Resources>

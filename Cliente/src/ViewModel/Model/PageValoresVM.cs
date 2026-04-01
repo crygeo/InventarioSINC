@@ -10,6 +10,7 @@ using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
 using Utilidades.Dialogs;
 using Utilidades.Mvvm;
+using Utilidades.Objs;
 
 namespace Cliente.src.ViewModel.Model;
 
