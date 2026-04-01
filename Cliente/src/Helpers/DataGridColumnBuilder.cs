@@ -41,9 +41,18 @@ public static class DataGridColumnBuilder
                 typeof(IEnumerable).IsAssignableFrom(prop.PropertyType)
                 && prop.PropertyType != typeof(string);
 
-            Binding binding = isEnumerable
-                ? new Binding($"{prop.Name}.Count")
-                : new Binding(prop.Name);
+            Binding binding;
+
+            if (vista.LookupType != null)
+            {
+                binding = new Binding($"Ref[{prop.Name}].{vista.DisplayMember ?? "Nombre"}");
+            }
+            else
+            {
+                binding = isEnumerable
+                    ? new Binding($"Model.{prop.Name}.Count")
+                    : new Binding($"Model.{prop.Name}");
+            }
 
             DataGridColumn column = vista.LookupType != null
                 ? new DataGridTextColumn

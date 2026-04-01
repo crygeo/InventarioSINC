@@ -11,7 +11,7 @@ namespace Servidor.Model;
 [AutoController]
 public class Turno : ITurno
 {
-    private ITurno _turnoImplementation;
+    private string _idTurnoTrabajo;
 
     [BsonId]
     [BsonRepresentation(BsonType.ObjectId)]
@@ -21,10 +21,13 @@ public class Turno : ITurno
     public bool Updatable { get; set; }
 
     public string Nombre { get; set; }
-    public TimeSpan HoraInicio { get; set; }
-    public TimeSpan HoraFin { get; set; }
+
+    [BsonRepresentation(BsonType.ObjectId)]
+    public string IdTurnoTrabajo { get; set; }
+
     public bool EsRotativo { get; set; }
 
+    [BsonRepresentation(BsonType.ObjectId)]
     public string AreaId { get; set; }
     
     public void Update(IModelObj entity)

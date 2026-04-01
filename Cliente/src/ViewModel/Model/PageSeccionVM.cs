@@ -2,13 +2,14 @@ using Cliente.Default;
 using Cliente.Obj.Model;
 using Cliente.Services.Model;
 using CommunityToolkit.Mvvm.Input;
+using Utilidades.Mvvm;
 
 namespace Cliente.ViewModel.Model;
 
 public partial class PageSeccionVM : ViewModelServiceBase<Seccion>
 {
     private ServiceBase<Grupo>? _serviceGrupo;
-    
+
     public ServiceSeccion ServiceSeccion => (ServiceSeccion)ServicioBase;
 
     // ==============================
@@ -26,7 +27,7 @@ public partial class PageSeccionVM : ViewModelServiceBase<Seccion>
             CrearEntityCommand.NotifyCanExecuteChanged();
         }
     }
-    
+
     public int TotalGrupos
     {
         get
@@ -47,7 +48,7 @@ public partial class PageSeccionVM : ViewModelServiceBase<Seccion>
     {
         get
         {
-            if ( _serviceGrupo is null || TurnoPadre is null) return 0;
+            if (_serviceGrupo is null || TurnoPadre is null) return 0;
 
             var seccionIds = ServicioBase.CacheById.Values
                 .Where(s => TurnoPadre.Id == s.TurnoId)
@@ -101,7 +102,13 @@ public partial class PageSeccionVM : ViewModelServiceBase<Seccion>
             .OrderBy(s => s.Nombre);
 
         foreach (var seccion in seccionesFiltradas)
-            Entities.Add(seccion);
+        {
+            var wrapper = new EntityWrapper<Seccion>(seccion);
+
+            await _referenceEnricher.EnrichAsync(wrapper);
+            Entities.Add(wrapper);
+        }
+
 
         await Task.CompletedTask;
     }
@@ -128,15 +135,15 @@ public partial class PageSeccionVM : ViewModelServiceBase<Seccion>
             return result;
         }, DialogDefaults.Progress);
     }
-    
+
     public void InjectChildServices(ServiceBase<Grupo> serviceGrupo)
     {
-        _serviceGrupo   = serviceGrupo;
+        _serviceGrupo = serviceGrupo;
 
         // Reaccionar a cambios en secciones/grupos para actualizar los contadores
-        _serviceGrupo.CollectionChanged   += OnGrupoCollectionChanged;
+        _serviceGrupo.CollectionChanged += OnGrupoCollectionChanged;
     }
-    
+
     private void OnGrupoCollectionChanged(EntityChangeType type, string id, Grupo? entity)
     {
         OnPropertyChanged(nameof(TotalGrupos));

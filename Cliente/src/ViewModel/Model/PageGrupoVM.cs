@@ -2,6 +2,7 @@ using Cliente.Default;
 using Cliente.Obj.Model;
 using Cliente.Services.Model;
 using CommunityToolkit.Mvvm.Input;
+using Utilidades.Mvvm;
 
 namespace Cliente.ViewModel.Model;
 
@@ -71,7 +72,13 @@ public partial class PageGrupoVM : ViewModelServiceBase<Grupo>
             .OrderBy(g => g.Nombre);
 
         foreach (var grupo in gruposFiltrados)
-            Entities.Add(grupo);
+        {
+            var wrapper = new EntityWrapper<Grupo>(grupo);
+
+            await _referenceEnricher.EnrichAsync(wrapper);
+            
+            Entities.Add(wrapper);
+        }
 
         await Task.CompletedTask;
     }

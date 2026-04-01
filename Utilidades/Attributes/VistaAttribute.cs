@@ -14,5 +14,6 @@ public class VistaAttribute : Attribute
     public string Nombre { get; set; }
     public bool Visible { get; set; } = true;
     public int Orden { get; set; }
+    public string DisplayMember { get; set; } = "Nombre";
     public Type LookupType { get; set; } = null;
 }

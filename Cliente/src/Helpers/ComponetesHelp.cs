@@ -267,6 +267,20 @@ public static class ComponetesHelp
         string? hint = null,
         Type? typeEntity = null)
     {
+        
+        if (typeEntity is null)
+            throw new ArgumentNullException(nameof(typeEntity));
+
+        if (!typeof(IIdentifiable).IsAssignableFrom(typeEntity) ||
+            !typeof(IDisplayable).IsAssignableFrom(typeEntity))
+        {
+            throw new ArgumentException(
+                $"El tipo {typeEntity.Name} debe implementar IIdentifiable y IDisplayable",
+                nameof(typeEntity));
+        }
+        
+
+        
         var service = (IServiceClient)ServiceFactory.GetService(typeEntity);
 
         // Recoger propiedades [Buscable] del tipo de entidad
@@ -276,24 +290,27 @@ public static class ComponetesHelp
             .Select(p => p.Name)
             .ToList() ?? [];
 
+        if (propiedadesBuscables.Count == 0)
+        {
+            throw new InvalidOperationException(
+                $"El tipo {typeEntity.Name} debe tener al menos una propiedad con [Buscable]");
+        }
+
         // Decidir si usar búsqueda remota (tiene [Buscable]) o local (caché)
         Func<string, Task<IEnumerable<object>>>? remoteSearch = null;
 
-        if (propiedadesBuscables.Count > 0)
+        remoteSearch = async query =>
         {
-            remoteSearch = async query =>
+            var request = new SearchRequest
             {
-                var request = new SearchRequest
-                {
-                    Query = query,
-                    Propiedades = propiedadesBuscables,
-                    PageSize = 20
-                };
-
-                var result = await service.SearchAsync(request);
-                return (IEnumerable<object>)(result.Success ? result.EntityGet : Enumerable.Empty<object>());
+                Query = query,
+                Propiedades = propiedadesBuscables,
+                PageSize = 20
             };
-        }
+
+            var result = await service.SearchAsync(request);
+            return (IEnumerable<object>)(result.Success ? result.EntityGet : Enumerable.Empty<object>());
+        };
 
 
         var entitySelector = new EntitySelector
@@ -303,7 +320,6 @@ public static class ComponetesHelp
             MinWidth = 200,
             HitText = hint,
             RemoteSearchFunc = remoteSearch,
-            DisplayMemberPath = "DescripcionVisual",
             EntityType = typeEntity,
             InitialLoadFunc = async () =>
             {

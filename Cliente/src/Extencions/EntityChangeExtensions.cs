@@ -10,8 +10,7 @@ using System.Reflection;
 public static class EntityChangeExtensions
 {
     public static IReadOnlyList<PropertyChange> GetChanges<T>(
-        this T original,
-        T modified)
+        this T original, T modified)
     {
         if (original == null)
             throw new ArgumentNullException(nameof(original));

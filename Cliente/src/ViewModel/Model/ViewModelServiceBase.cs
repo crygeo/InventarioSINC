@@ -2,9 +2,12 @@
 using Cliente.Default;
 using Cliente.Extencions;
 using Cliente.Helpers;
+using Cliente.Services;
 using Cliente.Services.Model;
+using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Extensions;
+using Shared.Interfaces;
 using Shared.Interfaces.Model;
 using Utilidades.Dialogs;
 using Utilidades.Interfaces;
@@ -23,7 +26,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
     // ESTADO PRIVADO
     private bool _canRefresh = true;
     private bool _autoCarga = true;
-    private TEntity? _entitySelect;
+    private EntityWrapper<TEntity>? _entitySelect;
     private int _progressValue;
     private bool _progressVisible;
     private int _pageIndex = 0;
@@ -37,9 +40,9 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
 
     // ==============================
     // PROPIEDADES PÚBLICAS
-    public ObservableCollection<TEntity> Entities { get; } = [];
-
-    public TEntity? EntitySelect
+    public ObservableCollection<EntityWrapper<TEntity>> Entities { get; } = new();
+    
+    public EntityWrapper<TEntity>? EntitySelect
     {
         get => _entitySelect;
         set
@@ -122,6 +125,8 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
     public IAsyncRelayCommand NextPageCommand { get; protected set; }
     public IAsyncRelayCommand PrevPageCommand { get; protected set; }
 
+    protected ReferenceEnricher _referenceEnricher = new ReferenceEnricher(new ReferenceResolver());
+    
     protected ViewModelServiceBase()
     {
         CargarPageCommand = new AsyncRelayCommand(
@@ -262,49 +267,63 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
     /// Los VMs hijos con contexto padre sobreescriben este método para filtrar
     /// por su padre activo sin llamadas adicionales al servidor.
     /// </summary>
-    protected virtual Task LoadEntitiesAsync()
+    protected virtual async Task LoadEntitiesAsync()
     {
         Entities.Clear();
 
         foreach (var entity in ServicioBase.CacheById.Values)
-            Entities.Add(entity);
+        {
+            var wrapper = new EntityWrapper<TEntity>(entity);
 
-        return Task.CompletedTask;
+            await _referenceEnricher.EnrichAsync(wrapper);
+
+            Entities.Add(wrapper);
+        }
     }
 
     // ==============================
     // REACCIÓN A SIGNALR
     // ==============================
 
-    protected virtual void OnServiceCollectionChanged(EntityChangeType type, string id, TEntity? entity)
+    protected virtual async void OnServiceCollectionChanged(EntityChangeType type, string id, TEntity? entity)
     {
         switch (type)
         {
             case EntityChangeType.Created when entity != null:
-                // Solo añadir si pasa el filtro del contexto actual
-                if (ShouldIncludeEntity(entity))
-                    Entities.Add(entity);
+            {
+                if (!ShouldIncludeEntity(entity)) return;
+
+                var wrapper = new EntityWrapper<TEntity>(entity);
+                await _referenceEnricher.EnrichAsync(wrapper);
+
+                Entities.Add(wrapper);
                 break;
+            }
 
             case EntityChangeType.Updated when entity != null:
-                var existing = Entities.FirstOrDefault(x => x.Id == id);
+            {
+                var existing = Entities.FirstOrDefault(x => ((IIdentifiable)x.Model).Id == id);
+
                 if (existing != null)
                 {
                     var index = Entities.IndexOf(existing);
-                    Entities[index] = entity;
-                }
-                else if (ShouldIncludeEntity(entity))
-                {
-                    // Llegó una entidad que ahora pertenece a este contexto
-                    Entities.Add(entity);
+
+                    var wrapper = new EntityWrapper<TEntity>(entity);
+                    await _referenceEnricher.EnrichAsync(wrapper);
+
+                    Entities[index] = wrapper;
                 }
                 break;
+            }
 
             case EntityChangeType.Deleted:
-                var toRemove = Entities.FirstOrDefault(x => x.Id == id);
+            {
+                var toRemove = Entities.FirstOrDefault(x => ((IIdentifiable)x.Model).Id == id);
                 if (toRemove != null)
                     Entities.Remove(toRemove);
+
                 break;
+            }
         }
     }
 
@@ -440,11 +459,11 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
         }, DialogDefaults.Progress);
     }
 
-    private async Task ConfirmarEditarEntityAsync(TEntity? entity)
+    private async Task ConfirmarEditarEntityAsync(EntityWrapper<TEntity>? entity)
     {
         if (entity == null) return;
 
-        var entityOriginal = ServicioBase.GetFromCache(entity.Id);
+        var entityOriginal = ServicioBase.GetFromCache(entity.Model.Id);
         if (entityOriginal == null) return;
 
         var changes = entityOriginal.GetChanges(entity);
@@ -456,7 +475,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
 
             await DialogServiceI.MostrarDialogoProgreso(async () =>
             {
-                var result = await ServicioBase.PropertyUpdateAsync(entity.Id, property.Name, property.NewValue);
+                var result = await ServicioBase.PropertyUpdateAsync(entity.Model.Id, property.Name, property.NewValue);
                 result.ObjInteration = typeof(TEntity);
                 await DialogServiceI.ValidarRespuesta(result);
                 return result;

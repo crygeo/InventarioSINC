@@ -88,7 +88,7 @@ public partial class ObjectIList : UserControl
                 Solicitar = p.GetCustomAttribute<SolicitarAttribute>()
             })
             .Where(x => x.Vista != null && x.Vista.Visible)
-            .OrderBy(x => x.Vista.Orden)
+            .OrderBy(x => x.Vista!.Orden)
             .ToList();
 
         DataGridSolicitados.Columns.Clear();
@@ -108,25 +108,30 @@ public partial class ObjectIList : UserControl
                 typeof(IEnumerable).IsAssignableFrom(prop.PropertyType)
                 && prop.PropertyType != typeof(string);
 
-            var binding = isEnumerable
-                ? new Binding($"{prop.Name}.Count")
-                : new Binding(prop.Name);
+            Binding binding;
 
+            // 🔥 CAMBIO CLAVE AQUÍ
             if (vista?.LookupType != null)
-                DataGridSolicitados.Columns.Add(new DataGridTextColumn
+            {
+                var displayMember = vista.DisplayMember ?? "Nombre";
+
+                binding = new Binding($"Ref[{prop.Name}].{displayMember}")
                 {
-                    Header = displayName,
-                    Binding = new Binding(prop.Name)
-                    {
-                        Converter = new LookupValueConverter(vista.LookupType)
-                    }
-                });
+                    TargetNullValue = string.Empty
+                };
+            }
             else
-                DataGridSolicitados.Columns.Add(new DataGridTextColumn
-                {
-                    Header = displayName,
-                    Binding = binding
-                });
+            {
+                binding = isEnumerable
+                    ? new Binding($"Model.{prop.Name}.Count")
+                    : new Binding($"Model.{prop.Name}");
+            }
+
+            DataGridSolicitados.Columns.Add(new DataGridTextColumn
+            {
+                Header = displayName,
+                Binding = binding
+            });
         }
     }
 

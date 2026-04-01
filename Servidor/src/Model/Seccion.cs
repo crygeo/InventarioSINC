@@ -21,7 +21,11 @@ public class Seccion : ISeccion
     public string Nombre { get; set; }
     public int Cupo { get; set; }
     public bool EsGrupo { get; set; }
+    
+    [BsonRepresentation(BsonType.ObjectId)]
     public IList<string> EmpleadoIds { get; set; }
+    
+    [BsonRepresentation(BsonType.ObjectId)]
     public string TurnoId { get; set; }
 
     public void Update(IModelObj entity)

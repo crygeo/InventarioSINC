@@ -55,10 +55,10 @@ public class PageValoresVM : ViewModelServiceBase<ElementoJerarquico>
     }
         
 
-    public Dictionary<string, List<ElementoJerarquico>> ValoresPorIdentificador => Entities
-        .Where(v => !string.IsNullOrEmpty(v.IdPerteneciente))
-        .GroupBy(v => v.IdPerteneciente)
-        .ToDictionary(g => g.Key!, g => g.OrderByDescending(e => e.FechaCreacion).ToList());
+    public Dictionary<ElementoJerarquico, List<EntityWrapper<ElementoJerarquico>>> ValoresPorIdentificador => Entities
+        .Where(v => !string.IsNullOrEmpty(v.Model.IdPerteneciente))
+        .GroupBy(v => v.Model)
+        .ToDictionary(g => g.Key!, g => g.OrderByDescending(e => e.Model.FechaCreacion).ToList());
 
 
     public SubViewModelBase IdentificadoresSubModelBase { get; }

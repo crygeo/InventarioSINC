@@ -21,10 +21,15 @@ public class Grupo : IGrupo
 
     public string Nombre { get; set; }
 
+    [BsonRepresentation(BsonType.ObjectId)]
     public string SeccionId{ get; set; }
 
+    [BsonRepresentation(BsonType.ObjectId)]
     public string JefeId { get; set; }
+    
     public int Cupo { get; set; }
+    
+    [BsonRepresentation(BsonType.ObjectId)]
     public IList<string> EmpleadoIds { get; set; }
 
     public void Update(IModelObj entity)

@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using MaterialDesignThemes.Wpf;
 using Shared.Interfaces;
 using Utilidades.Dialogs;
+using Utilidades.Interfaces;
 using RelayCommand = Utilidades.Mvvm.RelayCommand;
 
 namespace Cliente.View.Items;
@@ -47,7 +48,7 @@ public partial class EntitySelector : UserControl
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[EntitySelector] Error cargando datos iniciales: {ex}");
+            Console.WriteLine($"[EntitySelector] Error: {ex}");
         }
     }
 
@@ -85,22 +86,6 @@ public partial class EntitySelector : UserControl
     {
         get => (string?)GetValue(HitTextProperty);
         set => SetValue(HitTextProperty, value);
-    }
-
-    #endregion
-
-    #region DisplayMemberPath
-
-    public static readonly DependencyProperty DisplayMemberPathProperty =
-        DependencyProperty.Register(
-            nameof(DisplayMemberPath),
-            typeof(string),
-            typeof(EntitySelector));
-
-    public string? DisplayMemberPath
-    {
-        get => (string?)GetValue(DisplayMemberPathProperty);
-        set => SetValue(DisplayMemberPathProperty, value);
     }
 
     #endregion
@@ -180,14 +165,16 @@ public partial class EntitySelector : UserControl
         DependencyPropertyChangedEventArgs e)
     {
         if (d is not EntitySelector control || control._isSynchronizing) return;
-        if (e.NewValue is not IIdentifiable identifiable) return;
+        if (e.NewValue is not (IIdentifiable identifiable and IDisplayable displayable)) 
+            return;
+
         if (control.SelectedId == identifiable.Id) return;
 
         try
         {
             control._isSynchronizing = true;
             control.SelectedId = identifiable.Id;
-            control.DisplayText = control.ResolveDisplayText(e.NewValue);
+            control.DisplayText = displayable.DescripcionVisual;
         }
         finally
         {
@@ -258,13 +245,14 @@ public partial class EntitySelector : UserControl
 
     private void SynchronizeSelectedItem(object item)
     {
+        if(item is not IDisplayable newItem) return;
         if (_isSynchronizing || SelectedItem == item) return;
 
         try
         {
             _isSynchronizing = true;
             SelectedItem = item;
-            DisplayText = ResolveDisplayText(item);
+            DisplayText = newItem.DescripcionVisual;
         }
         finally
         {
@@ -343,12 +331,5 @@ public partial class EntitySelector : UserControl
     // Helpers
     // =========================================================
 
-    private string ResolveDisplayText(object item)
-    {
-        if (string.IsNullOrWhiteSpace(DisplayMemberPath))
-            return item.ToString() ?? string.Empty;
-
-        var prop = item.GetType().GetProperty(DisplayMemberPath);
-        return prop?.GetValue(item)?.ToString() ?? string.Empty;
-    }
+    
 }

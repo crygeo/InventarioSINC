@@ -5,13 +5,14 @@ using MaterialDesignThemes.Wpf;
 using Shared.Interfaces.Model.Obj;
 using Utilidades.Attributes;
 using Utilidades.Controls;
+using Utilidades.Interfaces;
 
 namespace Cliente.Obj.Model;
 
 [AutoViewModel]
 [Navegacion("PanelConfig", TituloS = "Proveedor", SelectedIcon = PackIconKind.Domain,
     UnselectedIcon = PackIconKind.DomainOff, DialogoPersonalizado = typeof(ProveedorDialog))]
-public class Proveedor : ModelBase<IProveedor>, IProveedor
+public class Proveedor : ModelBase<IProveedor>, IProveedor, IDisplayable
 {
     private string _cedula = string.Empty;
     private string _celular = string.Empty;
@@ -46,6 +47,7 @@ public class Proveedor : ModelBase<IProveedor>, IProveedor
     }
 
     [Solicitar("Primer Nombre", InputBoxType.Name, typeof(TextBox), Requerido = true)]
+    [Buscable]
     public string PrimerNombre
     {
         get => _primerNombre;
@@ -53,6 +55,7 @@ public class Proveedor : ModelBase<IProveedor>, IProveedor
     }
 
     [Solicitar("Segundo Nombre", InputBoxType.Name, typeof(TextBox))]
+    [Buscable]
     public string SegundoNombre
     {
         get => _segundoNombre;
@@ -60,6 +63,7 @@ public class Proveedor : ModelBase<IProveedor>, IProveedor
     }
 
     [Solicitar("Primer Apellido", InputBoxType.Name, typeof(TextBox), Requerido = true)]
+    [Buscable]
     public string PrimerApellido
     {
         get => _primerApellido;
@@ -67,6 +71,7 @@ public class Proveedor : ModelBase<IProveedor>, IProveedor
     }
 
     [Solicitar("Segundo Apellido", InputBoxType.Name, typeof(TextBox))]
+    [Buscable]
     public string SegundoApellido
     {
         get => _segundoApellido;
@@ -96,6 +101,7 @@ public class Proveedor : ModelBase<IProveedor>, IProveedor
     }
 
     [Solicitar("Razón Social", InputBoxType.Text, typeof(TextBox), Requerido = true)]
+    [Buscable]
     public string RazonSocial
     {
         get => _razonSocial;
@@ -126,6 +132,7 @@ public class Proveedor : ModelBase<IProveedor>, IProveedor
     public string NombreCompleto =>
         EsEmpresa ? RazonSocial : $"{PrimerNombre} {SegundoNombre} {PrimerApellido} {SegundoApellido}".Trim();
 
+    public string DescripcionVisual => EsEmpresa ? RazonSocial : $"{PrimerNombre} {PrimerApellido}";
 
     protected override void UpdateChanged()
     {

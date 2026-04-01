@@ -145,11 +145,8 @@
                             <TextBlock Text="{Binding Nombre}"
                                        FontWeight="SemiBold"
                                        FontSize="14" />
-                            <TextBlock FontSize="12"
-                                       Foreground="{DynamicResource MaterialDesignBodyLight}">
-                                <Run Text="{Binding HoraInicio, StringFormat=hh\\:mm}" />
-                                <Run Text=" — " />
-                                <Run Text="{Binding HoraFin, StringFormat=hh\\:mm}" />
+                            <TextBlock Text="{Binding IdTurnoTrabajo}" FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}">
+                                
                             </TextBlock>
                         </StackPanel>
 

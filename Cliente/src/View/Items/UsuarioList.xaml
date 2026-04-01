@@ -18,7 +18,7 @@
 
             <ListBox.ItemTemplate>
                 <DataTemplate>
-                    <items:UsuarioItemB Usuario="{Binding}"
+                    <items:UsuarioItemB Usuario="{Binding Model}"
                                         EditarUsuarioCommand="{Binding EditarUsuarioCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         EliminarUsuarioCommand="{Binding EliminarUsuarioCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
                                         CambiarPasswordCommand="{Binding CambiarPasswordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"

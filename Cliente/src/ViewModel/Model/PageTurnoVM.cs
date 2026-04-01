@@ -2,6 +2,7 @@ using System.Collections.Specialized;
 using Cliente.Default;
 using Cliente.Obj.Model;
 using Cliente.Services.Model;
+using Utilidades.Mvvm;
 
 namespace Cliente.ViewModel.Model;
 
@@ -201,21 +202,26 @@ public partial class PageTurnoVM : ViewModelServiceBase<Turno>
     /// Puebla Entities solo con los turnos del área activa.
     /// Se llama en ActivateAsync y en CargarPageCommand (que llama RefreshCacheAsync + LoadEntitiesAsync).
     /// </summary>
-    protected override Task LoadEntitiesAsync()
+    protected async override Task LoadEntitiesAsync()
     {
         Entities.Clear();
         EntitySelect = null;
 
-        if (AreaPadre is null) return Task.CompletedTask;
+        if (AreaPadre is null) return;
 
         var turnosFiltrados = ServicioBase.CacheById.Values
             .Where(t => t.AreaId == AreaPadre.Id)
-            .OrderBy(t => t.HoraInicio);
+            .OrderBy(t => t.Nombre);
 
         foreach (var turno in turnosFiltrados)
-            Entities.Add(turno);
+        {
+            var wrapper = new EntityWrapper<Turno>(turno);
 
-        return Task.CompletedTask;
+            await _referenceEnricher.EnrichAsync(wrapper);
+            Entities.Add(wrapper);
+        }
+
+        return;
     }
 
     /// <summary>
