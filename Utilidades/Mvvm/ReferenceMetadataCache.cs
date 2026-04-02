@@ -1,4 +1,5 @@
 using System;
+using System.Collections;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
@@ -22,10 +23,20 @@ public static class ReferenceMetadataCache
                     Vista = p.GetCustomAttribute<VistaAttribute>()
                 })
                 .Where(x => x.Vista?.LookupType != null)
-                .Select(x => new ReferenceMetadata
+                .Select(x =>
                 {
-                    Property = x.Prop,
-                    TargetType = x.Vista!.LookupType!
+                    var propType = x.Prop.PropertyType;
+                    var isCollection =
+                        typeof(IEnumerable).IsAssignableFrom(propType)
+                        && propType != typeof(string);
+
+                    return new ReferenceMetadata
+                    {
+                        Property    = x.Prop,
+                        TargetType  = x.Vista!.LookupType!,
+                        IsCollection = isCollection,
+                        DisplayMember = x.Vista.DisplayMember ?? "Nombre"
+                    };
                 })
                 .ToList();
         });

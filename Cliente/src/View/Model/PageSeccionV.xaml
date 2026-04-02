@@ -103,7 +103,7 @@
 
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
+                    <Grid DataContext="{Binding Model}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />

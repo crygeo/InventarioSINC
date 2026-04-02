@@ -80,13 +80,13 @@ public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
 
     public override async Task UpdateAsync()
     {
-        if (EntitySelect == null)
+        if (EntitySelectModel == null)
             return;
 
         var usuarioDialog = new UsuarioDialog
         {
             AceptarCommand = new AsyncRelayCommand<object?>(ConfirmarEditarUsuarioAsync),
-            Entity = EntitySelect.Model.Clone(),
+            Entity = EntitySelectModel.Clone(),
             TextHeader = "Editar Entity",
             DialogOpenIdentifier = DialogDefaults.Main
         };
@@ -96,7 +96,7 @@ public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
 
     public override async Task DeleteAsync()
     {
-        if (EntitySelect == null)
+        if (EntitySelectModel == null)
             return;
 
         var confirmDialog = new ConfirmDialog
@@ -139,11 +139,11 @@ public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
 
     private async Task ConfirmarEliminarUsuarioAsync()
     {
-        if (EntitySelect == null) return;
+        if (EntitySelectModel == null) return;
 
         await DialogServiceI.MostrarDialogoProgreso(async () =>
         {
-            var result = await ServicioBase.DeleteAsync(EntitySelect.Model.Id);
+            var result = await ServicioBase.DeleteAsync(EntitySelectModel.Id);
             await DialogServiceI.ValidarRespuesta(result);
             return result;
         }, DialogDefaults.Progress);

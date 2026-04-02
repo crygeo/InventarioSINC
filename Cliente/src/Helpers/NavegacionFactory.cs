@@ -4,6 +4,7 @@ using Cliente.Obj;
 using Cliente.ViewModel.Model;
 using Shared.Interfaces.Model;
 using Utilidades.Interfaces;
+using Utilidades.Objs;
 
 namespace Cliente.Helpers;
 

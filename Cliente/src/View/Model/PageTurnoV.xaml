@@ -133,7 +133,7 @@
 
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <Grid>
+                    <Grid >
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
@@ -142,12 +142,10 @@
 
                         <!-- Información del turno -->
                         <StackPanel Grid.Column="0" VerticalAlignment="Center">
-                            <TextBlock Text="{Binding Nombre}"
+                            <TextBlock Text="{Binding Model.Nombre}"
                                        FontWeight="SemiBold"
                                        FontSize="14" />
-                            <TextBlock Text="{Binding IdTurnoTrabajo}" FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}">
-                                
-                            </TextBlock>
+                            <TextBlock Text="{Binding Ref[IdTurnoTrabajo] }" FontSize="12" Foreground="{DynamicResource MaterialDesignBodyLight}"/>
                         </StackPanel>
 
                         <!-- Acciones CRUD con parámetro explícito — evita bug de EntitySelect -->
@@ -155,7 +153,8 @@
                                     Orientation="Horizontal"
                                     VerticalAlignment="Center"
                                     Visibility="Hidden"
-                                    x:Name="ActionPanel">
+                                    x:Name="ActionPanel"
+                                    DataContext="{Binding Model}">
                             <Button Style="{StaticResource MaterialDesignIconButton}"
                                     Command="{Binding DataContext.EditarEntityFromItemCommand,
                                                       RelativeSource={RelativeSource AncestorType=ListView}}"
@@ -177,7 +176,7 @@
                         <!-- Drill-down → ver secciones del turno -->
                         <Button Grid.Column="2"
                                 Style="{StaticResource MaterialDesignIconButton}"
-                                Tag="{Binding}"
+                                Tag="{Binding Model}"
                                 Click="OnVerSeccionesClick"
                                 VerticalAlignment="Center"
                                 ToolTip="Ver secciones">

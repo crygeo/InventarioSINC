@@ -50,7 +50,7 @@ public partial class EntitySelectorDialog : UserControl, IDialog, IDialogLifecyc
         if (e.NewItems == null || e.NewItems.Count == 0) return;
 
         _columnsGenerated = true;
-        DataGridColumnBuilder.BuildColumns(ResultsGrid, Vm.EntityType);
+        DataGridColumnBuilder.BuildColumnsFromModel(ResultsGrid, Vm.EntityType);
     }
     
     public void OnOpened()

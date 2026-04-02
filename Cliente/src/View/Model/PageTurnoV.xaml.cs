@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Cliente.Obj.Model;
 using Cliente.ViewModel.Model;
+using Utilidades.Mvvm;
 
 namespace Cliente.View.Model;
 
@@ -27,7 +28,7 @@ public partial class PageTurnoV : UserControl
         // Solo actualiza EntitySelect — la navegación se dispara
         // únicamente al hacer clic en ChevronRight, no al seleccionar.
         if (DataContext is PageTurnoVM vm && e.AddedItems.Count > 0)
-            vm.EntitySelect = e.AddedItems[0] as Turno;
+            vm.EntitySelect = e.AddedItems[0] as EntityWrapper<Turno>;
     }
 
     /// <summary>

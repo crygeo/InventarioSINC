@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
 using Cliente.Converter;
+using Cliente.Helpers;
 using CommunityToolkit.Mvvm.Input;
 using Utilidades.Attributes;
 
@@ -70,71 +71,10 @@ public partial class ObjectIList : UserControl
 
     private void ObjectIList_Loaded(object sender, RoutedEventArgs e)
     {
-        GenerateColumns();
+        DataGridColumnBuilder.BuildColumns(DataGridSolicitados, TypeItem);
     }
 
-    private void GenerateColumns()
-    {
-        TrySetItemType();
-
-        if (TypeItem == null)
-            throw new Exception("TypeItem is null");
-
-        var properties = TypeItem.GetProperties()
-            .Select(p => new
-            {
-                Prop = p,
-                Vista = p.GetCustomAttribute<VistaAttribute>(),
-                Solicitar = p.GetCustomAttribute<SolicitarAttribute>()
-            })
-            .Where(x => x.Vista != null && x.Vista.Visible)
-            .OrderBy(x => x.Vista!.Orden)
-            .ToList();
-
-        DataGridSolicitados.Columns.Clear();
-
-        foreach (var item in properties)
-        {
-            var prop = item.Prop;
-            var vista = item.Vista;
-            var solicitar = item.Solicitar;
-
-            var displayName =
-                vista?.Nombre ??
-                solicitar?.Nombre ??
-                prop.Name;
-
-            var isEnumerable =
-                typeof(IEnumerable).IsAssignableFrom(prop.PropertyType)
-                && prop.PropertyType != typeof(string);
-
-            Binding binding;
-
-            // 🔥 CAMBIO CLAVE AQUÍ
-            if (vista?.LookupType != null)
-            {
-                var displayMember = vista.DisplayMember ?? "Nombre";
-
-                binding = new Binding($"Ref[{prop.Name}].{displayMember}")
-                {
-                    TargetNullValue = string.Empty
-                };
-            }
-            else
-            {
-                binding = isEnumerable
-                    ? new Binding($"Model.{prop.Name}.Count")
-                    : new Binding($"Model.{prop.Name}");
-            }
-
-            DataGridSolicitados.Columns.Add(new DataGridTextColumn
-            {
-                Header = displayName,
-                Binding = binding
-            });
-        }
-    }
-
+    
 
     private void TrySetItemType()
     {

@@ -25,7 +25,7 @@ public class RecepcionCarga : ModelBase<IRecepcionCarga>, IRecepcionCarga
     private float _pesoTotal;
 
     [Solicitar("Identificadores", InputBoxType.None, typeof(IdentificadoresSelect), Requerido = true)]
-    [Vista(LookupType = typeof(ElementoJerarquico))]
+    [Vista(LookupType = typeof(ElementoJerarquico),  DisplayMember = nameof(ElementoJerarquico.Valor))]
     public IEnumerable<string> IdIdentificadores
     {
         get => _identificadores;
@@ -34,7 +34,7 @@ public class RecepcionCarga : ModelBase<IRecepcionCarga>, IRecepcionCarga
 
 
     [Solicitar("Proveedor", InputBoxType.None, typeof(EntitySelector), Requerido = true, EntityType = typeof(Proveedor))]
-    [Vista(LookupType = typeof(Proveedor))]
+    [Vista(LookupType = typeof(Proveedor), DisplayMember = nameof(Proveedor.DescripcionVisual))]
     public string IdProveedor
     {
         get => _idProveedor;

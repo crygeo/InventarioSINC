@@ -54,6 +54,8 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
             EliminarEntityFromItemCommand.NotifyCanExecuteChanged();
         }
     }
+    // Acceso rápido al modelo — para binding en vistas y comandos
+    public TEntity? EntitySelectModel => _entitySelect?.Model;
 
     public bool CanRefresh
     {
@@ -374,10 +376,10 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
 
     public virtual async Task UpdateAsync()
     {
-        if (EntitySelect == null) return;
+        if (EntitySelectModel == null) return;
 
         await DialogServiceI.BuscarMostrarDialogAsync(
-            EntitySelect.Clone(),
+            EntitySelectModel.Clone(),
             $"Editar {ComponetesHelp.GetNombreEntidad<TEntity>(Pluralidad.Singular)}",
             ConfirmarEditarEntityAsync);
     }
@@ -459,11 +461,11 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
         }, DialogDefaults.Progress);
     }
 
-    private async Task ConfirmarEditarEntityAsync(EntityWrapper<TEntity>? entity)
+    private async Task ConfirmarEditarEntityAsync(TEntity? entity)
     {
         if (entity == null) return;
 
-        var entityOriginal = ServicioBase.GetFromCache(entity.Model.Id);
+        var entityOriginal = ServicioBase.GetFromCache(entity.Id);
         if (entityOriginal == null) return;
 
         var changes = entityOriginal.GetChanges(entity);
@@ -475,7 +477,7 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
 
             await DialogServiceI.MostrarDialogoProgreso(async () =>
             {
-                var result = await ServicioBase.PropertyUpdateAsync(entity.Model.Id, property.Name, property.NewValue);
+                var result = await ServicioBase.PropertyUpdateAsync(entity.Id, property.Name, property.NewValue);
                 result.ObjInteration = typeof(TEntity);
                 await DialogServiceI.ValidarRespuesta(result);
                 return result;
@@ -485,11 +487,11 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
 
     private async Task ConfirmarEliminarEntityAsync()
     {
-        if (EntitySelect == null) return;
+        if (EntitySelectModel == null) return;
 
         await DialogServiceI.MostrarDialogoProgreso(async () =>
         {
-            var result = await ServicioBase.DeleteAsync(EntitySelect.Id);
+            var result = await ServicioBase.DeleteAsync(EntitySelectModel.Id);
             result.ObjInteration = typeof(TEntity);
             await DialogServiceI.ValidarRespuesta(result);
             return result;

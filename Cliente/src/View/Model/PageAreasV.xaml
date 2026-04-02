@@ -117,7 +117,7 @@
 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <Grid>
+                        <Grid DataContext="{Binding Model}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
@@ -137,7 +137,7 @@
                                 <Button Style="{StaticResource MaterialDesignIconButton}"
                                         Command="{Binding DataContext.EditarEntityFromItemCommand,
                                                           RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                        CommandParameter="{Binding}"
+                                        CommandParameter="{Binding  }"
                                         Width="28" Height="28" Padding="0"
                                         ToolTip="Editar área">
                                     <md:PackIcon Kind="Pencil" Width="14" Height="14" />
@@ -145,7 +145,7 @@
                                 <Button Style="{StaticResource MaterialDesignIconButton}"
                                         Command="{Binding DataContext.EliminarEntityFromItemCommand,
                                                           RelativeSource={RelativeSource AncestorType=ListBox}}"
-                                        CommandParameter="{Binding}"
+                                        CommandParameter="{Binding  }"
                                         Width="28" Height="28" Padding="0"
                                         ToolTip="Eliminar área">
                                     <md:PackIcon Kind="Delete" Width="14" Height="14" />

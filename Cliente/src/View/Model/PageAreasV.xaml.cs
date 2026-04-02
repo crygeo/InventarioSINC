@@ -1,6 +1,7 @@
 using System.Windows.Controls;
 using Cliente.Obj.Model;
 using Cliente.ViewModel.Model;
+using Utilidades.Mvvm;
 
 namespace Cliente.View.Model;
 
@@ -22,10 +23,10 @@ public partial class PageAreasV : UserControl
     {
         if (DataContext is not PageAreaVM vm) return;
         if (e.AddedItems.Count == 0) return;
-        if (e.AddedItems[0] is not Area area) return;
+        if (e.AddedItems[0] is not EntityWrapper<Area> area) return;
 
         // Lanzar la tarea async sin bloquear el hilo UI.
         // PageAreaVM garantiza que no se lanza si el área ya está activa.
-        _ = vm.OnAreaSelectedAsync(area);
+        _ = vm.OnAreaSelectedAsync(area.Model);
     }
 }

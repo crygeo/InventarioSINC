@@ -10,6 +10,7 @@ using MaterialDesignThemes.Wpf;
 using Utilidades.Dialogs;
 using Utilidades.Interfaces;
 using Utilidades.Mvvm;
+using Utilidades.Objs;
 
 namespace Cliente.ViewModel;
 

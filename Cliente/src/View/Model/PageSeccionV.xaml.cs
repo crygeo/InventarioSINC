@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Cliente.Obj.Model;
 using Cliente.ViewModel.Model;
+using Utilidades.Mvvm;
 
 namespace Cliente.View.Model;
 
@@ -15,7 +16,7 @@ public partial class PageSeccionV : UserControl
     private void OnSeccionSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (DataContext is PageSeccionVM vm && e.AddedItems.Count > 0)
-            vm.EntitySelect = e.AddedItems[0] as Seccion;
+            vm.EntitySelect = e.AddedItems[0] as EntityWrapper<Seccion>;
     }
 
     private void OnVerGruposClick(object sender, RoutedEventArgs e)

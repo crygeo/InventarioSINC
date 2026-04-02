@@ -129,7 +129,7 @@ public partial class PageAreaVM : ViewModelServiceBase<Area>
         await TryDeactivateAsync(PageTurnoVm);
 
         _areaActiva  = area;
-        EntitySelect = area;
+        EntitySelect = new EntityWrapper<Area>(area);
 
         PageTurnoVm.AreaPadre = area;
         

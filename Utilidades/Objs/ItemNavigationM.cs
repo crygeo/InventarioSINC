@@ -7,6 +7,7 @@ namespace Utilidades.Objs;
 public class ItemNavigationM : NotifyProperty, IItemNav
 {
     private object? _notification;
+    public string Indicador { get; set; }
     public required string Title { get; set; }
     public PackIconKind SelectedIcon { get; set; }
     public PackIconKind UnselectedIcon { get; set; }
