@@ -1,4 +1,4 @@
-﻿using System.Windows;
+﻿// Cliente/src/ViewModel/Model/PageUsuarioVM.cs
 using Cliente.Default;
 using Cliente.Obj.Model;
 using Cliente.Services.Model;
@@ -6,150 +6,167 @@ using Cliente.View.Dialog;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Extensions;
 using Utilidades.Dialogs;
+using System.Windows;
+using Utilidades.Mvvm;
 
 namespace Cliente.ViewModel.Model;
 
+/// <summary>
+/// VM para gestión de usuarios.
+///
+/// Responsabilidades:
+/// - CRUD estándar (heredado de ViewModelServiceBase).
+/// - Operaciones especiales: cambiar password, asignar/quitar rol.
+///
+/// Las operaciones especiales se delegan al ServiceUsuario —
+/// el VM solo orquesta diálogo → servicio → feedback.
+///
+/// Principio: el VM no sabe cómo se muestra el diálogo,
+/// solo sabe qué hacer con el resultado.
+/// </summary>
 public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
 {
+    private readonly ServiceUsuario _serviceUsuario;
+
     public PageUsuarioVM()
     {
-        CambiarPasswordCommand = new AsyncRelayCommand(CambiarPasswordAsync);
-        AsignarRolCommand = new AsyncRelayCommand<Rol>(AsignarRolAsync);
+        _serviceUsuario = (ServiceUsuario)ServicioBase;
+
+        CambiarPasswordCommand    = new AsyncRelayCommand<Usuario>(
+            CambiarPasswordAsync,
+            wrapper => wrapper is not null);
+
+        AsignarRolCommand         = new AsyncRelayCommand<RolAsignacionArgs>(
+            AsignarRolAsync,
+            args => args is not null);
     }
 
-    public IAsyncRelayCommand CambiarPasswordCommand { get; }
-    public IAsyncRelayCommand<Rol> AsignarRolCommand { get; }
+    // ==============================
+    // COMANDOS ESPECÍFICOS
+    // ==============================
 
-    public ServiceUsuario ServicioServiceUsuario => (ServiceUsuario)ServiceFactory.GetService<Usuario>();
+    /// <summary>
+    /// Recibe el wrapper del usuario sobre el cual actuar —
+    /// elimina el acoplamiento implícito a EntitySelect.
+    /// </summary>
+    public IAsyncRelayCommand<Usuario> CambiarPasswordCommand { get; }
 
-    private async Task CambiarPasswordAsync()
+    /// <summary>
+    /// Args tipados para evitar object boxing y acoplamiento implícito.
+    /// </summary>
+    public IAsyncRelayCommand<RolAsignacionArgs> AsignarRolCommand { get; }
+
+    // ==============================
+    // CRUD SOBREESCRITO — UI específica
+    // ==============================
+
+    public override async Task CreateAsync()
     {
-        if (EntitySelect == null)
-            return;
+        var entity = new Usuario { FechaNacimiento = DateTime.Today };
+        await ShowUserDialogAsync(entity, "Nuevo Usuario", ConfirmarCrearEntityAsync);
+    }
+
+    public override async Task UpdateAsync()
+    {
+        if (EntitySelect is null) return;
+        var clone = EntitySelect.Model.Clone();
+        await ShowUserDialogAsync(clone, "Editar Usuario", ConfirmarEditarUsuarioAsync);
+    }
+
+    // ==============================
+    // OPERACIONES ESPECÍFICAS
+    // ==============================
+
+    private async Task CambiarPasswordAsync(Usuario? model)
+    {
+        if (model is null) return;
 
         var dialog = new ChangePassDialog
         {
-            AceptarCommand = new AsyncRelayCommand<object?>(ConfirmarCambioPasswordAsync),
+            // Admin no necesita contraseña vieja — Collapsed lo indica
             OldPasswordRequired = Visibility.Collapsed,
-            DialogOpenIdentifier = DialogDefaults.Main
+            DialogOpenIdentifier = DialogDefaults.Main,
+            AceptarCommand = new AsyncRelayCommand<ChangePassDialog?>(
+                changePass => EjecutarCambioPasswordAsync(changePass, model))
         };
 
         await DialogServiceI.MostrarDialogo(dialog);
     }
 
-    private async Task ConfirmarCambioPasswordAsync(object? a)
+    private async Task EjecutarCambioPasswordAsync(
+        ChangePassDialog? changePass, Usuario usuario)
     {
-        if (a is not ChangePassDialog changePass)
-            return;
-
-        if (EntitySelect == null) return;
+        if (changePass is null) return;
 
         await DialogServiceI.MostrarDialogoProgreso(async () =>
         {
-            var result = await ServicioServiceUsuario.ChangePasswordAsync(EntitySelect.Model.Id, changePass.OldPassword,
+            var result = await _serviceUsuario.ChangePasswordAsync(
+                usuario.Id,
+                changePass.OldPassword,
                 changePass.NewPassword);
+
+            result.ObjInteration = typeof(Usuario);
             await DialogServiceI.ValidarRespuesta(result);
             return result;
         }, DialogDefaults.Progress);
     }
 
-    private async Task AsignarRolAsync(Rol? rol)
+    private async Task AsignarRolAsync(RolAsignacionArgs? args)
     {
-        if (EntitySelect == null || rol == null)
-            return;
+        if (args is null) return;
 
-        var result = await ServicioServiceUsuario.AsignarRol(EntitySelect.Model.Id, rol.Id);
+        var result = await _serviceUsuario.AsignarRol(
+            args.UsuarioId, args.Rol.Id);
+
         await DialogServiceI.ValidarRespuesta(result);
 
-        if (result.EntityGet)
-            rol.IsSelect = !rol.IsSelect;
+        // Solo actualizamos el estado visual si el servidor confirmó
+        if (result.Success)
+            args.Rol.IsSelect = !args.Rol.IsSelect;
     }
 
-    public override async Task CreateAsync()
+    // ==============================
+    // HELPERS INTERNOS
+    // ==============================
+
+    private async Task ShowUserDialogAsync(
+        Usuario entity,
+        string header,
+        Func<Usuario?, Task> onConfirm)
     {
-        var usuarioDialog = new UsuarioDialog
+        var dialog = new UsuarioDialog
         {
-            AceptarCommand = new AsyncRelayCommand<object?>(ConfirmarCrearUsuarioAsync),
-            Entity = new Usuario { FechaNacimiento = DateTime.Today },
-            TextHeader = "Nuevo Entity",
-            DialogOpenIdentifier = DialogDefaults.Main
+            Entity = entity,
+            TextHeader = header,
+            DialogOpenIdentifier = DialogDefaults.Main,
+            AceptarCommand = new AsyncRelayCommand<Usuario?>(onConfirm),
+            CancelarCommand = new AsyncRelayCommand(
+                () => DialogServiceI.CerrarSiEstaAbiertoYEsperar(
+                    DialogDefaults.Main))
         };
 
-        await DialogServiceI.MostrarDialogo(usuarioDialog);
+        await DialogServiceI.MostrarDialogo(dialog);
     }
 
-    public override async Task UpdateAsync()
+    private async Task ConfirmarEditarUsuarioAsync(Usuario? user)
     {
-        if (EntitySelectModel == null)
-            return;
-
-        var usuarioDialog = new UsuarioDialog
-        {
-            AceptarCommand = new AsyncRelayCommand<object?>(ConfirmarEditarUsuarioAsync),
-            Entity = EntitySelectModel.Clone(),
-            TextHeader = "Editar Entity",
-            DialogOpenIdentifier = DialogDefaults.Main
-        };
-
-        await DialogServiceI.MostrarDialogo(usuarioDialog);
-    }
-
-    public override async Task DeleteAsync()
-    {
-        if (EntitySelectModel == null)
-            return;
-
-        var confirmDialog = new ConfirmDialog
-        {
-            TextHeader = "Eliminar Usuarios",
-            Message = "¿Estás seguro de que quieres eliminar los usuarios seleccionados?",
-            AceptarCommand = new AsyncRelayCommand(ConfirmarEliminarUsuarioAsync),
-            DialogOpenIdentifier = DialogDefaults.Main
-        };
-
-        await DialogServiceI.MostrarDialogo(confirmDialog);
-    }
-
-
-    private async Task ConfirmarCrearUsuarioAsync(object? a)
-    {
-        if (a is not Usuario user)
-            return;
-
-        await DialogServiceI.MostrarDialogoProgreso(async () =>
-        {
-            var result = await ServicioBase.CreateAsync(user);
-            await DialogServiceI.ValidarRespuesta(result);
-            return result;
-        }, DialogDefaults.Progress);
-    }
-
-    private async Task ConfirmarEditarUsuarioAsync(object? a)
-    {
-        if (a is not Usuario user)
-            return;
+        if (user is null) return;
 
         await DialogServiceI.MostrarDialogoProgreso(async () =>
         {
             var result = await ServicioBase.UpdateAsync(user.Id, user);
+            result.ObjInteration = typeof(Usuario);
             await DialogServiceI.ValidarRespuesta(result);
             return result;
         }, DialogDefaults.Progress);
     }
 
-    private async Task ConfirmarEliminarUsuarioAsync()
-    {
-        if (EntitySelectModel == null) return;
-
-        await DialogServiceI.MostrarDialogoProgreso(async () =>
-        {
-            var result = await ServicioBase.DeleteAsync(EntitySelectModel.Id);
-            await DialogServiceI.ValidarRespuesta(result);
-            return result;
-        }, DialogDefaults.Progress);
-    }
-
-    protected override void UpdateChanged()
-    {
-    }
+    protected override void UpdateChanged() { }
 }
+
+/// <summary>
+/// Value Object tipado para asignación de rol.
+/// Evita usar object/Rol suelto como parámetro de comando —
+/// hace el contrato explícito y testeable.
+/// </summary>
+public sealed record RolAsignacionArgs(string UsuarioId, Rol Rol);

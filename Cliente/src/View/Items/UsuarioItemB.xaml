@@ -32,6 +32,7 @@
                       Icon="{md:PackIcon Kind=ShieldAccount}">
                 <MenuItem.ItemContainerStyle>
                     <Style TargetType="MenuItem">
+                        <Setter Property="Command" Value="{Binding Data.AsignarRolCommand, Source={StaticResource Proxy}}" />
                         <Setter Property="Header" Value="{Binding Nombre}" />
                         <Setter Property="IsEnabled"
                                 Value="{Binding IsAdmin, Converter={StaticResource InverseBooleanConverter}}" />

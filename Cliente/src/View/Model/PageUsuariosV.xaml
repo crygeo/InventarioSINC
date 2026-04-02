@@ -3,127 +3,222 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-             xmlns:Convert="clr-namespace:Utilidades.Converters;assembly=Utilidades"
-             xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:convert="clr-namespace:Utilidades.Converters;assembly=Utilidades"
+             xmlns:md="http://materialdesigninxaml.net/winfx/xaml/themes"
+             xmlns:vm="clr-namespace:Cliente.ViewModel.Model"
              xmlns:converter="clr-namespace:Cliente.Converter"
+             xmlns:ex="clr-namespace:Cliente.Extencions"
              xmlns:items="clr-namespace:Cliente.View.Items"
              mc:Ignorable="d"
              d:DesignHeight="600"
-             d:DesignWidth="800">
+             d:DesignWidth="800"
+             d:DataContext="{d:DesignInstance Type=vm:PageUsuarioVM}">
 
     <UserControl.Resources>
-        <Convert:InputBoxConverter x:Key="textFormat" />
-        <Convert:BooleanToVisibilityConverter x:Key="visibleConvert" />
-        <converter:IdToRolConverter x:Key="IdToRolConvert" />
+        <ex:BindingProxyWrapper x:Key="Proxy" Data="{Binding}"/>
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="4*" />
-            <ColumnDefinition Width="7*" />
+            <ColumnDefinition Width="240" MinWidth="180" MaxWidth="360" />
+            <ColumnDefinition Width="5" />
+            <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
-        <ProgressBar Grid.ColumnSpan="2"
-                     materialDesign:TransitionAssist.DisableTransitions="True"
-                     VerticalAlignment="Bottom"
-                     Value="{Binding DataContext.ProgressValue, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                     Visibility="{Binding DataContext.ProgressVisible, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource visibleConvert}}" />
+
         <Grid Grid.Column="0">
+
             <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <items:UsuarioList
-                ItemsSource="{Binding DataContext.Entities, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                Grid.Row="0"
-                Item="{Binding DataContext.EntitySelect, RelativeSource={RelativeSource AncestorType=UserControl}, Mode=TwoWay}"
-                EditarUsuarioCommand="{Binding DataContext.EditarEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                EliminarUsuarioCommand="{Binding DataContext.EliminarEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                CambiarPasswordCommand="{Binding DataContext.CambiarPasswordCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                AsignarRolCommand="{Binding DataContext.AsignarRolCommand, RelativeSource={RelativeSource AncestorType=UserControl}}" />
-            <StackPanel Grid.Row="1" Background="Transparent" Orientation="Horizontal" HorizontalAlignment="Right">
-
-                <Button Style="{StaticResource MaterialDesignFloatingActionDarkButton}"
-                        Margin="0,10,10,10"
-                        materialDesign:ButtonProgressAssist.IsIndicatorVisible="{Binding ProgressVisible}"
-                        materialDesign:ButtonProgressAssist.Value="{Binding ProgressValue}"
-                        VerticalAlignment="Center"
-                        HorizontalAlignment="Right"
-                        Command="{Binding DataContext.CargarEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        ToolTip="MaterialDesignFloatingActionDarkButton">
-                    <materialDesign:PackIcon Width="24"
-                                             Height="24"
-                                             Kind="Reload" />
-
+            <StackPanel Grid.Row="0"
+                        Orientation="Horizontal"
+                        Margin="8,8,8,4">
+                <TextBlock Text="Usuarios"
+                           FontSize="14"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           Margin="0,0,8,0" />
+                <Button Style="{StaticResource MaterialDesignIconButton}"
+                        Command="{Binding CargarPageCommand}"
+                        ToolTip="Actualizar lista">
+                    <md:PackIcon Kind="Refresh" Width="18" Height="18" />
                 </Button>
-                <Button Style="{StaticResource MaterialDesignFloatingActionDarkButton}"
-                        VerticalAlignment="Center"
-                        Margin="0,10,10,10"
-                        HorizontalAlignment="Right"
-                        Command="{Binding DataContext.CrearEntityCommand, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                        ToolTip="MaterialDesignFloatingActionDarkButton">
-                    <materialDesign:PackIcon Width="30"
-                                             Height="30"
-                                             Kind="AccountMultiplePlus" />
+                <Button Style="{StaticResource MaterialDesignIconButton}"
+                        Command="{Binding CrearEntityCommand}"
+                        ToolTip="Nuevo Usuario">
+                    <md:PackIcon Kind="Plus" Width="18" Height="18" />
                 </Button>
             </StackPanel>
 
-        </Grid>
-        <StackPanel Grid.Column="1">
-            <StackPanel.Resources>
-                <Style TargetType="TextBlock" x:Key="TextStyle">
-                    <Setter Property="Foreground" Value="White" />
-                    <Setter Property="FontWeight" Value="Bold" />
-                    <Setter Property="FontSize" Value="14" />
-                    <Setter Property="Margin" Value="20,-2,0,7" />
-                    <Setter Property="FontFamily" Value="Arial" />
-                </Style>
-                <Style TargetType="Label">
-                    <Setter Property="Foreground" Value="{StaticResource MainView_Foreground_1}" />
-                    <Setter Property="FontFamily" Value="Arial" />
-                </Style>
-            </StackPanel.Resources>
-            <Label Content="Nombre: " />
-            <TextBlock
-                Text="{Binding DataContext.EntitySelect.NombreCompleto, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                Style="{StaticResource TextStyle}" />
-            <Label Content="Cedula: " />
-            <TextBlock
-                Text="{Binding DataContext.EntitySelect.Cedula, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource textFormat}, ConverterParameter='Dni'}"
-                Style="{StaticResource TextStyle}" />
-            <Label Content="Telefono: " />
-            <TextBlock
-                Text="{Binding DataContext.EntitySelect.Celular, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource textFormat}, ConverterParameter='Phone'}"
-                Style="{StaticResource TextStyle}" />
-            <Label Content="Fecha Nacimiento: " />
-            <TextBlock
-                Text="{Binding DataContext.EntitySelect.FechaNacimiento, RelativeSource={RelativeSource AncestorType=UserControl}, StringFormat='dd MMM yyyy'}"
-                Style="{StaticResource TextStyle}" />
-            <Label Content="Roles: " />
-            <ItemsControl
-                ItemsSource="{Binding DataContext.EntitySelect.Roles, RelativeSource={RelativeSource AncestorType=UserControl}}">
-                <ItemsControl.ItemTemplate>
+            <ProgressBar Grid.Row="0"
+                         VerticalAlignment="Bottom"
+                         Height="2"
+                         IsIndeterminate="False"
+                         Value="{Binding ProgressValue}"
+                         Visibility="{Binding ProgressVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
+            
+            <ListBox ItemsSource="{Binding Entities}"
+                     SelectedItem="{Binding EntitySelect}"
+                     SelectionMode="Extended"
+                     HorizontalAlignment="Stretch"
+                     HorizontalContentAlignment="Stretch"
+                     Grid.Row="1">  
+
+                <ListBox.ItemTemplate>
                     <DataTemplate>
-                        <StackPanel DataContext="{Binding Converter={StaticResource IdToRolConvert}}"
-                                    Orientation="Horizontal">
-
-
-                            <TextBlock Text="►" Margin="20,0,0,0"
-                                       Visibility="{Binding IsClassified, Converter={StaticResource visibleConvert}, ConverterParameter='Invert'}"
-                                       Style="{StaticResource TextStyle}" />
-                            <TextBlock Text="{Binding Nombre}" Margin="5,0,0,0"
-                                       Visibility="{Binding IsClassified, Converter={StaticResource visibleConvert}, ConverterParameter='Invert'}"
-                                       Style="{StaticResource TextStyle}" />
-                            <TextBlock Text="{Binding Message}" x:Name="Message"
-                                       Visibility="{Binding IsClassified, Converter={StaticResource visibleConvert}}"
-                                       Style="{StaticResource TextStyle}" />
-                            <TextBlock Text=" 🔒" x:Name="Icon"
-                                       Visibility="{Binding IsClassified, Converter={StaticResource visibleConvert}}"
-                                       Style="{StaticResource TextStyle}" />
-
+                        <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5">
+                            <TextBlock Grid.Row="0" Text="{Binding Model.User}" FontSize="14" FontWeight="Bold" />
+                            <TextBlock Text="{Binding Model.NombreAndApellido}" FontSize="12" Margin="0,5,0,0" TextWrapping="Wrap" />
                         </StackPanel>
                     </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
-        </StackPanel>
+                </ListBox.ItemTemplate>
+
+                <ListBox.ItemContainerStyle>
+                    <Style TargetType="ListBoxItem" BasedOn="{StaticResource MaterialDesignListBoxItem}">
+                        <Setter Property="IsSelected" Value="{Binding Model.IsSelect, Mode=TwoWay}" />
+                        <Setter Property="ContextMenu">
+                            <Setter.Value>
+                                <ContextMenu Style="{StaticResource MaterialDesignContextMenu}">
+                                    <MenuItem Command="{Binding Data.EditarEntityFromItemCommand, Source={StaticResource Proxy}}" CommandParameter="{Binding Model}" Header="_Editar" Icon="{md:PackIcon Kind=AccountEdit}" />
+                                    <MenuItem Command="{Binding Data.EliminarEntityFromItemCommand, Source={StaticResource Proxy}}" CommandParameter="{Binding Model}" Header="_Eliminar" Icon="{md:PackIcon Kind=Delete}" />
+                                    <Separator />
+                                    <MenuItem Command="{Binding Data.CambiarPasswordCommand, Source={StaticResource Proxy}}"  CommandParameter="{Binding Model}" Header="_Cambiar Contraseña" Icon="{md:PackIcon Kind=FormTextboxPassword}" />
+                                    <Separator />
+                                    <MenuItem Header="_Roles" ItemsSource="{Binding Data.EntitySelectModel.Roles, Source={StaticResource Proxy}}" Icon="{md:PackIcon Kind=ShieldAccount}">
+                                        <MenuItem.ItemContainerStyle>
+                                            <Style TargetType="MenuItem">
+                                                <Setter Property="Command" Value="{Binding Data.AsignarRolCommand, Source={StaticResource Proxy}}" />
+                                                <Setter Property="Header" Value="{Binding Nombre}" />
+                                                <Setter Property="IsEnabled" Value="{Binding IsAdmin, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                                <Setter Property="IsCheckable" Value="False" />
+                                                <Setter Property="IsChecked" Value="{Binding IsSelect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                <Setter Property="StaysOpenOnClick" Value="True" />
+                                            </Style>
+                                        </MenuItem.ItemContainerStyle>
+                                    </MenuItem>
+                                </ContextMenu>
+                            </Setter.Value>
+                        </Setter>
+                    </Style>
+                </ListBox.ItemContainerStyle>
+
+            </ListBox>
+
+        </Grid>
+
+        <GridSplitter Grid.Column="1"
+              Width="5"
+              HorizontalAlignment="Stretch"
+              ResizeBehavior="PreviousAndNext"
+              Background="{DynamicResource MaterialDesignDivider}" />
+
+        <md:Card Padding="20" Margin="10" Background="{DynamicResource MaterialDesignPaper}" Grid.Column="2">
+
+            <Grid>
+                <Grid.Resources>
+
+                    <!-- Label -->
+                    <Style x:Key="FieldLabel" TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}" />
+                        <Setter Property="FontSize" Value="12"/>
+                        <Setter Property="Margin" Value="0,10,0,0"/>
+                    </Style>
+
+                    <!-- Value -->
+                    <Style x:Key="FieldValue" TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
+                        <Setter Property="FontSize" Value="15"/>
+                        <Setter Property="FontWeight" Value="SemiBold"/>
+                    </Style>
+
+                </Grid.Resources>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 🔹 Información principal -->
+                <Grid Grid.Row="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Columna 1 -->
+                    <StackPanel>
+                        <TextBlock Text="Nombre" Style="{StaticResource FieldLabel}"/>
+                        <TextBlock Text="{Binding EntitySelectModel.NombreCompleto}" 
+                                   Style="{StaticResource FieldValue}"/>
+
+                        <TextBlock Text="Cédula" Style="{StaticResource FieldLabel}"/>
+
+                        <TextBlock Text="{Binding EntitySelectModel.Cedula, Converter={StaticResource TextConverter}, ConverterParameter=Dni}" 
+                                   Style="{StaticResource FieldValue}"/>
+                        
+                    </StackPanel>
+
+                    <!-- Columna 2 -->
+                    <StackPanel Grid.Column="1">
+                        <TextBlock Text="Teléfono" Style="{StaticResource FieldLabel}"/>
+
+                        <TextBlock Text="{Binding EntitySelectModel.Celular, Converter={StaticResource TextConverter}, ConverterParameter=Phone}"
+                           Style="{StaticResource FieldValue}"/>
+
+                        <TextBlock Text="Nacimiento" Style="{StaticResource FieldLabel}"/>
+                        
+                        <TextBlock Text="{Binding DataContext.EntitySelect.FechaNacimiento,
+                                 RelativeSource={RelativeSource AncestorType=UserControl},
+                                 StringFormat='{}{0:dd MMM yyyy}'}"
+                           Style="{StaticResource FieldValue}"/>
+                    </StackPanel>
+                </Grid>
+
+                <!-- 🔹 Roles -->
+                <StackPanel Grid.Row="1" Margin="0,20,0,0">
+                    <TextBlock Text="Roles"
+                       Style="{StaticResource FieldLabel}"
+                       FontSize="14"
+                       FontWeight="Bold"/>
+
+                    <ItemsControl ItemsSource="{Binding EntitySelectModel.Roles}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel/>
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Margin="5"
+                                Padding="8,4"
+                                CornerRadius="12"
+                                Background="{DynamicResource MaterialDesignChipBackground}">
+
+                                    <StackPanel Orientation="Horizontal">
+
+                                        <!-- Normal -->
+                                        <TextBlock Text="{Binding }"
+                                           Visibility="{Binding IsClassified, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                           Style="{StaticResource FieldValue}"/>
+
+                                        <!-- Bloqueado -->
+                                        <StackPanel Orientation="Horizontal"
+                                            Visibility="{Binding IsClassified, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <TextBlock Text="{Binding Message}" Style="{StaticResource FieldValue}"/>
+                                            <TextBlock Text=" 🔒"/>
+                                        </StackPanel>
+
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </StackPanel>
+
+            </Grid>
+        </md:Card>
     </Grid>
 </UserControl>

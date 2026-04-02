@@ -21,7 +21,7 @@
         <viewModel:LoginVM />
     </Window.DataContext>
     <Window.Resources>
-        <conver:InputBoxConverter x:Key="InputBoxConverter" />
+        <conver:TextConverter x:Key="InputBoxConverter" />
     </Window.Resources>
     <md:DialogHost Identifier="{x:Static def:DialogDefaults.Login}">
         <Grid>

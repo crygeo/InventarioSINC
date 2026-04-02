@@ -123,7 +123,7 @@ public static class ComponetesHelp
             Mode = BindingMode.TwoWay,
             UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged,
             ValidatesOnNotifyDataErrors = true,
-            Converter = new InputBoxConverter(),
+            Converter = new TextConverter(),
             ConverterParameter = attr.InputBoxConvert.ToString()
         };
 

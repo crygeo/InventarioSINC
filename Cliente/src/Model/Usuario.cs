@@ -98,6 +98,7 @@ public class Usuario : ModelBase<IUsuario>, IUsuario
         set => SetProperty(ref _password, value);
     }
 
+    [Vista(LookupType = typeof(Rol), DisplayMember = nameof(Rol.Nombre))]
     public List<string> Roles
     {
         get => _roles;

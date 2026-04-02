@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using Cliente.Extencions;
 using Cliente.Obj.Model;
 using Cliente.Services.Model;
+using Cliente.ViewModel.Model;
 using CommunityToolkit.Mvvm.Input;
 using Shared.Extensions;
 
@@ -102,9 +103,16 @@ public partial class UsuarioItemB : UserControl
         if (control?.Usuario != null && control.ListRoles != null) control.ListRoles.SelectRol(control.Usuario.Roles);
     }
 
+    // Cliente/src/View/Items/UsuarioItemB.xaml.cs
     private async void MenuItem_Click(object sender, RoutedEventArgs e)
     {
-        if (sender is MenuItem menuitem && menuitem.DataContext is Rol rol)
-            await AsignarRolCommand.TryEjecutarAsync(rol);
+        if (sender is not MenuItem menuItem) return;
+        if (menuItem.DataContext is not Rol rol) return;
+        if (Usuario is null) return;
+
+        // Construimos el contrato explícito aquí — la vista sabe el usuarioId
+        // porque tiene la referencia al modelo directamente.
+        var args = new RolAsignacionArgs(Usuario.Id, rol);
+        await AsignarRolCommand.TryEjecutarAsync(args);
     }
 }
