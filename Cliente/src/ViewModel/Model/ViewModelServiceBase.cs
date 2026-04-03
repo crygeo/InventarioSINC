@@ -52,10 +52,11 @@ public class ViewModelServiceBase<TEntity> : ViewModelBase, IViewModelServiceBas
             EditarEntityCommand.NotifyCanExecuteChanged();
             EditarEntityFromItemCommand.NotifyCanExecuteChanged();
             EliminarEntityFromItemCommand.NotifyCanExecuteChanged();
+            OnPropertyChanged(nameof(EntitySelectModel));
         }
     }
     // Acceso rápido al modelo — para binding en vistas y comandos
-    public TEntity? EntitySelectModel => _entitySelect?.Model;
+    public TEntity? EntitySelectModel => EntitySelect?.Model;
 
     public bool CanRefresh
     {

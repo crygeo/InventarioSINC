@@ -36,7 +36,7 @@ public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
             CambiarPasswordAsync,
             wrapper => wrapper is not null);
 
-        AsignarRolCommand         = new AsyncRelayCommand<RolAsignacionArgs>(
+        AsignarRolCommand         = new AsyncRelayCommand<Rol>(
             AsignarRolAsync,
             args => args is not null);
     }
@@ -54,7 +54,7 @@ public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
     /// <summary>
     /// Args tipados para evitar object boxing y acoplamiento implícito.
     /// </summary>
-    public IAsyncRelayCommand<RolAsignacionArgs> AsignarRolCommand { get; }
+    public IAsyncRelayCommand<Rol> AsignarRolCommand { get; }
 
     // ==============================
     // CRUD SOBREESCRITO — UI específica
@@ -111,18 +111,17 @@ public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
         }, DialogDefaults.Progress);
     }
 
-    private async Task AsignarRolAsync(RolAsignacionArgs? args)
+    private async Task AsignarRolAsync(Rol? rol)
     {
-        if (args is null) return;
+        if (rol is null || EntitySelectModel is null) return;
 
-        var result = await _serviceUsuario.AsignarRol(
-            args.UsuarioId, args.Rol.Id);
+        var result = await _serviceUsuario.AsignarRol(EntitySelectModel.Id, rol.Id);
 
         await DialogServiceI.ValidarRespuesta(result);
 
         // Solo actualizamos el estado visual si el servidor confirmó
         if (result.Success)
-            args.Rol.IsSelect = !args.Rol.IsSelect;
+            rol.IsSelect = !rol.IsSelect;
     }
 
     // ==============================
@@ -163,10 +162,3 @@ public partial class PageUsuarioVM : ViewModelServiceBase<Usuario>
 
     protected override void UpdateChanged() { }
 }
-
-/// <summary>
-/// Value Object tipado para asignación de rol.
-/// Evita usar object/Rol suelto como parámetro de comando —
-/// hace el contrato explícito y testeable.
-/// </summary>
-public sealed record RolAsignacionArgs(string UsuarioId, Rol Rol);

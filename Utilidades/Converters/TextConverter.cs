@@ -52,3 +52,32 @@ public class TextConverter : IValueConverter
         };
     }
 }
+
+public class TextMultiConverter : IMultiValueConverter
+{
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (values?.Length < 2)
+            return string.Empty;
+
+        var text = values[0]?.ToString() ?? string.Empty;
+
+        if (values[1] is not InputBoxType formatStr)
+            return text;
+
+        return formatStr switch
+        {
+            InputBoxType.Phone => text.ToPhone(),
+            InputBoxType.Dni => text.ToDni(),
+            InputBoxType.Ruc => text.ToRUC(),
+            InputBoxType.Email => text.ToEmail(),
+            InputBoxType.Name => text.ToName(),
+            InputBoxType.NickName => text.ToNickName(),
+            InputBoxType.Number => text.ToNumber(),
+            _ => text
+        };
+    }
+
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+        => throw new NotSupportedException("Use only for OneWay bindings.");
+}

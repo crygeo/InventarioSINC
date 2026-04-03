@@ -15,12 +15,11 @@
                     Source="pack://application:,,,/MaterialDesignThemes.Wpf;component/Themes/MaterialDesign3.Defaults.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Utilidades;component/Styles/Style_TextBoxPlus.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Utilidades;component/Styles/Style_Button.xaml" />
-                <ResourceDictionary
-                    Source="pack://application:,,,/Utilidades;component/Styles/Style_PasswordBoxPlus.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Utilidades;component/Styles/Style_PasswordBoxPlus.xaml" />
+                <ResourceDictionary Source="pack://application:,,,/Utilidades;component/Styles/StyleAssist.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Cliente;component/src/Styles/StylesMainView.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Cliente;component/src/Styles/StyleItems.xaml" />
                 <ResourceDictionary Source="pack://application:,,,/Cliente;component/src/Resource/DataTemplate.xaml" />
-
 
             </ResourceDictionary.MergedDictionaries>
             <helpers:ViewModelToViewTemplateSelector x:Key="ViewModelTemplateSelector" />

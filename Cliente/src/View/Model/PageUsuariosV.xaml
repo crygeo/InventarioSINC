@@ -9,13 +9,14 @@
              xmlns:converter="clr-namespace:Cliente.Converter"
              xmlns:ex="clr-namespace:Cliente.Extencions"
              xmlns:items="clr-namespace:Cliente.View.Items"
+             xmlns:assist="clr-namespace:Utilidades.Assist;assembly=Utilidades"
              mc:Ignorable="d"
              d:DesignHeight="600"
              d:DesignWidth="800"
              d:DataContext="{d:DesignInstance Type=vm:PageUsuarioVM}">
 
     <UserControl.Resources>
-        <ex:BindingProxyWrapper x:Key="Proxy" Data="{Binding}"/>
+        <ex:BindingProxyWrapper x:Key="Proxy" Data="{Binding}" />
     </UserControl.Resources>
     <Grid>
         <Grid.ColumnDefinitions>
@@ -58,19 +59,20 @@
                          IsIndeterminate="False"
                          Value="{Binding ProgressValue}"
                          Visibility="{Binding ProgressVisible, Converter={StaticResource BooleanToVisibilityConverter}}" />
-            
+
             <ListBox ItemsSource="{Binding Entities}"
                      SelectedItem="{Binding EntitySelect}"
                      SelectionMode="Extended"
                      HorizontalAlignment="Stretch"
                      HorizontalContentAlignment="Stretch"
-                     Grid.Row="1">  
+                     Grid.Row="1">
 
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Grid.Row="1" Orientation="Vertical" Margin="5">
                             <TextBlock Grid.Row="0" Text="{Binding Model.User}" FontSize="14" FontWeight="Bold" />
-                            <TextBlock Text="{Binding Model.NombreAndApellido}" FontSize="12" Margin="0,5,0,0" TextWrapping="Wrap" />
+                            <TextBlock Text="{Binding Model.NombreAndApellido}" FontSize="12" Margin="0,5,0,0"
+                                       TextWrapping="Wrap" />
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -81,19 +83,34 @@
                         <Setter Property="ContextMenu">
                             <Setter.Value>
                                 <ContextMenu Style="{StaticResource MaterialDesignContextMenu}">
-                                    <MenuItem Command="{Binding Data.EditarEntityFromItemCommand, Source={StaticResource Proxy}}" CommandParameter="{Binding Model}" Header="_Editar" Icon="{md:PackIcon Kind=AccountEdit}" />
-                                    <MenuItem Command="{Binding Data.EliminarEntityFromItemCommand, Source={StaticResource Proxy}}" CommandParameter="{Binding Model}" Header="_Eliminar" Icon="{md:PackIcon Kind=Delete}" />
+                                    <MenuItem
+                                        Command="{Binding Data.EditarEntityFromItemCommand, Source={StaticResource Proxy}}"
+                                        CommandParameter="{Binding Model}" Header="_Editar"
+                                        Icon="{md:PackIcon Kind=AccountEdit}" />
+                                    <MenuItem
+                                        Command="{Binding Data.EliminarEntityFromItemCommand, Source={StaticResource Proxy}}"
+                                        CommandParameter="{Binding Model}" Header="_Eliminar"
+                                        Icon="{md:PackIcon Kind=Delete}" />
                                     <Separator />
-                                    <MenuItem Command="{Binding Data.CambiarPasswordCommand, Source={StaticResource Proxy}}"  CommandParameter="{Binding Model}" Header="_Cambiar Contraseña" Icon="{md:PackIcon Kind=FormTextboxPassword}" />
+                                    <MenuItem
+                                        Command="{Binding Data.CambiarPasswordCommand, Source={StaticResource Proxy}}"
+                                        CommandParameter="{Binding Model}" Header="_Cambiar Contraseña"
+                                        Icon="{md:PackIcon Kind=FormTextboxPassword}" />
                                     <Separator />
-                                    <MenuItem Header="_Roles" ItemsSource="{Binding Data.EntitySelectModel.Roles, Source={StaticResource Proxy}}" Icon="{md:PackIcon Kind=ShieldAccount}">
+                                    <MenuItem Header="_Roles"
+                                              ItemsSource="{Binding Data.EntitySelect.Ref[Roles], Source={StaticResource Proxy}}"
+                                              Icon="{md:PackIcon Kind=ShieldAccount}">
                                         <MenuItem.ItemContainerStyle>
                                             <Style TargetType="MenuItem">
-                                                <Setter Property="Command" Value="{Binding Data.AsignarRolCommand, Source={StaticResource Proxy}}" />
+                                                <Setter Property="Command"
+                                                        Value="{Binding Data.AsignarRolCommand, Source={StaticResource Proxy}}" />
+                                                <Setter Property="CommandParameter" Value="{Binding}" />
                                                 <Setter Property="Header" Value="{Binding Nombre}" />
-                                                <Setter Property="IsEnabled" Value="{Binding IsAdmin, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
+                                                <Setter Property="IsEnabled"
+                                                        Value="{Binding IsAdmin, Converter={StaticResource InverseBooleanToVisibilityConverter}}" />
                                                 <Setter Property="IsCheckable" Value="False" />
-                                                <Setter Property="IsChecked" Value="{Binding IsSelect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
+                                                <Setter Property="IsChecked"
+                                                        Value="{Binding IsSelect, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" />
                                                 <Setter Property="StaysOpenOnClick" Value="True" />
                                             </Style>
                                         </MenuItem.ItemContainerStyle>
@@ -109,106 +126,90 @@
         </Grid>
 
         <GridSplitter Grid.Column="1"
-              Width="5"
-              HorizontalAlignment="Stretch"
-              ResizeBehavior="PreviousAndNext"
-              Background="{DynamicResource MaterialDesignDivider}" />
+                      Width="5"
+                      HorizontalAlignment="Stretch"
+                      ResizeBehavior="PreviousAndNext"
+                      Background="{DynamicResource MaterialDesignDivider}" />
 
+        <!--Panel Derecho-->
         <md:Card Padding="20" Margin="10" Background="{DynamicResource MaterialDesignPaper}" Grid.Column="2">
 
             <Grid>
-                <Grid.Resources>
-
-                    <!-- Label -->
-                    <Style x:Key="FieldLabel" TargetType="TextBlock">
-                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBodyLight}" />
-                        <Setter Property="FontSize" Value="12"/>
-                        <Setter Property="Margin" Value="0,10,0,0"/>
-                    </Style>
-
-                    <!-- Value -->
-                    <Style x:Key="FieldValue" TargetType="TextBlock">
-                        <Setter Property="Foreground" Value="{DynamicResource MaterialDesignBody}" />
-                        <Setter Property="FontSize" Value="15"/>
-                        <Setter Property="FontWeight" Value="SemiBold"/>
-                    </Style>
-
-                </Grid.Resources>
 
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
                 <!-- 🔹 Información principal -->
                 <Grid Grid.Row="0">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
 
-                    <!-- Columna 1 -->
-                    <StackPanel>
-                        <TextBlock Text="Nombre" Style="{StaticResource FieldLabel}"/>
-                        <TextBlock Text="{Binding EntitySelectModel.NombreCompleto}" 
-                                   Style="{StaticResource FieldValue}"/>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
 
-                        <TextBlock Text="Cédula" Style="{StaticResource FieldLabel}"/>
+                    <ContentControl Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2"
+                                    Content="{Binding EntitySelectModel.NombreCompleto}"
+                                    assist:FieldAssist.Label="Nombre:"
+                                    Style="{StaticResource FieldStyle}" />
 
-                        <TextBlock Text="{Binding EntitySelectModel.Cedula, Converter={StaticResource TextConverter}, ConverterParameter=Dni}" 
-                                   Style="{StaticResource FieldValue}"/>
-                        
-                    </StackPanel>
+                    <ContentControl Grid.Row="1" Grid.Column="0"
+                                    Content="{Binding EntitySelectModel.Cedula}" assist:FieldAssist.Label="Cedula:"
+                                    assist:FieldAssist.Format="Dni"
+                                    Style="{StaticResource FieldStyle}" />
 
-                    <!-- Columna 2 -->
-                    <StackPanel Grid.Column="1">
-                        <TextBlock Text="Teléfono" Style="{StaticResource FieldLabel}"/>
+                    <ContentControl Grid.Row="1" Grid.Column="1"
+                                    Content="{Binding EntitySelectModel.Celular}"
+                                    assist:FieldAssist.Label="Celular:" assist:FieldAssist.Format="Phone"
+                                    Style="{StaticResource FieldStyle}" />
 
-                        <TextBlock Text="{Binding EntitySelectModel.Celular, Converter={StaticResource TextConverter}, ConverterParameter=Phone}"
-                           Style="{StaticResource FieldValue}"/>
+                    <ContentControl Grid.Row="2" Grid.Column="0"
+                                    Content="{Binding EntitySelectModel.User}"
+                                    assist:FieldAssist.Label="Usuario:" assist:FieldAssist.Format="NickName"
+                                    Style="{StaticResource FieldStyle}" />
 
-                        <TextBlock Text="Nacimiento" Style="{StaticResource FieldLabel}"/>
-                        
-                        <TextBlock Text="{Binding DataContext.EntitySelect.FechaNacimiento,
-                                 RelativeSource={RelativeSource AncestorType=UserControl},
-                                 StringFormat='{}{0:dd MMM yyyy}'}"
-                           Style="{StaticResource FieldValue}"/>
-                    </StackPanel>
+
                 </Grid>
 
                 <!-- 🔹 Roles -->
                 <StackPanel Grid.Row="1" Margin="0,20,0,0">
                     <TextBlock Text="Roles"
-                       Style="{StaticResource FieldLabel}"
-                       FontSize="14"
-                       FontWeight="Bold"/>
+                               Style="{StaticResource FieldLabel}"
+                               FontSize="14"
+                               FontWeight="Bold" />
 
-                    <ItemsControl ItemsSource="{Binding EntitySelectModel.Roles}">
+                    <ItemsControl ItemsSource="{Binding EntitySelect.Ref[Roles]}">
                         <ItemsControl.ItemsPanel>
                             <ItemsPanelTemplate>
-                                <WrapPanel/>
+                                <WrapPanel />
                             </ItemsPanelTemplate>
                         </ItemsControl.ItemsPanel>
 
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
                                 <Border Margin="5"
-                                Padding="8,4"
-                                CornerRadius="12"
-                                Background="{DynamicResource MaterialDesignChipBackground}">
+                                        Padding="8,4"
+                                        CornerRadius="12"
+                                        Background="{DynamicResource MaterialDesignChipBackground}">
 
                                     <StackPanel Orientation="Horizontal">
 
                                         <!-- Normal -->
-                                        <TextBlock Text="{Binding }"
-                                           Visibility="{Binding IsClassified, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
-                                           Style="{StaticResource FieldValue}"/>
+                                        <TextBlock Text="{Binding Nombre}"
+                                                   Visibility="{Binding IsClassified, Converter={StaticResource InverseBooleanToVisibilityConverter}}"
+                                                   Style="{StaticResource FieldValue}" />
 
                                         <!-- Bloqueado -->
                                         <StackPanel Orientation="Horizontal"
-                                            Visibility="{Binding IsClassified, Converter={StaticResource BooleanToVisibilityConverter}}">
-                                            <TextBlock Text="{Binding Message}" Style="{StaticResource FieldValue}"/>
-                                            <TextBlock Text=" 🔒"/>
+                                                    Visibility="{Binding IsClassified, Converter={StaticResource BooleanToVisibilityConverter}}">
+                                            <TextBlock Text="{Binding Message}" Style="{StaticResource FieldValue}" />
+                                            <TextBlock Text=" 🔒" />
                                         </StackPanel>
 
                                     </StackPanel>
